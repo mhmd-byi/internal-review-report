@@ -1,0 +1,2878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Internal Review – Observation Template</title>
+    <style>
+        body {
+            font-family: "Bookman Old Style", "Times New Roman", serif;
+            font-size: 12pt;
+            background: radial-gradient(circle at top left, #e0f2fe 0, #f4f5f7 35%, #e5e7eb 100%);
+            margin: 20px;
+            padding-top: 40px;
+            color: #222;
+        }
+
+        .page-wrapper {
+            max-width: 1100px;
+            margin: 0 auto 40px auto;
+        }
+
+        .header-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 10px;
+            margin-bottom: 6px;
+        }
+
+        .header-titles {
+            text-align: center;
+        }
+
+        h1, h2 {
+            margin-bottom: 6px;
+        }
+
+        h1 {
+            margin-top: 4px;
+        }
+
+        h2 {
+            font-size: 16pt;
+            font-weight: 500;
+            margin-top: 2px;
+            white-space: nowrap;
+        }
+
+        .report-header {
+            margin-top: 25px !important;
+            margin-bottom: 10px;
+            font-size: 11pt;
+            color: #4b5563;
+            text-align: center;
+            padding-bottom: 4px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        @media print {
+            .report-header {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                background: #ffffff;
+                padding-top: 4px;
+                z-index: 999;
+            }
+            body {
+                margin-top: 90px;
+                padding-top: 0;
+            }
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.16);
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.45);
+            box-shadow: 0 18px 35px rgba(15, 23, 42, 0.25);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        .meta-header {
+            padding: 16px 20px;
+            margin-bottom: 18px;
+            font-size: 14px;
+        }
+        .meta-header.glass-card {
+            box-shadow: 0 12px 25px rgba(15, 23, 42, 0.18);
+        }
+
+        .meta-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 18px;
+            margin-bottom: 6px;
+        }
+
+        .meta-item {
+            min-width: 200px;
+        }
+
+        @media (min-width: 992px) {
+            .meta-row {
+                flex-wrap: nowrap;
+                align-items: flex-end;
+            }
+            .meta-item {
+                flex: 1 1 0;
+                min-width: 0;
+            }
+            .meta-item.date-item {
+                flex: 0 0 150px;
+            }
+        }
+
+        .meta-label {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .meta-input {
+            width: 100%;
+            padding: 6px 8px;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            font-size: 13px;
+            box-sizing: border-box;
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .meta-input[type="date"] {
+            padding: 5px 8px;
+        }
+
+        .toolbar {
+            padding: 10px 14px;
+            margin: 0 0 20px 0;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .toolbar.glass-card {
+            box-shadow: 0 12px 25px rgba(15, 23, 42, 0.18);
+        }
+
+        .toolbar-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .toolbar-counter {
+            font-size: 11px;
+            font-weight: 600;
+            color: #f9fafb;
+            padding: 7px 14px;
+            border-radius: 999px;
+            border: 1px solid rgba(15, 23, 42, 0.25);
+            background: rgba(12, 74, 110, 0.95);
+            box-shadow: 0 3px 6px rgba(15, 23, 42, 0.3);
+            white-space: nowrap;
+        }
+
+        .toolbar-counter span {
+            font-weight: 700;
+        }
+
+        .toolbar-location {
+            font-size: 11px;
+            font-weight: 600;
+            color: #f9fafb;
+            padding: 6px 10px;
+            border-radius: 999px;
+            border: 1px solid rgba(15,23,42,0.25);
+            background: rgba(15,23,42,0.55);
+            white-space: nowrap;
+        }
+
+        .toolbar-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .toolbar button {
+            padding: 7px 14px;
+            font-size: 12px;
+            border-radius: 999px;
+            border: 1px solid rgba(15, 23, 42, 0.2);
+            background: rgba(12, 74, 110, 0.95);
+            color: #ffffff;
+            cursor: pointer;
+            letter-spacing: 0.02em;
+        }
+
+        .toolbar button:hover {
+            background: rgba(7, 89, 133, 1);
+        }
+
+        .shortcut-hint {
+            font-size: 9px;
+            margin-left: 4px;
+            opacity: 0.8;
+        }
+
+        #printSummary {
+            display: none;
+            padding: 12px 14px;
+            margin-bottom: 20px;
+            font-size: 12px;
+        }
+        #printSummary.glass-card {
+            background: #ffffff;
+            box-shadow: none;
+            border-radius: 8px;
+        }
+
+        #printSummary h3 {
+            margin: 0 0 6px 0;
+            font-size: 14px;
+            color: #111827;
+        }
+
+        .summary-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+        }
+
+        .summary-table th,
+        .summary-table td {
+            border: 1px solid #e5e7eb;
+            padding: 3px 4px;
+            text-align: left;
+            vertical-align: middle;
+        }
+
+        .summary-table th {
+            background: #f3f4f6;
+            font-weight: 600;
+        }
+
+               .obs-list-separator {
+            border-top: 2px solid #e5e7eb;
+            margin: 16px 0;
+        }
+        .obs-global-controls {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 8px;
+            margin: 4px 0 8px 0;
+        }
+
+        .collapse-toggle-global {
+            font-weight: 500;
+        }
+
+
+        #obsContainer {
+            margin-top: 10px;
+        }
+
+        
+
+        .page-separator {
+            border: 0;
+            border-top: 1px solid #e5e7eb;
+            margin: 16px 0;
+        }
+
+        .observation-card {
+            margin-bottom: 10px;
+            overflow: hidden;
+            padding: 1px;
+            width: 100%;
+            box-sizing: border-box;
+            page-break-inside: avoid;
+            break-inside: avoid;
+        }
+        .observation-card.glass-card {
+            border-radius: 16px;
+        }
+
+        .obs-header {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 12px 18px 10px 18px;
+            background: linear-gradient(135deg, rgba(12, 74, 110, 0.92), rgba(15, 23, 42, 0.96));
+            color: #ffffff;
+        }
+
+        .obs-title-block {
+            width: 100%;
+        }
+
+        .obs-title-row {
+            width: 100%;
+        }
+
+        .obs-title-box {
+            width: 100%;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.55);
+            background: rgba(15, 23, 42, 0.18);
+            padding: 6px 8px;
+            box-sizing: border-box;
+        }
+
+        .obs-title-input {
+            width: 100%;
+            border: none;
+            background: transparent;
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: 600;
+            padding: 0;
+            margin: 0;
+            outline: none;
+            white-space: normal;
+        }
+
+        .obs-number-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 6px;
+        }
+
+        .obs-number {
+            flex: 1;
+            font-size: 13px;
+            opacity: 0.9;
+            white-space: nowrap;
+            text-align: right;
+        }
+
+        .obs-right-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .na-toggle {
+            font-size: 11px;
+            color: #fefce8;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            white-space: nowrap;
+        }
+
+        .na-toggle input[type="checkbox"] {
+            margin: 0;
+        }
+
+        .tag-label {
+            font-weight: 600;
+        }
+
+        .obs-meta-tags {
+            text-align: center;
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .meta-inline {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .meta-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(15, 23, 42, 0.18);
+            padding: 2px 8px;
+            border-radius: 999px;
+        }
+
+        .meta-pill .tag-label {
+            font-weight: 500;
+            font-size: 11px;
+        }
+
+        .risk-dropdown {
+            padding: 1px 4px;
+            font-size: 11px;
+            border-radius: 6px;
+            border: 1px solid #cbd5e1;
+        }
+
+        .obs-type-select,
+        .area-select {
+            padding: 1px 4px;
+            font-size: 11px;
+            border-radius: 4px;
+            border: 1px solid #cbd5e1;
+            background: #ffffff;
+            color: #111827;
+        }
+
+        .fin-impact-input {
+            width: 90px;
+            padding: 1px 4px;
+            font-size: 11px;
+            border-radius: 4px;
+            border: 1px solid #cbd5e1;
+            background: #ffffff;
+        }
+
+        .collapse-toggle {
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            background: rgba(15, 23, 42, 0.25);
+            padding: 2px 10px;
+            font-size: 11px;
+            color: #f9fafb;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .obs-body {
+            padding: 14px 18px 10px 18px;
+            font-size: 13px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 0 0 14px 14px;
+        }
+
+        .observation-card.collapsed .obs-body {
+            display: none;
+        }
+
+        .section-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        @media (min-width: 900px) {
+            .section-grid-two {
+                display: grid;
+                grid-template-columns: 1.5fr 1fr;
+                gap: 12px 18px;
+            }
+        }
+
+        .field-block {
+            background: rgba(249, 250, 251, 0.95);
+            border-radius: 10px;
+            padding: 10px 12px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .field-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #6b7280;
+            font-weight: 700;
+            margin-bottom: 3px;
+        }
+
+        .field-help {
+            font-size: 11px;
+            color: #9ca3af;
+            margin-bottom: 4px;
+        }
+
+        .field-note {
+            font-size: 10px;
+            color: #9ca3af;
+            margin-top: -2px;
+            margin-bottom: 6px;
+            font-style: italic;
+        }
+
+        .field-value,
+        textarea,
+        input,
+        select {
+            font-size: 13px;
+            width: 100%;
+            border: none;
+            background: transparent;
+            font-family: inherit;
+            color: #111827;
+        }
+
+        textarea {
+            min-height: 40px;
+            resize: none;
+            padding: 0;
+            outline: none;
+            overflow: hidden;
+        }
+
+        .action-plan {
+            min-height: 60px;
+        }
+
+        input[type="date"] {
+            padding: 4px 6px;
+            outline: none;
+            background: #ffffff;
+            border-radius: 4px;
+            border: none;
+            width: 100%;
+        }
+
+        .timeline-target {
+            font-size: 13pt;
+            font-weight: 700;
+        }
+
+        .status-select,
+        .resp-select {
+            padding: 4px 6px;
+            border-radius: 6px;
+            border: 1px solid #cbd5e1;
+            background: #ffffff;
+            width: 100%;
+            outline: none;
+            font-size: 13pt;
+            font-weight: 700;
+        }
+
+        .small-columns {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .small-col {
+            flex: 1 1 200px;
+        }
+
+        .footer-note {
+            font-size: 11px;
+            color: #6b7280;
+            margin-top: 4px;
+        }
+
+        .obs-separator {
+            border-top: 1px dashed #d1d5db;
+            margin: 8px 0;
+        }
+
+        .sub-field-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: #4b5563;
+            margin: 6px 0 2px 0;
+        }
+
+        .narrow-block {
+            max-width: 520px;
+        }
+
+        .dashboard {
+            padding: 14px 18px 16px 18px;
+            margin-top: 20px;
+        }
+
+        .dashboard.glass-card {
+            border-radius: 18px;
+        }
+
+        .dashboard-intro {
+            font-size: 11px;
+            color: #4b5563;
+            margin-bottom: 4px;
+            font-style: italic;
+        }
+
+        .dashboard-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .dashboard-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .dashboard-controls {
+            font-size: 11px;
+            color: #4b5563;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .dashboard-controls select {
+            font-size: 11px;
+            padding: 2px 4px;
+            border-radius: 4px;
+            border: 1px solid #cbd5e1;
+            background: rgba(255,255,255,0.9);
+        }
+
+        .dash-refresh {
+            padding: 3px 8px;
+            font-size: 11px;
+            border-radius: 999px;
+            border: 1px solid rgba(15,23,42,0.25);
+            background: rgba(255,255,255,0.85);
+            cursor: pointer;
+        }
+
+        .dash-refresh:hover {
+            background: #e5e7eb;
+        }
+
+        .kpi-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .kpi-card {
+            flex: 1 1 150px;
+            padding: 8px 10px;
+            border-radius: 12px;
+            background: rgba(249, 250, 251, 0.92);
+            border: 1px solid #e5e7eb;
+        }
+
+        .kpi-label {
+            font-size: 11px;
+            color: #6b7280;
+        }
+
+        .kpi-line {
+            margin: 2px 0;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .kpi-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: #111827;
+        }
+
+        .kpi-subtext {
+            font-size: 10px;
+            color: #6b7280;
+        }
+
+        #kpiFinImpactTotal {
+            font-size: 16pt;
+            font-weight: bold;
+            text-decoration: underline;
+        }
+
+        .dashboard-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .dashboard-grid.charts-row {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            align-items: stretch;
+        }
+
+        .dashboard-grid.charts-row .dashboard-block {
+            flex: 0 0 auto;
+        }
+
+        .dashboard-grid.charts-row .matrix-card {
+            height: 100%;
+        }
+
+
+        .dashboard-block {
+            flex: 1 1 230px;
+        }
+
+        .dashboard-block h4 {
+            font-size: 12px;
+            margin: 0 0 4px 0;
+            color: #374151;
+        }
+
+        .chart-container {
+            max-width: 180px;
+        }
+
+        .chart-legend {
+            font-size: 10px;
+            margin-top: 4px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-bottom: 1px;
+        }
+
+        .legend-color {
+            width: 9px;
+            height: 9px;
+            border-radius: 2px;
+            display: inline-block;
+        }
+
+        .chip-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 6px;
+            font-size: 10.5px;
+        }
+
+        .chip {
+            border-radius: 999px;
+            padding: 3px 8px;
+            border: 1px solid transparent;
+        }
+
+        .chip-ok {
+            background: #ecfdf3;
+            border-color: #22c55e;
+            color: #166534;
+        }
+
+        .chip-warn {
+            background: #fffbeb;
+            border-color: #fbbf24;
+            color: #92400e;
+        }
+
+        .chip-bad {
+            background: #fef2f2;
+            border-color: #ef4444;
+            color: #b91c1c;
+        }
+
+        .audit-info {
+            margin-top: 6px;
+            font-size: 10px;
+            color: #6b7280;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .timeline-table {
+            table-layout: fixed;
+        }
+
+        .timeline-table th:nth-child(1) { width: 10%; }
+        .timeline-table th:nth-child(2) { width: 16%; }
+        .timeline-table th:nth-child(3) { width: 14%; }
+        .timeline-table th:nth-child(4) { width: 15%; }
+        .timeline-table th:nth-child(5) { width: 15%; }
+        .timeline-table th:nth-child(6) { width: 30%; }
+
+        .timeline-table td {
+            word-wrap: break-word;
+            white-space: normal;
+        }
+
+        .timeline-bar-outer {
+            position: relative;
+            height: 18px;
+            background: #e5e7eb;
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .timeline-bar-inner {
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+        }
+
+        .timeline-bar-label {
+            position: absolute;
+            inset: 0;
+            font-size: 10px;
+            text-align: center;
+            line-height: 18px;
+            color: #111827;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .legend-note {
+            font-size: 10px;
+            color: #6b7280;
+            margin-top: 4px;
+        }
+
+        .legend-swatch {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 2px;
+            margin-right: 3px;
+            vertical-align: middle;
+        }
+
+        #expiryWarning {
+            font-size: 11px;
+        }
+
+        .matrix-card {
+            background: rgba(249, 250, 251, 0.96);
+            border-radius: 12px;
+            border: 1px solid #d1d5db;
+            padding: 8px 10px;
+            box-shadow: 0 4px 10px rgba(15, 23, 42, 0.12);
+            margin-bottom: 8px;
+        }
+
+        .locked-field {
+            background: #f3f4f6 !important;
+            color: #6b7280 !important;
+            border-color: #d1d5db !important;
+        }
+
+        .editable-field {
+            border-width: 3px !important;
+            border-style: solid !important;
+            background: #ffffff !important;
+            box-shadow: 0 0 0 2px rgba(148, 163, 184, 0.4);
+            transition:
+                box-shadow 0.18s ease-out,
+                transform 0.18s ease-out,
+                background-color 0.18s ease-out;
+        }
+
+        .editable-field:hover {
+            box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.35);
+            transform: translateY(-1px);
+            background-color: #f9fafb !important;
+        }
+
+        .status-open {
+            background: #F1ECF7;
+            border: 2px solid #8F7EA5;
+            color: #5E4E78;
+        }
+        .status-inprogress {
+            background: #F4ECE6;
+            border: 2px solid #6A4F3A;
+            color: #4E3A2A;
+        }
+        .status-closed {
+            background: #E8F1EE;
+            border: 2px solid #5A7F71;
+            color: #3F594E;
+        }
+
+        .status-icon {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            margin-right: 4px;
+            vertical-align: middle;
+        }
+        .status-open-icon {
+            background: #8F7EA5;
+            clip-path: polygon(
+                25% 0%,
+                75% 0%,
+                100% 50%,
+                75% 100%,
+                25% 100%,
+                0% 50%
+            );
+        }
+        .status-inprogress-icon {
+            background: #6A4F3A;
+            border-radius: 50%;
+        }
+        .status-closed-icon {
+            background: #5A7F71;
+            clip-path: polygon(
+                50% 0%,
+                100% 38%,
+                82% 100%,
+                18% 100%,
+                0% 38%
+            );
+        }
+
+        @media print {
+            .toolbar {
+                display: none;
+            }
+
+            .page-wrapper {
+                margin: 0;
+                max-width: 100%;
+            }
+
+            .observation-card {
+                box-shadow: none;
+                background: #ffffff;
+            }
+
+            .observation-card.na-card {
+                display: none !important;
+            }
+
+            .na-toggle {
+                display: none !important;
+            }
+
+            .collapse-toggle {
+                display: none !important;
+            }
+
+            .dashboard {
+                page-break-before: always;
+            }
+        }
+    </style>
+</head>
+<body onload="initialiseTemplate()">
+<div class="page-wrapper">
+
+    <div class="report-header" id="reportHeader"></div>
+
+    <div class="header-row">
+        <div class="header-titles">
+            <h1>Internal Review Report</h1>
+            <h2>Observation Summary Template</h2>
+        </div>
+    </div>
+
+    <div id="expiryWarning" class="legend-note" style="text-align:center; font-weight:600;"></div>
+
+    <div class="meta-header glass-card">
+        <div class="meta-row">
+            <div class="meta-item">
+                <div class="meta-label">School</div>
+                <input type="text" id="metaSchoolName" class="meta-input" value="MSB School">
+            </div>
+            <div class="meta-item">
+                <div class="meta-label">Location</div>
+                <input type="text" id="metaLocation" class="meta-input" value="Rajkot">
+            </div>
+            <div class="meta-item">
+                <div class="meta-label">Period of Review</div>
+                <input type="text" id="metaPeriod" class="meta-input" value="01-Apr-2024 to 31-Jan-2025">
+            </div>
+            <div class="meta-item date-item">
+                <div class="meta-label">Date of Audit</div>
+                <input type="date" id="metaAuditDate" class="meta-input">
+            </div>
+            <div class="meta-item">
+                <div class="meta-label">Prepared By</div>
+                <input type="text" id="metaPreparedBy" class="meta-input" value="Internal Audit Team">
+            </div>
+        </div>
+    </div>
+
+    <div class="toolbar glass-card">
+        <div class="toolbar-left">
+            <div class="toolbar-counter">
+                Observations: <span id="obsCounter">1</span>
+            </div>
+            <div class="toolbar-location">
+                Location: <span id="toolbarLocation">Rajkot</span>
+            </div>
+        </div>
+        <div class="toolbar-actions">
+            <button type="button" onclick="addObservationCard()">
+                Add Observation <span class="shortcut-hint">(Ctrl+Shift+A)</span>
+            </button>
+            <button type="button" onclick="exportToPDF()">
+                Export to PDF <span class="shortcut-hint">(Ctrl+Shift+P)</span>
+            </button>
+            <button type="button" onclick="exportToWord()">Export to Word</button>
+            <button type="button" onclick="saveFinalDraft()">Save Final Draft</button>
+            <button type="button" onclick="sendToManagement()">Send to Management</button>
+        </div>
+    </div>
+
+    <div id="printSummary" class="glass-card">
+        <h3>Observation Summary (Index)</h3>
+        <table class="summary-table">
+            <thead>
+            <tr>
+                <th>Observation No.</th>
+                <th>Area</th>
+                <th>Observation</th>
+                <th>Risk Category</th>
+                <th>Recommendation (Preview)</th>
+            </tr>
+            </thead>
+            <tbody id="printSummaryBody"></tbody>
+        </table>
+    </div>
+
+    <hr class="obs-list-separator">
+
+    <div class="obs-global-controls">
+        <button type="button" id="btnToggleAllObs" class="collapse-toggle collapse-toggle-global">Collapse all</button>
+    </div>
+
+    <div id="obsContainer">
+        <hr class="observation-divider">
+        <div class="observation-card glass-card">
+            <div class="obs-header">
+                <div class="obs-title-block">
+                    <div class="obs-title-row">
+                        <div class="obs-title-box">
+                            <input type="text" class="obs-title-input"
+                                   value="Minutes Register for Management Meetings is not maintained">
+                        </div>
+                    </div>
+                </div>
+                <div class="obs-number-row">
+                    <div class="obs-number">
+                        Observation No.: <span>1</span>
+                    </div>
+                    <div class="obs-right-group">
+                        <label class="na-toggle">
+                            <input type="checkbox" class="na-checkbox">
+                            Not Applicable
+                        </label>
+                        <button type="button" class="collapse-toggle">Collapse</button>
+                    </div>
+                </div>
+                <div class="obs-meta-tags">
+                    <div class="meta-inline">
+                        <div class="meta-pill">
+                            <span class="tag-label">Area:</span>
+                            <select class="area-select">
+                                <option value="" selected>Select Area</option>
+                                <option value="Fees">Fees</option>
+                                <option value="HR">HR</option>
+                                <option value="Academics">Academics</option>
+                                <option value="Infrastructure">Infrastructure</option>
+                                <option value="Compliance">Compliance</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="meta-pill">
+                            <span class="tag-label">Type:</span>
+                            <select class="obs-type-select">
+                                <option value="Financial">Financial</option>
+                                <option value="Non Financial" selected>Non Financial</option>
+                            </select>
+                        </div>
+                        <div class="meta-pill">
+                            <span class="tag-label">Risk:</span>
+                            <select class="risk-dropdown">
+                                <option value="High">High</option>
+                                <option value="Medium" selected>Medium</option>
+                                <option value="Low">Low</option>
+                            </select>
+                        </div>
+                        <div class="meta-pill fin-impact-pill" style="display:none;">
+                            <span class="tag-label">Impact (₹):</span>
+                            <input type="number" min="0" step="1" class="fin-impact-input">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="obs-body">
+                <div class="section-grid">
+
+                    <div class="field-block">
+                        <div class="field-label">Background</div>
+                        <div class="field-help">
+                            Briefly describe the current process / practice followed at the school for this area.
+                        </div>
+                        <textarea placeholder="Example: Management meetings are held monthly to discuss academic, operational, and financial matters, but no formal minutes or action trackers are maintained."></textarea>
+                    </div>
+
+                    <div class="field-block">
+                        <div class="field-label">Observation</div>
+                        <div class="field-help">
+                            Highlight the specific issue identified during the review.
+                        </div>
+                        <textarea placeholder="Example: No Minutes Register is maintained; decisions and action points are not documented, and follow-up is not tracked."></textarea>
+                    </div>
+
+                    <div class="field-block">
+                        <div class="field-label">Recommendation</div>
+                        <div class="field-help">
+                            Recommended corrective action as suggested by auditors for process improvement.
+                        </div>
+                        <textarea class="recommendation-text"
+                                  placeholder="Example: Introduce a formal Minutes Register (physical or digital) capturing decisions, responsibilities, and timelines. Review progress in each subsequent meeting."></textarea>
+                    </div>
+
+                    <div class="field-block">
+                        <div class="field-label">Implication</div>
+                        <div class="field-help">
+                            Potential qualitative / quantitative impact over operations, finances, or compliance.
+                        </div>
+                        <textarea placeholder="Example: Risk of decisions not being implemented, lack of accountability, and inability to demonstrate governance to Idarah or statutory authorities."></textarea>
+                    </div>
+
+                    <div class="field-block">
+                        <div class="field-label">Management Response</div>
+                        <div class="field-help">
+                            Structured response from management, including Action Plan.
+                        </div>
+
+                        <div class="sub-field-label">Action Plan</div>
+                        <textarea class="action-plan"
+                                  placeholder="Detail the exact steps management will take to address the observation."></textarea>
+
+                        <div class="footer-note">
+                            Suggested structure: Specific Action Plan aligned to the observation.
+                        </div>
+                    </div>
+
+                    <div class="section-grid-two">
+                        <div class="field-block narrow-block">
+                            <div class="field-label">Timelines (Tracker)</div>
+                            <div class="field-help">
+                                Due date for implementation of corrective action.
+                            </div>
+                            <div class="field-note">
+                                Target Date cannot be earlier than the Audit Date.
+                            </div>
+                            <div class="small-columns">
+                                <div class="small-col">
+                                    <span class="field-value">Target Date:</span><br>
+                                    <input type="date" class="timeline-target" required>
+                                </div>
+                                <div class="small-col">
+                                    <span class="field-value">Status (mandatory):</span><br>
+                                    <select class="status-select" required>
+                                        <option value="Open" selected>Open</option>
+                                        <option value="In-Progress">In-Progress</option>
+                                        <option value="Closed">Closed</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="field-block">
+                            <div class="field-label">Responsibility</div>
+                            <div class="field-help">
+                                Responsibility assigned for implementation of corrective action (mandatory).
+                            </div>
+                            <select class="resp-select" required>
+                                <option value="" disabled selected>Select Responsible Person</option>
+                                <option value="Principal">Principal</option>
+                                <option value="Admin Head">Admin Head</option>
+                                <option value="Accountant">Accountant</option>
+                                <option value="Management Committee">Management Committee</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="obs-separator"></div>
+                <div class="footer-note">
+                </div>
+            </div>
+        </div>
+        <hr class="page-separator">
+    </div>
+
+    <div class="dashboard glass-card">
+        <div class="dashboard-intro">
+            Internal Review Dashboard – consolidated analytics for Management overview.
+        </div>
+        <div class="dashboard-header-row">
+            <div class="dashboard-title">Dashboard Summary</div>
+            <div class="dashboard-controls">
+                <span>View:</span>
+                <select id="dashboardStatusFilter">
+                    <option value="All" selected>All Statuses</option>
+                    <option value="Open">Open Only</option>
+                    <option value="In-Progress">In-Progress Only</option>
+                    <option value="Closed">Closed Only</option>
+                </select>
+                <button type="button" class="dash-refresh" onclick="recalcSummary()">Refresh Dashboard</button>
+            </div>
+        </div>
+
+        <div class="kpi-row">
+            <div class="kpi-card">
+                <div class="kpi-label">Observations</div>
+                <h3 class="kpi-line" id="kpiObsLine1">Total Observations: 0</h3>
+                <h3 class="kpi-line" id="kpiObsLine2">High: 0 | Medium: 0 | Low: 0</h3>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Status</div>
+                <h3 class="kpi-line" id="kpiStatusLine1">Total Status Filled: 0</h3>
+                <h3 class="kpi-line" id="kpiStatusLine2">
+                    <span class="status-icon status-open-icon"></span>Open:
+                    <span id="stKpiOpen">0</span>
+                    &nbsp;|&nbsp;
+                    <span class="status-icon status-inprogress-icon"></span>In-Progress:
+                    <span id="stKpiInProg">0</span>
+                    &nbsp;|&nbsp;
+                    <span class="status-icon status-closed-icon"></span>Closed:
+                    <span id="stKpiClosed">0</span>
+                </h3>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Financial Observations</div>
+                <div class="kpi-value" id="kpiFinCount">0</div>
+                <div class="kpi-subtext">
+                    With Impact Filled: <span id="kpiFinImpactFilled">0</span>
+                </div>
+                <div class="kpi-subtext">
+                    Est. Impact (₹): <span id="kpiFinImpactTotal">₹ 0</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-grid charts-row">
+            <div class="dashboard-block">
+                <div class="matrix-card">
+                    <h4>By Observation Type</h4>
+                    <div class="chart-container">
+                        <canvas id="pieType" width="160" height="160"></canvas>
+                        <div class="chart-legend">
+                            <div class="legend-item">
+                                <span class="legend-color" style="background:#1d4ed8;"></span>
+                                Financial: <span id="countFinancial">0</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color" style="background:#22c55e;"></span>
+                                Non Financial: <span id="countNonFinancial">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="dashboard-block">
+                <div class="matrix-card">
+                    <h4>By Risk Level</h4>
+                    <div class="chart-container">
+                        <canvas id="pieRisk" width="160" height="160"></canvas>
+                        <div class="chart-legend">
+                            <div class="legend-item">
+                                <span class="legend-color" style="background:#dc2626;"></span>
+                                High: <span id="countHigh">0</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color" style="background:#facc15;"></span>
+                                Medium: <span id="countMedium">0</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color" style="background:#16a34a;"></span>
+                                Low: <span id="countLow">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="dashboard-block">
+                <div class="matrix-card">
+                    <h4>By Status</h4>
+                    <div class="chart-container">
+                        <canvas id="pieStatus" width="160" height="160"></canvas>
+                        <div class="chart-legend">
+                            <div class="legend-item">
+                                <span class="legend-color" style="background:#0ea5e9;"></span>
+                                Open: <span id="countStatusOpen">0</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color" style="background:#a855f7;"></span>
+                                In-Progress: <span id="countStatusInProg">0</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color" style="background:#22c55e;"></span>
+                                Closed: <span id="countStatusClosed">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="dashboard-block">
+                <div class="matrix-card">
+                    <h4>By Responsibility</h4>
+                    <div class="chart-container">
+                        <canvas id="pieResp" width="160" height="160"></canvas>
+                        <div class="chart-legend">
+                            <div class="legend-item">
+                                <span class="legend-color" style="background:#f97316;"></span>
+                                Principal: <span id="countRespPrincipal">0</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color" style="background:#6366f1;"></span>
+                                Admin Head: <span id="countRespAdminHead">0</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color" style="background:#14b8a6;"></span>
+                                Accountant: <span id="countRespAccountant">0</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color" style="background:#ec4899;"></span>
+                                Mgmt Committee: <span id="countRespMgmtCommittee">0</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color" style="background:#84cc16;"></span>
+                                Other: <span id="countRespOther">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-grid" style="margin-top:10px;">
+            <div class="dashboard-block">
+                <div class="matrix-card">
+                    <h4>Risk × Type Matrix</h4>
+                    <table class="summary-table">
+                        <thead>
+                        <tr>
+                            <th></th>
+                            <th>High</th>
+                            <th>Medium</th>
+                            <th>Low</th>
+                            <th>Total</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>Financial</td>
+                            <td id="mxFinHigh">0</td>
+                            <td id="mxFinMed">0</td>
+                            <td id="mxFinLow">0</td>
+                            <td id="mxFinTotal"><b>0</b></td>
+                        </tr>
+                        <tr>
+                            <td>Non Financial</td>
+                            <td id="mxNonHigh">0</td>
+                            <td id="mxNonMed">0</td>
+                            <td id="mxNonLow">0</td>
+                            <td id="mxNonTotal"><b>0</b></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <div class="legend-note">
+                        <strong>Matrix Legend:</strong>
+                        <span class="legend-swatch" style="background:#fee2e2;"></span> High Risk
+                        &nbsp;|&nbsp;
+                        <span class="legend-swatch" style="background:#fef9c3;"></span> Medium Risk
+                        &nbsp;|&nbsp;
+                        <span class="legend-swatch" style="background:#dcfce7;"></span> Low Risk
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-block">
+                <div class="matrix-card">
+                    <h4>Status × Risk Matrix</h4>
+                    <table class="summary-table">
+                        <thead>
+                        <tr>
+                            <th>Status</th>
+                            <th>High</th>
+                            <th>Medium</th>
+                            <th>Low</th>
+                            <th>Total</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>Open</td>
+                            <td id="stOpenHigh">0</td>
+                            <td id="stOpenMed">0</td>
+                            <td id="stOpenLow">0</td>
+                            <td id="stOpenTotal"><b>0</b></td>
+                        </tr>
+                        <tr>
+                            <td>In-Progress</td>
+                            <td id="stInProgHigh">0</td>
+                            <td id="stInProgMed">0</td>
+                            <td id="stInProgLow">0</td>
+                            <td id="stInProgTotal"><b>0</b></td>
+                        </tr>
+                        <tr>
+                            <td>Closed</td>
+                            <td id="stClosedHigh">0</td>
+                            <td id="stClosedMed">0</td>
+                            <td id="stClosedLow">0</td>
+                            <td id="stClosedTotal"><b>0</b></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="dashboard-block">
+                <div class="matrix-card">
+                    <h4>Responsibility × Risk Matrix</h4>
+                    <table class="summary-table">
+                        <thead>
+                        <tr>
+                            <th>Responsibility</th>
+                            <th>High</th>
+                            <th>Medium</th>
+                            <th>Low</th>
+                            <th>Total</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>Principal</td>
+                            <td id="respRskPrincipalHigh">0</td>
+                            <td id="respRskPrincipalMed">0</td>
+                            <td id="respRskPrincipalLow">0</td>
+                            <td id="respRskPrincipalTotal"><b>0</b></td>
+                        </tr>
+                        <tr>
+                            <td>Admin Head</td>
+                            <td id="respRskAdminHigh">0</td>
+                            <td id="respRskAdminMed">0</td>
+                            <td id="respRskAdminLow">0</td>
+                            <td id="respRskAdminTotal"><b>0</b></td>
+                        </tr>
+                        <tr>
+                            <td>Accountant</td>
+                            <td id="respRskAccountantHigh">0</td>
+                            <td id="respRskAccountantMed">0</td>
+                            <td id="respRskAccountantLow">0</td>
+                            <td id="respRskAccountantTotal"><b>0</b></td>
+                        </tr>
+                        <tr>
+                            <td>Management Committee</td>
+                            <td id="respRskMgmtHigh">0</td>
+                            <td id="respRskMgmtMed">0</td>
+                            <td id="respRskMgmtLow">0</td>
+                            <td id="respRskMgmtTotal"><b>0</b></td>
+                        </tr>
+                        <tr>
+                            <td>Other</td>
+                            <td id="respRskOtherHigh">0</td>
+                            <td id="respRskOtherMed">0</td>
+                            <td id="respRskOtherLow">0</td>
+                            <td id="respRskOtherTotal"><b>0</b></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-grid" style="margin-top:10px;">
+            <div class="dashboard-block">
+                <div class="matrix-card">
+                    <h4>Action Plan Documentation & Key Alerts</h4>
+                    <table class="summary-table">
+                        <tbody>
+                        <tr><th>Action Plan defined</th><td id="apComplete">0</td></tr>
+                        <tr><th>Missing Action Plan</th><td id="apMissingAP">0</td></tr>
+                        <tr><th>Missing Timeline</th><td id="apMissingTL">0</td></tr>
+                        <tr><th>Missing Responsibility</th><td id="apMissingOnus">0</td></tr>
+                        </tbody>
+                    </table>
+                    <div class="chip-row" style="margin-top:6px;">
+                        <span id="chipRisk" class="chip chip-ok">Risk load: OK</span>
+                        <span id="chipOverdue" class="chip chip-ok">Overdue: None</span>
+                        <span id="chipQuality" class="chip chip-ok">Documentation: Healthy</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-block">
+                <div class="matrix-card">
+                    <h4>Area-wise Risk Matrix</h4>
+                    <table class="summary-table">
+                        <thead>
+                        <tr>
+                            <th>Area</th>
+                            <th>High</th>
+                            <th>Medium</th>
+                            <th>Low</th>
+                            <th>Total</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>Fees</td>
+                            <td id="areaFeesHigh">0</td>
+                            <td id="areaFeesMed">0</td>
+                            <td id="areaFeesLow">0</td>
+                            <td id="areaFeesTotal">0</td>
+                        </tr>
+                        <tr>
+                            <td>HR</td>
+                            <td id="areaHRHigh">0</td>
+                            <td id="areaHRMed">0</td>
+                            <td id="areaHRLow">0</td>
+                            <td id="areaHRTotal">0</td>
+                        </tr>
+                        <tr>
+                            <td>Academics</td>
+                            <td id="areaAcademicsHigh">0</td>
+                            <td id="areaAcademicsMed">0</td>
+                            <td id="areaAcademicsLow">0</td>
+                            <td id="areaAcademicsTotal">0</td>
+                        </tr>
+                        <tr>
+                            <td>Infrastructure</td>
+                            <td id="areaInfraHigh">0</td>
+                            <td id="areaInfraMed">0</td>
+                            <td id="areaInfraLow">0</td>
+                            <td id="areaInfraTotal">0</td>
+                        </tr>
+                        <tr>
+                            <td>Compliance</td>
+                            <td id="areaComplianceHigh">0</td>
+                            <td id="areaComplianceMed">0</td>
+                            <td id="areaComplianceLow">0</td>
+                            <td id="areaComplianceTotal">0</td>
+                        </tr>
+                        <tr>
+                            <td>Other / Unspecified</td>
+                            <td id="areaOtherHigh">0</td>
+                            <td id="areaOtherMed">0</td>
+                            <td id="areaOtherLow">0</td>
+                            <td id="areaOtherTotal">0</td>
+                        </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="legend-note">
+                        Colours indicate risk intensity for each area:
+                        <span class="legend-swatch" style="background:#fee2e2;"></span> High
+                        <span class="legend-swatch" style="background:#fef9c3; margin-left:6px;"></span> Medium
+                        <span class="legend-swatch" style="background:#dcfce7; margin-left:6px;"></span> Low
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-grid" style="margin-top:10px;">
+            <div class="dashboard-block">
+                <div class="matrix-card">
+                    <h4>Observation Timelines (Target Date vs Responsibility)</h4>
+                    <table class="summary-table timeline-table">
+                        <thead>
+                        <tr>
+                            <th>Obs No.</th>
+                            <th>Target Date</th>
+                            <th>Status</th>
+                            <th>Overdue (Days)</th>
+                            <th>No. of days to go</th>
+                            <th>Timeline</th>
+                        </tr>
+                        </thead>
+                        <tbody id="obsTimelineBody"></tbody>
+                    </table>
+
+                    <div class="legend-note">
+                        <strong>Timeline Legend:</strong>
+                        ⚠ = Overdue (Target date has passed).<br>
+                        Bar length represents how far the target date lies between the earliest and latest targets
+                        (longer bar = relatively later deadline within the review window).<br>
+                        <span class="legend-swatch" style="background:#dc2626;"></span> High Risk
+                        <span class="legend-swatch" style="background:#facc15; margin-left:6px;"></span> Medium Risk
+                        <span class="legend-swatch" style="background:#16a34a; margin-left:6px;"></span> Low Risk
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="audit-info">
+            <div>Version: <strong>v1.9 – Internal Review Dashboard | Copyright &amp; Created by. CA Ahmed Ali</strong></div>
+            <div>Last Updated: <span id="dashLastUpdate">-</span></div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+function getCurrentDateISO() {
+    const now = new Date();
+    const y = now.getFullYear();
+    const m = String(now.getMonth() + 1).padStart(2, "0");
+    const d = String(now.getDate()).padStart(2, "0");
+    return y + "-" + m + "-" + d;
+}
+
+function getTargetDateFromAudit() {
+    const auditInput = document.getElementById("metaAuditDate");
+    let baseDate;
+    if (auditInput && auditInput.value) {
+        baseDate = new Date(auditInput.value + "T00:00:00");
+    } else {
+        baseDate = new Date();
+    }
+
+    // +15 days from Audit Date; if Sunday, push to Monday
+    baseDate.setDate(baseDate.getDate() + 15);
+    if (baseDate.getDay() === 0) { // Sunday
+        baseDate.setDate(baseDate.getDate() + 1);
+    }
+
+    const y = baseDate.getFullYear();
+    const m = String(baseDate.getMonth() + 1).padStart(2, "0");
+    const d = String(baseDate.getDate()).padStart(2, "0");
+    return y + "-" + m + "-" + d;
+}
+
+function formatIndianNumber(num) {
+    const n = Number(num);
+    if (isNaN(n)) return num;
+    const parts = n.toString().split(".");
+    let integer = parts[0];
+    const lastThree = integer.slice(-3);
+    const other = integer.slice(0, -3);
+    if (other !== "") {
+        integer = other.replace(/\B(?=(\d{2})+(?!\d))/g, ",") + "," + lastThree;
+    }
+    return parts.length > 1 ? integer + "." + parts[1] : integer;
+}
+
+function numberToIndianWords(num) {
+    if (!num || isNaN(num)) return "Rupees Zero Only";
+
+    const a = [
+        "", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine",
+        "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen",
+        "Sixteen", "Seventeen", "Eighteen", "Nineteen"
+    ];
+    const b = [
+        "", "", "Twenty", "Thirty", "Forty", "Fifty",
+        "Sixty", "Seventy", "Eighty", "Ninety"
+    ];
+
+    function inWords(n) {
+        if (n < 20) return a[n];
+        if (n < 100) return b[Math.floor(n / 10)] + (n % 10 ? " " + a[n % 10] : "");
+        if (n < 1000)
+            return a[Math.floor(n / 100)] + " Hundred" + (n % 100 ? " and " + inWords(n % 100) : "");
+        if (n < 100000)
+            return inWords(Math.floor(n / 1000)) + " Thousand" + (n % 1000 ? " " + inWords(n % 1000) : "");
+        if (n < 10000000)
+            return inWords(Math.floor(n / 100000)) + " Lakh" + (n % 100000 ? " " + inWords(n % 100000) : "");
+        return inWords(Math.floor(n / 10000000)) + " Crore" + (n % 10000000 ? " " + inWords(n % 10000000) : "");
+    }
+
+    return "Rupees " + inWords(num) + " Only";
+}
+
+const TEMPLATE_VALID_UNTIL = new Date("2026-03-31T23:59:59");
+
+function checkTemplateExpiry() {
+    const now = new Date();
+    const warnEl = document.getElementById("expiryWarning");
+    if (!warnEl) return;
+
+    if (now > TEMPLATE_VALID_UNTIL) {
+        warnEl.textContent =
+            "⚠ IMPORTANT: This Internal Review format is past its approved validity date. " +
+            "Reports generated after " +
+            TEMPLATE_VALID_UNTIL.toLocaleDateString() +
+            " may not comply with updated Idarah / management guidelines and should be reviewed carefully before use.";
+        warnEl.style.color = "#b91c1c";
+    } else {
+        warnEl.textContent = "";
+    }
+}
+
+function autoResizeTextarea(el) {
+    el.style.height = "auto";
+    el.style.height = el.scrollHeight + "px";
+}
+
+function initTextareas(card) {
+    card.querySelectorAll("textarea").forEach(t => {
+        autoResizeTextarea(t);
+        t.addEventListener("input", function () {
+            autoResizeTextarea(t);
+        });
+    });
+}
+
+function expandAllTextareasForPrint() {
+    document.querySelectorAll("textarea").forEach(t => {
+        t.style.height = "auto";
+        t.style.height = t.scrollHeight + "px";
+        t.style.overflow = "visible";
+        t.style.whiteSpace = "normal";
+    });
+}
+
+function applyRiskColour(card, riskValue) {
+    const header = card.querySelector(".obs-header");
+    const dropdown = card.querySelector(".risk-dropdown");
+    if (!header || !dropdown) return;
+
+    if (riskValue === "High") {
+        header.style.background = "linear-gradient(135deg,#b91c1c,#7f1d1d)";
+        dropdown.style.backgroundColor = "#fee2e2";
+        dropdown.style.color = "#b91c1c";
+    } else if (riskValue === "Medium") {
+        header.style.background = "linear-gradient(135deg,#facc15,#854d0e)";
+        dropdown.style.backgroundColor = "#fef9c3";
+        dropdown.style.color = "#854d0e";
+    } else if (riskValue === "Low") {
+        header.style.background = "linear-gradient(135deg,#16a34a,#166534)";
+        dropdown.style.backgroundColor = "#dcfce7";
+        dropdown.style.color = "#166534";
+    } else {
+        header.style.background = "linear-gradient(135deg,rgba(12,74,110,0.92),rgba(15,23,42,0.96))";
+        dropdown.style.backgroundColor = "#ffffff";
+        dropdown.style.color = "#0c4a6e";
+    }
+}
+
+function initRisk(card) {
+    const dropdown = card.querySelector(".risk-dropdown");
+    if (!dropdown) return;
+    applyRiskColour(card, dropdown.value);
+    dropdown.addEventListener("change", function () {
+        applyRiskColour(card, dropdown.value);
+        recalcSummary();
+    });
+}
+
+function updateFinancialImpactVisibility(card) {
+    const typeSel = card.querySelector(".obs-type-select");
+    const pill = card.querySelector(".fin-impact-pill");
+    if (!typeSel || !pill) return;
+    if (typeSel.value === "Financial") {
+        pill.style.display = "inline-flex";
+    } else {
+        pill.style.display = "none";
+        const inp = pill.querySelector(".fin-impact-input");
+        if (inp) inp.value = "";
+    }
+}
+
+function initType(card) {
+    const sel = card.querySelector(".obs-type-select");
+    if (!sel) return;
+    updateFinancialImpactVisibility(card);
+    sel.addEventListener("change", function () {
+        updateFinancialImpactVisibility(card);
+        recalcSummary();
+    });
+}
+
+function drawPieChart(canvasId, data, colors) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    const total = data.reduce((a, b) => a + b, 0);
+    const w = canvas.width;
+    const h = canvas.height;
+    const cx = w / 2;
+    const cy = h / 2;
+    const r = Math.min(w, h) / 2 - 5;
+
+    ctx.clearRect(0, 0, w, h);
+
+    if (total === 0) {
+        ctx.fillStyle = "#e5e7eb";
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        ctx.fill();
+        return;
+    }
+
+    let start = -Math.PI / 2;
+    data.forEach((val, i) => {
+        if (val <= 0) return;
+        const angle = (val / total) * Math.PI * 2;
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.arc(cx, cy, r, start, start + angle);
+        ctx.closePath();
+        ctx.fillStyle = colors[i];
+        ctx.fill();
+        start += angle;
+    });
+}
+
+function shouldIncludeInDashboard(card) {
+    const na = card.querySelector(".na-checkbox");
+    if (na && na.checked) return false;
+
+    const statusFilterEl = document.getElementById("dashboardStatusFilter");
+    const statusFilter = statusFilterEl ? statusFilterEl.value : "All";
+    if (statusFilter === "All") return true;
+
+    const statusSel = card.querySelector(".status-select");
+    const statusVal = statusSel ? statusSel.value : "";
+    return statusVal === statusFilter;
+}
+
+function applyMatrixColorStyles() {
+    function colorCells(ids, bg, color) {
+        ids.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.style.backgroundColor = bg;
+                el.style.color = color;
+            }
+        });
+    }
+
+    colorCells(["mxFinHigh", "mxNonHigh"], "#fee2e2", "#b91c1c");
+    colorCells(["mxFinMed", "mxNonMed"], "#fef9c3", "#854d0e");
+    colorCells(["mxFinLow", "mxNonLow"], "#dcfce7", "#166534");
+
+    const statusHighIds = ["stOpenHigh","stInProgHigh","stClosedHigh"];
+    const statusMedIds  = ["stOpenMed","stInProgMed","stClosedMed"];
+    const statusLowIds  = ["stOpenLow","stInProgLow","stClosedLow"];
+    colorCells(statusHighIds, "#fee2e2", "#b91c1c");
+    colorCells(statusMedIds,  "#fef9c3", "#854d0e");
+    colorCells(statusLowIds,  "#dcfce7", "#166534");
+
+    const highRespIds = [
+        "respRskPrincipalHigh","respRskAdminHigh","respRskAccountantHigh",
+        "respRskMgmtHigh","respRskOtherHigh"
+    ];
+    const medRespIds = [
+        "respRskPrincipalMed","respRskAdminMed","respRskAccountantMed",
+        "respRskMgmtMed","respRskOtherMed"
+    ];
+    const lowRespIds = [
+        "respRskPrincipalLow","respRskAdminLow","respRskAccountantLow",
+        "respRskMgmtLow","respRskOtherLow"
+    ];
+    colorCells(highRespIds, "#fee2e2", "#b91c1c");
+    colorCells(medRespIds,  "#fef9c3", "#854d0e");
+    colorCells(lowRespIds,  "#dcfce7", "#166534");
+
+    const areaHighIds = [
+        "areaFeesHigh","areaHRHigh","areaAcademicsHigh",
+        "areaInfraHigh","areaComplianceHigh","areaOtherHigh"
+    ];
+    const areaMedIds = [
+        "areaFeesMed","areaHRMed","areaAcademicsMed",
+        "areaInfraMed","areaComplianceMed","areaOtherMed"
+    ];
+    const areaLowIds = [
+        "areaFeesLow","areaHRLow","areaAcademicsLow",
+        "areaInfraLow","areaComplianceLow","areaOtherLow"
+    ];
+    colorCells(areaHighIds, "#fee2e2", "#b91c1c");
+    colorCells(areaMedIds,  "#fef9c3", "#854d0e");
+    colorCells(areaLowIds,  "#dcfce7", "#166534");
+}
+
+function recalcSummary() {
+    const now = new Date();
+
+    let total = 0;
+    let open = 0, inProg = 0, closed = 0, statusFilled = 0;
+    let financial = 0, nonFinancial = 0;
+    let respPrincipal = 0, respAdmin = 0, respAccountant = 0, respMgmt = 0, respOther = 0;
+    let high = 0, medium = 0, low = 0;
+
+    let fHigh = 0, fMed = 0, fLow = 0;
+    let nfHigh = 0, nfMed = 0, nfLow = 0;
+
+    let finCount = 0, finImpactFilled = 0, finImpactTotal = 0;
+
+    let apComplete = 0, apMissingAP = 0, apMissingTL = 0, apMissingOnus = 0;
+
+    const areaRisk = {
+        Fees:       { High: 0, Medium: 0, Low: 0 },
+        HR:         { High: 0, Medium: 0, Low: 0 },
+        Academics:  { High: 0, Medium: 0, Low: 0 },
+        Infrastructure: { High: 0, Medium: 0, Low: 0 },
+        Compliance: { High: 0, Medium: 0, Low: 0 },
+        Other:      { High: 0, Medium: 0, Low: 0 }
+    };
+
+    let stOpenHigh = 0, stOpenMed = 0, stOpenLow = 0;
+    let stInProgHigh = 0, stInProgMed = 0, stInProgLow = 0;
+    let stClosedHigh = 0, stClosedMed = 0, stClosedLow = 0;
+
+    let respRskPrincipalHigh = 0, respRskPrincipalMed = 0, respRskPrincipalLow = 0;
+    let respRskAdminHigh = 0, respRskAdminMed = 0, respRskAdminLow = 0;
+    let respRskAccountantHigh = 0, respRskAccountantMed = 0, respRskAccountantLow = 0;
+    let respRskMgmtHigh = 0, respRskMgmtMed = 0, respRskMgmtLow = 0;
+    let respRskOtherHigh = 0, respRskOtherMed = 0, respRskOtherLow = 0;
+
+    const timelineEntries = [];
+
+    document.querySelectorAll(".observation-card").forEach(card => {
+        if (!shouldIncludeInDashboard(card)) return;
+
+        const typeSel = card.querySelector(".obs-type-select");
+        const riskSel = card.querySelector(".risk-dropdown");
+        const respSel = card.querySelector(".resp-select");
+        const statusSel = card.querySelector(".status-select");
+        const dtInput = card.querySelector(".timeline-target");
+        const areaSel = card.querySelector(".area-select");
+        const finImpactInp = card.querySelector(".fin-impact-input");
+        const apTextarea = card.querySelector(".action-plan");
+        const numSpan = card.querySelector(".obs-number span");
+
+        const typeVal = typeSel ? typeSel.value : "";
+        const riskVal = riskSel ? riskSel.value : "";
+        const respVal = respSel ? respSel.value : "";
+        const statusVal = statusSel ? statusSel.value : "";
+        const areaVal = areaSel ? areaSel.value : "";
+        const obsNum = numSpan ? numSpan.textContent.trim() : "";
+
+        if (respVal === "Principal") respPrincipal++;
+        else if (respVal === "Admin Head") respAdmin++;
+        else if (respVal === "Accountant") respAccountant++;
+        else if (respVal === "Management Committee") respMgmt++;
+        else if (respVal === "Other") respOther++;
+
+        total++;
+
+        if (statusVal) statusFilled++;
+        if (statusVal === "Open") open++;
+        else if (statusVal === "In-Progress") inProg++;
+        else if (statusVal === "Closed") closed++;
+
+        const isFin = (typeVal === "Financial");
+        if (isFin) financial++;
+        else if (typeVal === "Non Financial") nonFinancial++;
+
+        if (riskVal === "High") high++;
+        else if (riskVal === "Medium") medium++;
+        else if (riskVal === "Low") low++;
+
+        if (isFin) {
+            if (riskVal === "High") fHigh++;
+            else if (riskVal === "Medium") fMed++;
+            else if (riskVal === "Low") fLow++;
+        } else if (typeVal === "Non Financial") {
+            if (riskVal === "High") nfHigh++;
+            else if (riskVal === "Medium") nfMed++;
+            else if (riskVal === "Low") nfLow++;
+        }
+
+        function bumpStatusRisk(status, risk) {
+            if (risk !== "High" && risk !== "Medium" && risk !== "Low") return;
+            if (status === "Open") {
+                if (risk === "High") stOpenHigh++;
+                else if (risk === "Medium") stOpenMed++;
+                else if (risk === "Low") stOpenLow++;
+            } else if (status === "In-Progress") {
+                if (risk === "High") stInProgHigh++;
+                else if (risk === "Medium") stInProgMed++;
+                else if (risk === "Low") stInProgLow++;
+            } else if (status === "Closed") {
+                if (risk === "High") stClosedHigh++;
+                else if (risk === "Medium") stClosedMed++;
+                else if (risk === "Low") stClosedLow++;
+            }
+        }
+        bumpStatusRisk(statusVal, riskVal);
+
+        function bumpRespRisk(resp, risk) {
+            if (resp === "Principal") {
+                if (risk === "High") respRskPrincipalHigh++;
+                else if (risk === "Medium") respRskPrincipalMed++;
+                else if (risk === "Low") respRskPrincipalLow++;
+            } else if (resp === "Admin Head") {
+                if (risk === "High") respRskAdminHigh++;
+                else if (risk === "Medium") respRskAdminMed++;
+                else if (risk === "Low") respRskAdminLow++;
+            } else if (resp === "Accountant") {
+                if (risk === "High") respRskAccountantHigh++;
+                else if (risk === "Medium") respRskAccountantMed++;
+                else if (risk === "Low") respRskAccountantLow++;
+            } else if (resp === "Management Committee") {
+                if (risk === "High") respRskMgmtHigh++;
+                else if (risk === "Medium") respRskMgmtMed++;
+                else if (risk === "Low") respRskMgmtLow++;
+            } else if (resp === "Other") {
+                if (risk === "High") respRskOtherHigh++;
+                else if (risk === "Medium") respRskOtherMed++;
+                else if (risk === "Low") respRskOtherLow++;
+            }
+        }
+        if (respVal && riskVal) bumpRespRisk(respVal, riskVal);
+
+        let dt = null;
+        let diffDays = null;
+        if (dtInput && dtInput.value) {
+            const tmpDt = new Date(dtInput.value + "T00:00:00");
+            if (!isNaN(tmpDt.getTime())) {
+                dt = tmpDt;
+                const diffMs = dt - now;
+                diffDays = diffMs / (1000 * 60 * 60 * 24);
+            }
+        }
+
+        timelineEntries.push({
+            obsNum,
+            dt,
+            resp: respVal,
+            risk: riskVal,
+            diffDays,
+            status: statusVal
+        });
+
+        if (isFin) {
+            finCount++;
+            if (finImpactInp && finImpactInp.value.trim() !== "") {
+                let val = Number(finImpactInp.value);
+                if (!isNaN(val)) {
+                    val = Math.round(val);
+                    finImpactInp.value = val;
+                    finImpactFilled++;
+                    finImpactTotal += val;
+                }
+            }
+        }
+
+        const hasAP = apTextarea && apTextarea.value.trim() !== "";
+        const hasMgmtTL = dtInput && dtInput.value;
+        const hasOnus = respSel && respSel.value;
+
+        if (hasAP && hasMgmtTL && hasOnus) {
+            apComplete++;
+        } else {
+            if (!hasAP) apMissingAP++;
+            if (!hasMgmtTL) apMissingTL++;
+            if (!hasOnus) apMissingOnus++;
+        }
+
+        let areaKey = areaVal;
+        if (!areaKey || !areaRisk[areaKey]) {
+            areaKey = "Other";
+        }
+        if (riskVal === "High" || riskVal === "Medium" || riskVal === "Low") {
+            areaRisk[areaKey][riskVal]++;
+        }
+    });
+
+    const obsLine1 = document.getElementById("kpiObsLine1");
+    const obsLine2 = document.getElementById("kpiObsLine2");
+    if (obsLine1) obsLine1.textContent = "Total Observations: " + total;
+    if (obsLine2) obsLine2.textContent =
+        "High: " + high + " | Medium: " + medium + " | Low: " + low;
+
+    const stLine1 = document.getElementById("kpiStatusLine1");
+    if (stLine1) stLine1.textContent = "Total Status Filled: " + statusFilled;
+
+    const stKpiOpen   = document.getElementById("stKpiOpen");
+    const stKpiInProg = document.getElementById("stKpiInProg");
+    const stKpiClosed = document.getElementById("stKpiClosed");
+
+    if (stKpiOpen)   stKpiOpen.textContent   = open;
+    if (stKpiInProg) stKpiInProg.textContent = inProg;
+    if (stKpiClosed) stKpiClosed.textContent = closed;
+
+    const stLegendOpen   = document.getElementById("countStatusOpen");
+    const stLegendInProg = document.getElementById("countStatusInProg");
+    const stLegendClosed = document.getElementById("countStatusClosed");
+
+    if (stLegendOpen)   stLegendOpen.textContent   = open;
+    if (stLegendInProg) stLegendInProg.textContent = inProg;
+    if (stLegendClosed) stLegendClosed.textContent = closed;
+
+    const finFormatted = finImpactTotal ? "₹ " + formatIndianNumber(finImpactTotal) : "₹ 0";
+    document.getElementById("kpiFinCount").textContent = finCount;
+    document.getElementById("kpiFinImpactFilled").textContent = finImpactFilled;
+    document.getElementById("kpiFinImpactTotal").innerHTML =
+        finFormatted +
+        "<br><span style='font-size:10pt; font-weight:normal; text-decoration:none;'>" +
+        numberToIndianWords(finImpactTotal || 0) +
+        "</span>";
+
+    document.getElementById("countFinancial").textContent = financial;
+    document.getElementById("countNonFinancial").textContent = nonFinancial;
+    document.getElementById("countHigh").textContent = high;
+    document.getElementById("countMedium").textContent = medium;
+    document.getElementById("countLow").textContent = low;
+
+    document.getElementById("mxFinHigh").textContent = fHigh;
+    document.getElementById("mxFinMed").textContent = fMed;
+    document.getElementById("mxFinLow").textContent = fLow;
+    document.getElementById("mxFinTotal").innerHTML = "<b>" + (fHigh + fMed + fLow) + "</b>";
+
+    document.getElementById("mxNonHigh").textContent = nfHigh;
+    document.getElementById("mxNonMed").textContent = nfMed;
+    document.getElementById("mxNonLow").textContent = nfLow;
+    document.getElementById("mxNonTotal").innerHTML = "<b>" + (nfHigh + nfMed + nfLow) + "</b>";
+
+    const setText = (id, val, bold) => {
+        const el = document.getElementById(id);
+        if (el) el.innerHTML = bold ? "<b>" + val + "</b>" : val;
+    };
+
+    let stOpenTotal = stOpenHigh + stOpenMed + stOpenLow;
+    let stInProgTotal = stInProgHigh + stInProgMed + stInProgLow;
+    let stClosedTotal = stClosedHigh + stClosedMed + stClosedLow;
+
+    setText("stOpenHigh", stOpenHigh);
+    setText("stOpenMed", stOpenMed);
+    setText("stOpenLow", stOpenLow);
+    setText("stOpenTotal", stOpenTotal, true);
+
+    setText("stInProgHigh", stInProgHigh);
+    setText("stInProgMed", stInProgMed);
+    setText("stInProgLow", stInProgLow);
+    setText("stInProgTotal", stInProgTotal, true);
+
+    setText("stClosedHigh", stClosedHigh);
+    setText("stClosedMed", stClosedMed);
+    setText("stClosedLow", stClosedLow);
+    setText("stClosedTotal", stClosedTotal, true);
+
+    function setAreaRow(prefix, data) {
+        const high = data.High || 0;
+        const med  = data.Medium || 0;
+        const low  = data.Low || 0;
+        const totalArea = high + med + low;
+        setText(prefix + "High", high);
+        setText(prefix + "Med", med);
+        setText(prefix + "Low", low);
+        setText(prefix + "Total", totalArea);
+    }
+
+    setAreaRow("areaFees", areaRisk.Fees);
+    setAreaRow("areaHR", areaRisk.HR);
+    setAreaRow("areaAcademics", areaRisk.Academics);
+    setAreaRow("areaInfra", areaRisk.Infrastructure);
+    setAreaRow("areaCompliance", areaRisk.Compliance);
+    setAreaRow("areaOther", areaRisk.Other);
+
+    setText("respRskPrincipalHigh", respRskPrincipalHigh);
+    setText("respRskPrincipalMed", respRskPrincipalMed);
+    setText("respRskPrincipalLow", respRskPrincipalLow);
+    setText("respRskPrincipalTotal", respRskPrincipalHigh + respRskPrincipalMed + respRskPrincipalLow, true);
+
+    setText("respRskAdminHigh", respRskAdminHigh);
+    setText("respRskAdminMed", respRskAdminMed);
+    setText("respRskAdminLow", respRskAdminLow);
+    setText("respRskAdminTotal", respRskAdminHigh + respRskAdminMed + respRskAdminLow, true);
+
+    setText("respRskAccountantHigh", respRskAccountantHigh);
+    setText("respRskAccountantMed", respRskAccountantMed);
+    setText("respRskAccountantLow", respRskAccountantLow);
+    setText("respRskAccountantTotal", respRskAccountantHigh + respRskAccountantMed + respRskAccountantLow, true);
+
+    setText("respRskMgmtHigh", respRskMgmtHigh);
+    setText("respRskMgmtMed", respRskMgmtMed);
+    setText("respRskMgmtLow", respRskMgmtLow);
+    setText("respRskMgmtTotal", respRskMgmtHigh + respRskMgmtMed + respRskMgmtLow, true);
+
+    setText("respRskOtherHigh", respRskOtherHigh);
+    setText("respRskOtherMed", respRskOtherMed);
+    setText("respRskOtherLow", respRskOtherLow);
+    setText("respRskOtherTotal", respRskOtherHigh + respRskOtherMed + respRskOtherLow, true);
+
+    const respLegendPrincipal  = document.getElementById("countRespPrincipal");
+    const respLegendAdmin      = document.getElementById("countRespAdminHead");
+    const respLegendAccountant = document.getElementById("countRespAccountant");
+    const respLegendMgmt       = document.getElementById("countRespMgmtCommittee");
+    const respLegendOther      = document.getElementById("countRespOther");
+
+    if (respLegendPrincipal)  respLegendPrincipal.textContent  = respPrincipal;
+    if (respLegendAdmin)      respLegendAdmin.textContent      = respAdmin;
+    if (respLegendAccountant) respLegendAccountant.textContent = respAccountant;
+    if (respLegendMgmt)       respLegendMgmt.textContent       = respMgmt;
+    if (respLegendOther)      respLegendOther.textContent      = respOther;
+
+    document.getElementById("apComplete").textContent = apComplete;
+    document.getElementById("apMissingAP").textContent = apMissingAP;
+    document.getElementById("apMissingTL").textContent = apMissingTL;
+    document.getElementById("apMissingOnus").textContent = apMissingOnus;
+
+    drawPieChart("pieType", [financial, nonFinancial], ["#1d4ed8", "#22c55e"]);
+    drawPieChart("pieRisk", [high, medium, low], ["#dc2626", "#facc15", "#16a34a"]);
+    drawPieChart("pieStatus", [open, inProg, closed], ["#0ea5e9", "#a855f7", "#22c55e"]);
+    drawPieChart("pieResp", [respPrincipal, respAdmin, respAccountant, respMgmt, respOther],
+                 ["#f97316", "#6366f1", "#14b8a6", "#ec4899", "#84cc16"]);
+
+    const chipRisk = document.getElementById("chipRisk");
+    const chipOverdue = document.getElementById("chipOverdue");
+    const chipQuality = document.getElementById("chipQuality");
+
+    chipRisk.className = "chip";
+    if (high >= 5) {
+        chipRisk.classList.add("chip-bad");
+        chipRisk.textContent = "Risk load: Many high-risk (≥5)";
+    } else if (high >= 1) {
+        chipRisk.classList.add("chip-warn");
+        chipRisk.textContent = "Risk load: Some high-risk present";
+    } else {
+        chipRisk.classList.add("chip-ok");
+        chipRisk.textContent = "Risk load: No high-risk";
+    }
+
+    let tlOverdue = 0, tlLt7 = 0, tl7to30 = 0, tlGt30 = 0;
+
+    const tbodyTL = document.getElementById("obsTimelineBody");
+    if (tbodyTL) {
+        tbodyTL.innerHTML = "";
+
+        const timelineEntriesLocal = timelineEntries.slice();
+
+        if (timelineEntriesLocal.length) {
+            timelineEntriesLocal.forEach(entry => {
+                if (entry.diffDays == null || isNaN(entry.diffDays)) return;
+                if (entry.diffDays < 0) tlOverdue++;
+                else if (entry.diffDays < 7) tlLt7++;
+                else if (entry.diffDays < 30) tl7to30++;
+                else tlGt30++;
+            });
+
+            timelineEntriesLocal.sort((a, b) => {
+                const nA = parseFloat((a.obsNum || "").replace(/[^\d.]/g, "")) || 0;
+                const nB = parseFloat((b.obsNum || "").replace(/[^\d.]/g, "")) || 0;
+                return nA - nB;
+            });
+
+            let timelineMin = null;
+            let timelineMax = null;
+            const datedEntries = timelineEntriesLocal.filter(e => e.dt && !isNaN(e.dt.getTime()));
+            datedEntries.forEach(entry => {
+                if (!timelineMin || entry.dt < timelineMin) timelineMin = entry.dt;
+                if (!timelineMax || entry.dt > timelineMax) timelineMax = entry.dt;
+            });
+            const spanMs = timelineMax && timelineMin ? (timelineMax - timelineMin || 1) : 1;
+
+            timelineEntriesLocal.forEach(entry => {
+                const tr = document.createElement("tr");
+
+                const tdObs = document.createElement("td");
+                tdObs.textContent = entry.obsNum || "-";
+
+                const tdDate = document.createElement("td");
+                tdDate.textContent = entry.dt ? entry.dt.toLocaleDateString() : "-";
+
+                const tdStatus = document.createElement("td");
+                tdStatus.textContent = entry.status || "-";
+
+                let overdueDays = 0;
+                let daysToGo = 0;
+                let diffDaysRounded = null;
+
+                if (entry.diffDays != null && !isNaN(entry.diffDays)) {
+                    diffDaysRounded = Math.round(entry.diffDays);
+
+                    if (diffDaysRounded < 0) {
+                        overdueDays = Math.abs(diffDaysRounded);
+                    } else if (diffDaysRounded > 0) {
+                        daysToGo = diffDaysRounded;
+                    }
+                }
+
+                const tdOverdue = document.createElement("td");
+                tdOverdue.textContent = overdueDays > 0 ? "⚠ " + overdueDays : "-";
+
+                const tdDaysToGo = document.createElement("td");
+                tdDaysToGo.textContent = daysToGo > 0 ? daysToGo : "-";
+
+                const tdBar = document.createElement("td");
+                const outer = document.createElement("div");
+                outer.className = "timeline-bar-outer";
+                const inner = document.createElement("div");
+                inner.className = "timeline-bar-inner";
+
+                let widthPct = 50;
+                if (entry.dt && timelineMax && timelineMin) {
+                    widthPct = Math.max(20, Math.min(100, ((entry.dt - timelineMin) / spanMs) * 100));
+                } else if (!entry.dt && timelineMax && timelineMin) {
+                    widthPct = 20;
+                }
+                inner.style.width = widthPct + "%";
+
+                let barColor = "#0ea5e9";
+                if (entry.risk === "High") barColor = "#dc2626";
+                else if (entry.risk === "Medium") barColor = "#facc15";
+                else if (entry.risk === "Low") barColor = "#16a34a";
+                inner.style.background = barColor;
+
+                const label = document.createElement("div");
+                label.className = "timeline-bar-label";
+                label.textContent = entry.resp || "";
+
+                outer.appendChild(inner);
+                outer.appendChild(label);
+                tdBar.appendChild(outer);
+
+                tr.appendChild(tdObs);
+                tr.appendChild(tdDate);
+                tr.appendChild(tdStatus);
+                tr.appendChild(tdOverdue);
+                tr.appendChild(tdDaysToGo);
+                tr.appendChild(tdBar);
+                tbodyTL.appendChild(tr);
+            });
+        }
+    }
+
+    chipOverdue.className = "chip";
+    if (tlOverdue > 0) {
+        chipOverdue.classList.add("chip-bad");
+        chipOverdue.textContent = "Overdue: " + tlOverdue + " past due";
+    } else if (tlLt7 > 0 || tl7to30 > 0 || tlGt30 > 0) {
+        chipOverdue.classList.add("chip-warn");
+        chipOverdue.textContent = "Upcoming deadlines in next 90 days";
+    } else {
+        chipOverdue.classList.add("chip-ok");
+        chipOverdue.textContent = "Overdue: None";
+    }
+
+    chipQuality.className = "chip";
+    let qualityText = "Documentation: -";
+    if (total > 0) {
+        const ratio = apComplete / total;
+        if (ratio >= 0.8) {
+            chipQuality.classList.add("chip-ok");
+            qualityText = "Documentation: Strong (≥80% fully documented)";
+        } else if (ratio >= 0.5) {
+            chipQuality.classList.add("chip-warn");
+            qualityText = "Documentation: Moderate (50–80% complete)";
+        } else {
+            chipQuality.classList.add("chip-bad");
+            qualityText = "Documentation: Weak (<50% fully documented)";
+        }
+    } else {
+        chipQuality.classList.add("chip-ok");
+        qualityText = "Documentation: No applicable observations";
+    }
+    chipQuality.textContent = qualityText;
+
+    const dashUpdate = document.getElementById("dashLastUpdate");
+    if (dashUpdate) dashUpdate.textContent = new Date().toLocaleDateString();
+
+    applyMatrixColorStyles();
+}
+
+function updateObsCounter() {
+    const counterEl = document.getElementById("obsCounter");
+    if (!counterEl) return;
+    let count = 0;
+    document.querySelectorAll(".observation-card").forEach(card => {
+        const na = card.querySelector(".na-checkbox");
+        if (na && na.checked) return;
+        count++;
+    });
+    counterEl.textContent = formatIndianNumber(count);
+}
+
+function autoNumberObservations() {
+    let idx = 0;
+    document.querySelectorAll(".observation-card").forEach(card => {
+        const numSpan = card.querySelector(".obs-number span");
+        const na = card.querySelector(".na-checkbox");
+        if (na && na.checked) {
+            if (numSpan) numSpan.textContent = "N/A";
+            card.classList.add("na-card");
+        } else {
+            card.classList.remove("na-card");
+            idx++;
+            if (numSpan) numSpan.textContent = formatIndianNumber(idx);
+        }
+    });
+    updateObsCounter();
+    recalcSummary();
+}
+
+function updateTargetDayLabel(dtInput) {
+    if (!dtInput) return;
+    const wrapper = dtInput.closest(".small-col") || dtInput.parentElement;
+    if (!wrapper) return;
+
+    let label = wrapper.querySelector(".target-day-label");
+    if (!label) {
+        label = document.createElement("div");
+        label.className = "target-day-label";
+        label.style.fontSize = "10px";
+        label.style.color = "#374151";
+        label.style.marginTop = "2px";
+        wrapper.appendChild(label);
+    }
+
+    if (!dtInput.value) {
+        label.textContent = "";
+        return;
+    }
+
+    const d = new Date(dtInput.value + "T00:00:00");
+    if (isNaN(d.getTime())) {
+        label.textContent = "";
+        return;
+    }
+
+    const days = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+    label.textContent = days[d.getDay()];
+}
+
+function initDates(card) {
+    const dt = card.querySelector(".timeline-target");
+    if (!dt) return;
+
+    const auditInput = document.getElementById("metaAuditDate");
+    const todayISO = getCurrentDateISO();
+    let minDate = todayISO;
+
+    if (auditInput && auditInput.value) {
+        const auditDateISO = auditInput.value;
+        minDate = auditDateISO > todayISO ? auditDateISO : todayISO;
+    }
+
+    dt.min = minDate;
+
+    if (!dt.value) {
+        const targetISO = getTargetDateFromAudit();
+        if (targetISO) {
+            dt.value = targetISO;
+        }
+    }
+
+    if (dt.value && dt.value < minDate) {
+        dt.value = minDate;
+    }
+
+    updateTargetDayLabel(dt);
+
+    dt.addEventListener("change", function () {
+        updateTargetDayLabel(dt);
+    });
+}
+
+function initApplicability(card) {
+    const cb = card.querySelector(".na-checkbox");
+    if (!cb) return;
+    cb.addEventListener("change", function () {
+        autoNumberObservations();
+    });
+}
+
+function initCollapse(card) {
+    const btn = card.querySelector(".collapse-toggle");
+    if (!btn) return;
+    btn.addEventListener("click", function (e) {
+        e.stopPropagation();
+        const collapsed = card.classList.toggle("collapsed");
+        btn.textContent = collapsed ? "Expand" : "Collapse";
+        updateGlobalCollapseButtonState();
+    });
+}
+
+function setAllCardsCollapsed(collapsed) {
+    const obsContainer = document.getElementById("obsContainer");
+    if (!obsContainer) return;
+    const cards = obsContainer.querySelectorAll(".observation-card");
+    cards.forEach(card => {
+        card.classList.toggle("collapsed", collapsed);
+        const btn = card.querySelector(".collapse-toggle");
+        if (btn) {
+            btn.textContent = collapsed ? "Expand" : "Collapse";
+        }
+    });
+}
+
+function areAllCardsCollapsed() {
+    const obsContainer = document.getElementById("obsContainer");
+    if (!obsContainer) return false;
+    const cards = obsContainer.querySelectorAll(".observation-card");
+    if (cards.length === 0) return false;
+    return Array.from(cards).every(card => card.classList.contains("collapsed"));
+}
+
+function updateGlobalCollapseButtonState() {
+    const globalBtn = document.getElementById("btnToggleAllObs");
+    if (!globalBtn) return;
+    const allCollapsed = areAllCardsCollapsed();
+    globalBtn.textContent = allCollapsed ? "Expand all" : "Collapse all";
+}
+function syncLocationToCards() {
+    const locInput = document.getElementById("metaLocation");
+    const loc = locInput && locInput.value ? locInput.value : "–";
+    const tl = document.getElementById("toolbarLocation");
+    if (tl) tl.textContent = loc;
+}
+
+function resetSelects(card) {
+    const status = card.querySelector(".status-select");
+    if (status) status.value = "Open";
+
+    const resp = card.querySelector(".resp-select");
+    if (resp) resp.value = "";
+
+    const typeSel = card.querySelector(".obs-type-select");
+    if (typeSel) typeSel.value = "Non Financial";
+
+    const areaSel = card.querySelector(".area-select");
+    if (areaSel) areaSel.value = "";
+}
+
+function formatHeaderDate(dateStr) {
+    if (!dateStr) return "Date of Audit";
+
+    const parts = dateStr.split("-");
+    if (parts.length !== 3) return dateStr;
+
+    const [y, m, d] = parts;
+    const dt = new Date(`${y}-${m}-${d}T00:00:00`);
+    if (isNaN(dt.getTime())) return dateStr;
+
+    const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    const days   = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+
+    const MMM = months[dt.getMonth()];
+    const DD  = String(dt.getDate()).padStart(2, "0");
+    const YYYY = dt.getFullYear();
+    const DDD  = days[dt.getDay()];
+
+    return `${MMM} ${DD}, ${YYYY} [${DDD}]`;
+}
+
+function syncHeader() {
+    const school = document.getElementById("metaSchoolName")?.value || "School";
+    const location = document.getElementById("metaLocation")?.value || "Location";
+    const auditRaw = document.getElementById("metaAuditDate")?.value || "";
+    const auditDate = formatHeaderDate(auditRaw);
+    const prepared = document.getElementById("metaPreparedBy")?.value || "Prepared By";
+    const header = document.getElementById("reportHeader");
+    if (!header) return;
+    header.textContent = `${school} | ${location} | ${auditDate} | ${prepared}`;
+}
+
+function buildPrintSummary() {
+    const tbody = document.getElementById("printSummaryBody");
+    if (!tbody) return;
+    tbody.innerHTML = "";
+
+    document.querySelectorAll(".observation-card").forEach(card => {
+        const na = card.querySelector(".na-checkbox");
+        if (na && na.checked) return;
+
+        const numSpan = card.querySelector(".obs-number span");
+        const titleInput = card.querySelector(".obs-title-input");
+        const riskSel = card.querySelector(".risk-dropdown");
+        const recTextarea = card.querySelector(".recommendation-text");
+        const areaSel = card.querySelector(".area-select");
+
+        const num = numSpan ? numSpan.textContent.trim() : "";
+        const title = titleInput ? titleInput.value.trim() : "";
+        const risk = riskSel ? riskSel.value : "";
+        let rec = recTextarea ? recTextarea.value.trim() : "";
+        if (rec.length > 230) rec = rec.slice(0, 227) + "...";
+
+        let area = areaSel ? (areaSel.value || "") : "";
+        if (!area) area = "Other / Unspecified";
+
+        const tr = document.createElement("tr");
+        const cells = [num, area, title, risk, rec];
+
+        cells.forEach((value, idx) => {
+            const td = document.createElement("td");
+            td.textContent = value;
+
+            if (idx === 3) {
+                if (value === "High") {
+                    td.style.backgroundColor = "#fee2e2";
+                    td.style.color = "#b91c1c";
+                    td.style.fontWeight = "600";
+                } else if (value === "Medium") {
+                    td.style.backgroundColor = "#fef9c3";
+                    td.style.color = "#854d0e";
+                    td.style.fontWeight = "600";
+                } else if (value === "Low") {
+                    td.style.backgroundColor = "#dcfce7";
+                    td.style.color = "#166534";
+                    td.style.fontWeight = "600";
+                }
+            }
+
+            tr.appendChild(td);
+        });
+
+        tbody.appendChild(tr);
+    });
+}
+
+function expandAllCardsForExport() {
+    document.querySelectorAll(".observation-card").forEach(card => {
+        card.classList.remove("collapsed");
+        const btn = card.querySelector(".collapse-toggle");
+        if (btn) btn.textContent = "Collapse";
+    });
+    updateGlobalCollapseButtonState();
+}
+
+function initCard(card) {
+    initTextareas(card);
+    initRisk(card);
+    initApplicability(card);
+    initType(card);
+    initDates(card);
+    initCollapse(card);
+}
+
+function addObservationCard() {
+    const obsContainer = document.getElementById("obsContainer");
+    if (!obsContainer) return;
+    const cards = obsContainer.querySelectorAll(".observation-card");
+    if (cards.length === 0) return;
+
+    const lastCard = cards[cards.length - 1];
+    const newCard = lastCard.cloneNode(true);
+
+    newCard.querySelectorAll("textarea").forEach(t => t.value = "");
+    resetSelects(newCard);
+
+    const na = newCard.querySelector(".na-checkbox");
+    if (na) na.checked = false;
+    newCard.classList.remove("na-card");
+    newCard.classList.remove("collapsed");
+
+    const collapseBtn = newCard.querySelector(".collapse-toggle");
+    if (collapseBtn) collapseBtn.textContent = "Collapse";
+
+    const riskSel = newCard.querySelector(".risk-dropdown");
+    if (riskSel) riskSel.value = "Medium";
+
+    const titleInput = newCard.querySelector(".obs-title-input");
+    if (titleInput) titleInput.value = "";
+
+    const finImpactInput = newCard.querySelector(".fin-impact-input");
+    if (finImpactInput) finImpactInput.value = "";
+
+    const divider = document.createElement("hr");
+    divider.className = "observation-divider";
+    obsContainer.appendChild(divider);
+
+    obsContainer.appendChild(newCard);
+
+    const pageSep = document.createElement("hr");
+    pageSep.className = "page-separator";
+    obsContainer.appendChild(pageSep);
+
+    initCard(newCard);
+    updateGlobalCollapseButtonState();
+    syncLocationToCards();
+    autoNumberObservations();
+
+    newCard.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function exportToPDF() {
+    expandAllCardsForExport();
+    autoNumberObservations();
+    syncHeader();
+    buildPrintSummary();
+    expandAllTextareasForPrint();
+    window.print();
+}
+
+function exportToWord() {
+    expandAllCardsForExport();
+    autoNumberObservations();
+    syncHeader();
+    buildPrintSummary();
+    expandAllTextareasForPrint();
+    const content = document.querySelector(".page-wrapper").innerHTML;
+    const preHtml = "<html xmlns:o='urn:schemas-microsoft-com:office:office' " +
+        "xmlns:w='urn:schemas-microsoft-com:office:word' " +
+        "xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Internal Review</title></head><body>";
+    const postHtml = "</body></html>";
+    const html = preHtml + content + postHtml;
+    const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "Internal_Review_Report.doc";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+}
+
+function makeHtmlFileName(suffix) {
+    const schoolEl = document.getElementById("metaSchoolName");
+    const locEl = document.getElementById("metaLocation");
+    const school = schoolEl && schoolEl.value ? schoolEl.value : "School";
+    const loc = locEl && locEl.value ? locEl.value : "Location";
+    const dateStr = getCurrentDateISO();
+    const raw = `${school} ${loc} ${dateStr} ${suffix}`;
+    const safe = raw.trim().replace(/[^a-z0-9]+/gi, "_").replace(/^_+|_+$/g, "");
+    return safe + ".html";
+}
+
+function saveFinalDraft() {
+    expandAllCardsForExport();
+    autoNumberObservations();
+    syncHeader();
+    buildPrintSummary();
+    expandAllTextareasForPrint();
+
+    const fullHtml = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+    const blob = new Blob([fullHtml], { type: "text/html" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = makeHtmlFileName("final draft");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+}
+
+function sendToManagement() {
+    expandAllCardsForExport();
+    autoNumberObservations();
+    syncHeader();
+    buildPrintSummary();
+    expandAllTextareasForPrint();
+
+    const locked = [];
+    const editableFields = [];
+    const allFields = document.querySelectorAll("input, textarea, select");
+
+    allFields.forEach(el => {
+        const isTimeline = el.classList.contains("timeline-target");
+        const isStatus = el.classList.contains("status-select");
+        const isResp = el.classList.contains("resp-select");
+        const isActionPlan = el.classList.contains("action-plan");
+
+        const editable = (isTimeline || isStatus || isResp || isActionPlan);
+
+        if (editable) {
+            el.classList.remove("locked-field");
+            el.classList.add("editable-field");
+
+            const card = el.closest(".observation-card");
+            if (card) {
+                const riskSel = card.querySelector(".risk-dropdown");
+                if (riskSel) {
+                    const risk = riskSel.value;
+                    if (risk === "High") {
+                        el.style.borderColor = "#b91c1c";
+                    } else if (risk === "Medium") {
+                        el.style.borderColor = "#ca8a04";
+                    } else if (risk === "Low") {
+                        el.style.borderColor = "#166534";
+                    }
+                }
+            }
+            editableFields.push(el);
+            return;
+        }
+
+        if (el.tagName === "TEXTAREA") {
+            locked.push({ el, attr: "readOnly", prev: el.readOnly });
+            el.readOnly = true;
+        } else if (el.tagName === "INPUT" || el.tagName === "SELECT") {
+            locked.push({ el, attr: "disabled", prev: el.disabled });
+            el.disabled = true;
+        }
+        el.classList.add("locked-field");
+    });
+
+    const fullHtml = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+    const blob = new Blob([fullHtml], { type: "text/html" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = makeHtmlFileName("for Mngt");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    locked.forEach(({ el, attr, prev }) => {
+        el[attr] = prev;
+        el.classList.remove("locked-field");
+    });
+
+    editableFields.forEach(el => {
+        el.classList.remove("editable-field");
+        el.style.borderColor = "";
+    });
+}
+
+document.addEventListener("keydown", function (e) {
+    const key = e.key.toLowerCase();
+    const mod = e.ctrlKey || e.metaKey;
+    if (mod && e.shiftKey && key === "a") {
+        e.preventDefault();
+        addObservationCard();
+    } else if (mod && e.shiftKey && key === "p") {
+        e.preventDefault();
+        exportToPDF();
+    }
+});
+
+function initialiseTemplate() {
+    const auditInput = document.getElementById("metaAuditDate");
+    if (auditInput && !auditInput.value) {
+        auditInput.value = getCurrentDateISO();
+    }
+
+    document.querySelectorAll(".observation-card").forEach(card => {
+        initCard(card);
+    });
+
+    const schoolInput = document.getElementById("metaSchoolName");
+    const locInput = document.getElementById("metaLocation");
+    const auditInput2 = document.getElementById("metaAuditDate");
+    const prepInput = document.getElementById("metaPreparedBy");
+
+    if (locInput) locInput.addEventListener("input", syncLocationToCards);
+    [schoolInput, locInput, auditInput2, prepInput].forEach(el => {
+        if (!el) return;
+        const evt = el.type === "date" ? "change" : "input";
+        el.addEventListener(evt, () => {
+            syncHeader();
+            if (el === auditInput2) {
+                const todayISO = getCurrentDateISO();
+                const auditDateISO = auditInput2.value || todayISO;
+                const minDate = auditDateISO > todayISO ? auditDateISO : todayISO;
+                const targetISO = getTargetDateFromAudit();
+
+                document.querySelectorAll(".observation-card").forEach(card => {
+                    const dt = card.querySelector(".timeline-target");
+                    if (dt) {
+                        dt.min = minDate;
+                        if (!dt.value && targetISO) {
+                            dt.value = targetISO;
+                        } else if (dt.value && dt.value < minDate) {
+                            dt.value = minDate;
+                        }
+                        updateTargetDayLabel(dt);
+                    }
+                });
+            }
+        });
+    });
+
+    const dashFilter = document.getElementById("dashboardStatusFilter");
+    if (dashFilter) dashFilter.addEventListener("change", recalcSummary);
+
+    const globalCollapseBtn = document.getElementById("btnToggleAllObs");
+    if (globalCollapseBtn) {
+        globalCollapseBtn.addEventListener("click", function () {
+            const allCollapsed = areAllCardsCollapsed();
+            setAllCardsCollapsed(!allCollapsed);
+            updateGlobalCollapseButtonState();
+        });
+    }
+
+    updateGlobalCollapseButtonState();
+    syncLocationToCards();
+    autoNumberObservations();
+    syncHeader();
+    checkTemplateExpiry();
+}
+</script>
+</body>
+</html>
