@@ -1,27 +1,51 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useReport } from '@/components/ReportContext';
 import { Button } from '@/components/ui/button';
-import { Plus, Download, Save } from 'lucide-react';
-// import html2pdf from 'html2pdf.js'; // We will import dynamically or use a wrapper
+import { Plus, Download, Save, Loader2 } from 'lucide-react';
 
 export function Toolbar() {
-    const { stats, location, addObservation } = useReport();
+    const { stats, location, addObservation, observations, schoolName, period, auditDate, preparedBy } = useReport();
+    const [isSaving, setIsSaving] = useState(false);
 
     const handleExportPDF = async () => {
-        // Dynamic import to avoid SSR issues
-        // const html2pdf = (await import('html2pdf.js')).default;
-        // const element = document.getElementById('report-container');
-        // const opt = {
-        //   margin: 10,
-        //   filename: `Internal_Review_${location}_${new Date().toISOString().split('T')[0]}.pdf`,
-        //   image: { type: 'jpeg', quality: 0.98 },
-        //   html2canvas: { scale: 2 },
-        //   jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-        // };
-        // html2pdf().set(opt).from(element).save();
         alert("PDF Export is temporarily disabled for build verification.");
+    };
+
+    const handleSave = async () => {
+        setIsSaving(true);
+        try {
+            const reportData = {
+                schoolName,
+                location,
+                period,
+                auditDate,
+                preparedBy,
+                observations
+            };
+
+            const response = await fetch('/api/reports', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(reportData),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || 'Failed to save report');
+            }
+
+            alert('Report saved successfully!');
+        } catch (error) {
+            console.error('Error saving report:', error);
+            alert('Failed to save report. Please try again.');
+        } finally {
+            setIsSaving(false);
+        }
     };
 
     return (
@@ -48,9 +72,14 @@ export function Toolbar() {
                 >
                     <Download className="w-3 h-3 mr-1" /> Export PDF
                 </Button>
-                {/* Placeholders for other actions */}
-                <Button variant="outline" className="rounded-full text-xs h-8 bg-white/80 hover:bg-white">
-                    <Save className="w-3 h-3 mr-1" /> Save Draft
+                <Button
+                    variant="outline"
+                    className="rounded-full text-xs h-8 bg-white/80 hover:bg-white"
+                    onClick={handleSave}
+                    disabled={isSaving}
+                >
+                    {isSaving ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <Save className="w-3 h-3 mr-1" />}
+                    {isSaving ? 'Saving...' : 'Save Draft'}
                 </Button>
             </div>
         </div>

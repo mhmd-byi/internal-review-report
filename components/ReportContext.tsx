@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { IObservation } from '@/models/Report';
+import { IObservation, IReport } from '@/models/Report';
 import { getCurrentDateISO, getTargetDateFromAudit } from '@/utils/dates';
 
 interface ReportContextType {
@@ -19,6 +19,7 @@ interface ReportContextType {
     addObservation: () => void;
     updateObservation: (id: string, updates: Partial<IObservation>) => void;
     deleteObservation: (id: string) => void; // Optional, if we want delete
+    loadReport: (reportData: any) => void;
     stats: {
         total: number;
         high: number;
@@ -113,6 +114,15 @@ export function ReportProvider({ children }: { children: ReactNode }) {
         }
     );
 
+    const loadReport = (reportData: IReport) => {
+        setSchoolName(reportData.schoolName);
+        setLocation(reportData.location);
+        setPeriod(reportData.period);
+        setAuditDate(new Date(reportData.auditDate).toISOString().split('T')[0]);
+        setPreparedBy(reportData.preparedBy);
+        setObservations(reportData.observations);
+    };
+
     return (
         <ReportContext.Provider
             value={{
@@ -130,6 +140,7 @@ export function ReportProvider({ children }: { children: ReactNode }) {
                 addObservation,
                 updateObservation,
                 deleteObservation,
+                loadReport,
                 stats,
             }}
         >

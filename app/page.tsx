@@ -1,14 +1,39 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { useSession, signOut } from 'next-auth/react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardContent, CardTitle, CardDescription } from '@/components/ui/card';
-import { FileText, Users, LogOut, PlusCircle } from 'lucide-react';
+import { FileText, Users, LogOut, PlusCircle, Clock, ChevronRight } from 'lucide-react';
+
+interface ReportSummary {
+    _id: string;
+    schoolName: string;
+    location: string;
+    auditDate: string;
+    createdAt: string;
+}
 
 export default function DashboardPage() {
     const sessionObj = useSession();
     const session = sessionObj?.data;
+    const [recentReports, setRecentReports] = useState<ReportSummary[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        if (session) {
+            fetch('/api/reports')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        setRecentReports(data.data.slice(0, 5)); // Show top 5
+                    }
+                })
+                .catch(err => console.error('Failed to fetch reports:', err))
+                .finally(() => setLoading(false));
+        }
+    }, [session]);
 
     return (
         <div className="min-h-screen bg-slate-50 p-8">
@@ -23,7 +48,7 @@ export default function DashboardPage() {
                     </Button>
                 </header>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
                     {/* Create Report Card */}
                     <Link href="/report" className="block group">
                         <Card className="h-full transition-all hover:shadow-lg hover:border-sky-500 cursor-pointer">
@@ -65,19 +90,43 @@ export default function DashboardPage() {
                             </Card>
                         </Link>
                     )}
+                </div>
 
-                    {/* Placeholder for future features */}
-                    <Card className="h-full opacity-50 border-dashed">
-                        <CardHeader>
-                            <CardTitle className="text-slate-400">Recent Reports</CardTitle>
-                            <CardDescription>Coming Soon</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <p className="text-sm text-slate-400">
-                                View and edit previously saved reports.
-                            </p>
-                        </CardContent>
-                    </Card>
+                {/* Recent Reports Section */}
+                <div className="space-y-6">
+                    <h2 className="text-xl font-semibold text-slate-900 flex items-center gap-2">
+                        <Clock className="w-5 h-5 text-slate-500" /> Recent Reports
+                    </h2>
+
+                    {loading ? (
+                        <p className="text-slate-500">Loading reports...</p>
+                    ) : recentReports.length > 0 ? (
+                        <div className="grid gap-4">
+                            {recentReports.map((report) => (
+                                <Link key={report._id} href={`/report?id=${report._id}`} className="block group">
+                                    <Card className="hover:shadow-md transition-all border-l-4 border-l-transparent hover:border-l-sky-500">
+                                        <CardContent className="p-6 flex items-center justify-between">
+                                            <div>
+                                                <h3 className="font-semibold text-slate-900 group-hover:text-sky-700 transition-colors">
+                                                    {report.schoolName} - {report.location}
+                                                </h3>
+                                                <p className="text-sm text-slate-500 mt-1">
+                                                    Audit Date: {new Date(report.auditDate).toLocaleDateString()}
+                                                </p>
+                                            </div>
+                                            <ChevronRight className="w-5 h-5 text-slate-400 group-hover:text-sky-500 transition-colors" />
+                                        </CardContent>
+                                    </Card>
+                                </Link>
+                            ))}
+                        </div>
+                    ) : (
+                        <Card className="bg-slate-50 border-dashed">
+                            <CardContent className="p-8 text-center text-slate-500">
+                                No reports found. Create your first report to see it here.
+                            </CardContent>
+                        </Card>
+                    )}
                 </div>
             </div>
         </div>
