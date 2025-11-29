@@ -112,31 +112,137 @@ export function ObservationCard({ observation, index }: ObservationCardProps) {
 
     if (isNA) {
         return (
-            <div className="hidden print:hidden">
-                <div className="mb-4 p-2 bg-gray-100 rounded flex justify-between items-center opacity-60">
-                    <span className="text-xs font-bold">Observation {index + 1} (N/A)</span>
-                    <label className="flex items-center gap-2 text-xs cursor-pointer">
+            <div className="mb-6 print:hidden">
+                <div className="p-4 bg-slate-100 border border-slate-200 rounded-lg flex justify-between items-center opacity-75 hover:opacity-100 transition-opacity">
+                    <div className="flex items-center gap-3">
+                        <span className="text-sm font-bold text-slate-500">Observation {index + 1}</span>
+                        <span className="text-xs bg-slate-200 text-slate-600 px-2 py-0.5 rounded-full font-medium">Not Applicable</span>
+                    </div>
+                    <label className="flex items-center gap-2 text-sm cursor-pointer text-slate-600 hover:text-slate-900">
                         <input
                             type="checkbox"
                             checked={isNA}
                             onChange={(e) => handleUpdate('isNA', e.target.checked)}
+                            className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
                         />
-                        Not Applicable
+                        Mark as Applicable
                     </label>
                 </div>
             </div>
         );
     }
 
+    if (isCollapsed) {
+        return (
+            <Card
+                className="mb-4 border-slate-200 shadow-sm hover:shadow-md transition-all cursor-pointer group"
+                onClick={() => setIsCollapsed(false)}
+            >
+                <div className={cn("p-3 flex items-center justify-between bg-gradient-to-r rounded-lg", getRiskColor(risk))}>
+                    <div className="flex items-center gap-4 text-white">
+                        <span className="font-bold text-sm bg-white/20 w-6 h-6 flex items-center justify-center rounded-full">
+                            {index + 1}
+                        </span>
+                        <span className="font-semibold text-sm truncate max-w-[300px] md:max-w-[500px]">
+                            {title || 'Untitled Observation'}
+                        </span>
+                        {area && (
+                            <span className="hidden md:inline-block text-xs bg-white/10 px-2 py-0.5 rounded text-white/90 border border-white/10">
+                                {area}
+                            </span>
+                        )}
+                    </div>
+                    <div className="flex items-center gap-3">
+                        <span className="text-xs px-2 py-0.5 rounded font-bold bg-white/20 text-white border border-white/10">
+                            {risk}
+                        </span>
+                        <span className="hidden md:inline text-xs text-white/80 font-medium">
+                            {status}
+                        </span>
+                        <div className="text-white/70 group-hover:text-white transition-colors">
+                            <span className="text-xs font-medium">Expand</span>
+                        </div>
+                    </div>
+                </div>
+            </Card>
+        );
+    }
+
     return (
-        <Card className={cn("mb-6 border-slate-200 shadow-lg overflow-hidden transition-all", isCollapsed ? "h-[60px]" : "")}>
-            <div className={cn("p-3 text-white bg-gradient-to-br", getRiskColor(risk))}>
-                <div className="flex flex-col gap-2">
-                    {/* Title Row - NOW A DROPDOWN OR INPUT */}
-                    <div className="w-full relative">
+        <Card className="mb-6 border-slate-200 shadow-lg overflow-hidden transition-all">
+            {/* Header Section */}
+            <div className={cn("p-4 text-white bg-gradient-to-r", getRiskColor(risk))}>
+                <div className="flex flex-col gap-4">
+
+                    {/* Top Row: Area & Meta */}
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                        {/* Area Selector */}
+                        <div className="flex-1 min-w-[200px]">
+                            <label className="text-[10px] uppercase tracking-wider font-bold text-white/70 mb-1 block">Area</label>
+                            <select
+                                className="w-full bg-white/10 border border-white/20 rounded px-3 py-2 text-sm text-white font-medium focus:outline-none focus:bg-white/20 focus:border-white/50 transition-colors cursor-pointer"
+                                value={area}
+                                onChange={(e) => handleUpdate('area', e.target.value)}
+                            >
+                                <option value="" className="text-slate-800">Select Area...</option>
+                                {availableAreas.map(a => (
+                                    <option key={a} value={a} className="text-slate-800">{a}</option>
+                                ))}
+                                <option value="Other" className="text-slate-800">Other</option>
+                            </select>
+                        </div>
+
+                        {/* Metadata Badges */}
+                        <div className="flex flex-wrap items-center gap-3">
+                            {/* Risk Badge */}
+                            <div className="flex flex-col">
+                                <label className="text-[10px] uppercase tracking-wider font-bold text-white/70 mb-1 block">Risk Level</label>
+                                <select
+                                    className={cn("h-[38px] rounded px-3 text-xs font-bold border-none focus:ring-0 cursor-pointer shadow-sm", getRiskBg(risk))}
+                                    value={risk}
+                                    onChange={(e) => handleUpdate('risk', e.target.value as any)}
+                                >
+                                    <option value="High">High Risk</option>
+                                    <option value="Medium">Medium Risk</option>
+                                    <option value="Low">Low Risk</option>
+                                </select>
+                            </div>
+
+                            {/* Type Badge */}
+                            <div className="flex flex-col">
+                                <label className="text-[10px] uppercase tracking-wider font-bold text-white/70 mb-1 block">Type</label>
+                                <select
+                                    className="h-[38px] bg-white/10 border border-white/20 rounded px-3 text-xs text-white font-medium focus:outline-none focus:bg-white/20 cursor-pointer"
+                                    value={type}
+                                    onChange={(e) => handleUpdate('type', e.target.value as any)}
+                                >
+                                    <option value="Financial" className="text-slate-800">Financial</option>
+                                    <option value="Non Financial" className="text-slate-800">Non-Financial</option>
+                                </select>
+                            </div>
+
+                            {/* Financial Impact */}
+                            {type === 'Financial' && (
+                                <div className="flex flex-col">
+                                    <label className="text-[10px] uppercase tracking-wider font-bold text-white/70 mb-1 block">Impact (₹)</label>
+                                    <input
+                                        type="number"
+                                        className="h-[38px] w-24 bg-white text-slate-900 rounded px-3 text-sm font-bold border-none focus:ring-0 shadow-sm"
+                                        placeholder="0.00"
+                                        value={financialImpact || ''}
+                                        onChange={(e) => handleUpdate('financialImpact', e.target.value)}
+                                    />
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Title Row */}
+                    <div className="w-full">
+                        <label className="text-[10px] uppercase tracking-wider font-bold text-white/70 mb-1 block">Observation Title</label>
                         {filteredTitles.length > 0 ? (
                             <select
-                                className="w-full bg-slate-900/20 border border-white/40 rounded px-2 py-1 text-white font-semibold focus:outline-none focus:bg-slate-900/40 appearance-none cursor-pointer"
+                                className="w-full bg-white/10 border border-white/20 rounded px-3 py-2 text-lg text-white font-semibold focus:outline-none focus:bg-white/20 focus:border-white/50 transition-colors cursor-pointer appearance-none"
                                 value={title}
                                 onChange={handleTitleChange}
                             >
@@ -149,91 +255,36 @@ export function ObservationCard({ observation, index }: ObservationCardProps) {
                         ) : (
                             <input
                                 type="text"
-                                className="w-full bg-slate-900/20 border border-white/40 rounded px-2 py-1 text-white font-semibold placeholder:text-white/50 focus:outline-none focus:bg-slate-900/40"
-                                placeholder="Observation Title..."
+                                className="w-full bg-white/10 border border-white/20 rounded px-3 py-2 text-lg text-white font-semibold placeholder:text-white/40 focus:outline-none focus:bg-white/20 focus:border-white/50 transition-colors"
+                                placeholder="Enter Observation Title..."
                                 value={title}
                                 onChange={(e) => handleUpdate('title', e.target.value)}
                             />
                         )}
                     </div>
 
-                    {/* Meta Row */}
-                    <div className="flex items-center justify-between mt-1">
-                        <div className="text-sm font-medium opacity-90">
-                            Observation No.: <span>{index + 1}</span>
+                    {/* Controls Row */}
+                    <div className="flex items-center justify-between pt-2 border-t border-white/10">
+                        <div className="text-xs font-medium text-white/80">
+                            Observation #{index + 1}
                         </div>
                         <div className="flex items-center gap-4">
-                            <label className="flex items-center gap-1 text-xs text-yellow-50 cursor-pointer">
+                            <label className="flex items-center gap-2 text-xs text-white/90 cursor-pointer hover:text-white transition-colors">
                                 <input
                                     type="checkbox"
                                     checked={isNA}
                                     onChange={(e) => handleUpdate('isNA', e.target.checked)}
-                                    className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                                    className="rounded border-white/30 bg-white/10 text-indigo-500 focus:ring-offset-0 focus:ring-1 focus:ring-white/50"
                                 />
-                                Not Applicable
+                                Mark as N/A
                             </label>
                             <button
                                 onClick={() => setIsCollapsed(!isCollapsed)}
-                                className="text-xs bg-white/20 hover:bg-white/30 px-3 py-0.5 rounded-full border border-white/40 transition-colors"
+                                className="text-xs bg-white/10 hover:bg-white/20 px-4 py-1 rounded-full border border-white/20 transition-all font-medium"
                             >
                                 {isCollapsed ? 'Expand' : 'Collapse'}
                             </button>
                         </div>
-                    </div>
-
-                    {/* Tags Row */}
-                    <div className="flex flex-wrap gap-2 justify-center mt-1 text-xs text-slate-800">
-                        <div className="flex items-center gap-1 bg-slate-900/20 px-2 py-0.5 rounded-full text-white">
-                            <span className="font-medium">Area:</span>
-                            <select
-                                className="bg-white text-slate-900 rounded px-1 py-0.5 text-xs border-none focus:ring-0 cursor-pointer max-w-[150px]"
-                                value={area}
-                                onChange={(e) => handleUpdate('area', e.target.value)}
-                            >
-                                <option value="">Select Area</option>
-                                {availableAreas.map(a => (
-                                    <option key={a} value={a}>{a}</option>
-                                ))}
-                                <option value="Other">Other</option>
-                            </select>
-                        </div>
-
-                        <div className="flex items-center gap-1 bg-slate-900/20 px-2 py-0.5 rounded-full text-white">
-                            <span className="font-medium">Type:</span>
-                            <select
-                                className="bg-white text-slate-900 rounded px-1 py-0.5 text-xs border-none focus:ring-0 cursor-pointer"
-                                value={type}
-                                onChange={(e) => handleUpdate('type', e.target.value as any)}
-                            >
-                                <option value="Financial">Financial</option>
-                                <option value="Non Financial">Non Financial</option>
-                            </select>
-                        </div>
-
-                        <div className="flex items-center gap-1 bg-slate-900/20 px-2 py-0.5 rounded-full text-white">
-                            <span className="font-medium">Risk:</span>
-                            <select
-                                className={cn("rounded px-1 py-0.5 text-xs border-none focus:ring-0 cursor-pointer font-semibold", getRiskBg(risk))}
-                                value={risk}
-                                onChange={(e) => handleUpdate('risk', e.target.value as any)}
-                            >
-                                <option value="High">High</option>
-                                <option value="Medium">Medium</option>
-                                <option value="Low">Low</option>
-                            </select>
-                        </div>
-
-                        {type === 'Financial' && (
-                            <div className="flex items-center gap-1 bg-slate-900/20 px-2 py-0.5 rounded-full text-white">
-                                <span className="font-medium">Impact (₹):</span>
-                                <input
-                                    type="number"
-                                    className="w-20 bg-white text-slate-900 rounded px-1 py-0.5 text-xs border-none focus:ring-0"
-                                    value={financialImpact || ''}
-                                    onChange={(e) => handleUpdate('financialImpact', e.target.value)}
-                                />
-                            </div>
-                        )}
                     </div>
                 </div>
             </div>
