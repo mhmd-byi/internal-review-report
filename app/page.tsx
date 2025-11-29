@@ -71,24 +71,45 @@ export default function DashboardPage() {
 
                     {/* Admin: Manage Users */}
                     {session?.user?.role === 'admin' && (
-                        <Link href="/admin/users" className="block group">
-                            <Card className="h-full transition-all hover:shadow-lg hover:border-purple-500 cursor-pointer">
-                                <CardHeader>
-                                    <CardTitle className="flex items-center gap-2 group-hover:text-purple-600 transition-colors">
-                                        <Users className="w-5 h-5" /> Manage Users
-                                    </CardTitle>
-                                    <CardDescription>Admin User Management</CardDescription>
-                                </CardHeader>
-                                <CardContent>
-                                    <div className="bg-purple-50 rounded-full w-12 h-12 flex items-center justify-center mb-4 group-hover:bg-purple-100 transition-colors">
-                                        <Users className="w-6 h-6 text-purple-600" />
-                                    </div>
-                                    <p className="text-sm text-slate-600">
-                                        Create new users, manage existing accounts, and assign roles.
-                                    </p>
-                                </CardContent>
-                            </Card>
-                        </Link>
+                        <>
+                            <Link href="/admin/users" className="block group">
+                                <Card className="h-full transition-all hover:shadow-lg hover:border-purple-500 cursor-pointer">
+                                    <CardHeader>
+                                        <CardTitle className="flex items-center gap-2 group-hover:text-purple-600 transition-colors">
+                                            <Users className="w-5 h-5" /> Manage Users
+                                        </CardTitle>
+                                        <CardDescription>Admin User Management</CardDescription>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <div className="bg-purple-50 rounded-full w-12 h-12 flex items-center justify-center mb-4 group-hover:bg-purple-100 transition-colors">
+                                            <Users className="w-6 h-6 text-purple-600" />
+                                        </div>
+                                        <p className="text-sm text-slate-600">
+                                            Create new users, manage existing accounts, and assign roles.
+                                        </p>
+                                    </CardContent>
+                                </Card>
+                            </Link>
+
+                            <Link href="/admin/templates" className="block group">
+                                <Card className="h-full transition-all hover:shadow-lg hover:border-indigo-500 cursor-pointer">
+                                    <CardHeader>
+                                        <CardTitle className="flex items-center gap-2 group-hover:text-indigo-600 transition-colors">
+                                            <FileText className="w-5 h-5" /> Manage Templates
+                                        </CardTitle>
+                                        <CardDescription>Observation Templates</CardDescription>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <div className="bg-indigo-50 rounded-full w-12 h-12 flex items-center justify-center mb-4 group-hover:bg-indigo-100 transition-colors">
+                                            <FileText className="w-6 h-6 text-indigo-600" />
+                                        </div>
+                                        <p className="text-sm text-slate-600">
+                                            Add and edit observation templates for auto-population.
+                                        </p>
+                                    </CardContent>
+                                </Card>
+                            </Link>
+                        </>
                     )}
                 </div>
 

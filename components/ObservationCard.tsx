@@ -19,6 +19,9 @@ interface ObservationCardProps {
 export function ObservationCard({ observation, index }: ObservationCardProps) {
     const { updateObservation, deleteObservation, auditDate } = useReport();
     const [isCollapsed, setIsCollapsed] = useState(false);
+    const [templates, setTemplates] = useState<any[]>([]);
+    const [availableAreas, setAvailableAreas] = useState<string[]>([]);
+    const [filteredTitles, setFilteredTitles] = useState<any[]>([]);
 
     const {
         id,
@@ -38,6 +41,29 @@ export function ObservationCard({ observation, index }: ObservationCardProps) {
         responsibility,
     } = observation;
 
+    useEffect(() => {
+        // Fetch templates on mount
+        fetch('/api/templates')
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    setTemplates(data.data);
+                    const areas = Array.from(new Set(data.data.map((t: any) => t.area)));
+                    setAvailableAreas(areas as string[]);
+                }
+            })
+            .catch(err => console.error('Failed to fetch templates:', err));
+    }, []);
+
+    useEffect(() => {
+        if (area) {
+            const titles = templates.filter(t => t.area === area);
+            setFilteredTitles(titles);
+        } else {
+            setFilteredTitles([]);
+        }
+    }, [area, templates]);
+
     // Auto-set target date if empty
     useEffect(() => {
         if (!targetDate && !isNA) {
@@ -48,6 +74,22 @@ export function ObservationCard({ observation, index }: ObservationCardProps) {
 
     const handleUpdate = (field: keyof IObservation, value: any) => {
         updateObservation(id, { [field]: value });
+    };
+
+    const handleTitleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const selectedTitle = e.target.value;
+        if (selectedTitle === 'custom') {
+            handleUpdate('title', '');
+            return;
+        }
+
+        const template = templates.find(t => t.title === selectedTitle && t.area === area);
+
+        handleUpdate('title', selectedTitle);
+        if (template) {
+            handleUpdate('risk', template.risk);
+            handleUpdate('actionPlan', template.actionPlan);
+        }
     };
 
     const getRiskColor = (r: string) => {
@@ -71,8 +113,6 @@ export function ObservationCard({ observation, index }: ObservationCardProps) {
     if (isNA) {
         return (
             <div className="hidden print:hidden">
-                {/* Hidden in UI if NA, or maybe just collapsed? Original hides it mostly but keeps it in DOM */}
-                {/* Let's show a small bar if NA so user can uncheck it */}
                 <div className="mb-4 p-2 bg-gray-100 rounded flex justify-between items-center opacity-60">
                     <span className="text-xs font-bold">Observation {index + 1} (N/A)</span>
                     <label className="flex items-center gap-2 text-xs cursor-pointer">
@@ -92,15 +132,29 @@ export function ObservationCard({ observation, index }: ObservationCardProps) {
         <Card className={cn("mb-6 border-slate-200 shadow-lg overflow-hidden transition-all", isCollapsed ? "h-[60px]" : "")}>
             <div className={cn("p-3 text-white bg-gradient-to-br", getRiskColor(risk))}>
                 <div className="flex flex-col gap-2">
-                    {/* Title Row */}
-                    <div className="w-full">
-                        <input
-                            type="text"
-                            className="w-full bg-slate-900/20 border border-white/40 rounded px-2 py-1 text-white font-semibold placeholder:text-white/50 focus:outline-none focus:bg-slate-900/40"
-                            placeholder="Observation Title..."
-                            value={title}
-                            onChange={(e) => handleUpdate('title', e.target.value)}
-                        />
+                    {/* Title Row - NOW A DROPDOWN OR INPUT */}
+                    <div className="w-full relative">
+                        {filteredTitles.length > 0 ? (
+                            <select
+                                className="w-full bg-slate-900/20 border border-white/40 rounded px-2 py-1 text-white font-semibold focus:outline-none focus:bg-slate-900/40 appearance-none cursor-pointer"
+                                value={title}
+                                onChange={handleTitleChange}
+                            >
+                                <option value="" className="text-slate-800">Select Observation Title...</option>
+                                {filteredTitles.map(t => (
+                                    <option key={t._id} value={t.title} className="text-slate-800">{t.title}</option>
+                                ))}
+                                <option value="custom" className="text-slate-800 font-bold">-- Custom Title --</option>
+                            </select>
+                        ) : (
+                            <input
+                                type="text"
+                                className="w-full bg-slate-900/20 border border-white/40 rounded px-2 py-1 text-white font-semibold placeholder:text-white/50 focus:outline-none focus:bg-slate-900/40"
+                                placeholder="Observation Title..."
+                                value={title}
+                                onChange={(e) => handleUpdate('title', e.target.value)}
+                            />
+                        )}
                     </div>
 
                     {/* Meta Row */}
@@ -132,16 +186,14 @@ export function ObservationCard({ observation, index }: ObservationCardProps) {
                         <div className="flex items-center gap-1 bg-slate-900/20 px-2 py-0.5 rounded-full text-white">
                             <span className="font-medium">Area:</span>
                             <select
-                                className="bg-white text-slate-900 rounded px-1 py-0.5 text-xs border-none focus:ring-0 cursor-pointer"
+                                className="bg-white text-slate-900 rounded px-1 py-0.5 text-xs border-none focus:ring-0 cursor-pointer max-w-[150px]"
                                 value={area}
                                 onChange={(e) => handleUpdate('area', e.target.value)}
                             >
                                 <option value="">Select Area</option>
-                                <option value="Fees">Fees</option>
-                                <option value="HR">HR</option>
-                                <option value="Academics">Academics</option>
-                                <option value="Infrastructure">Infrastructure</option>
-                                <option value="Compliance">Compliance</option>
+                                {availableAreas.map(a => (
+                                    <option key={a} value={a}>{a}</option>
+                                ))}
                                 <option value="Other">Other</option>
                             </select>
                         </div>
