@@ -14,6 +14,7 @@ interface User {
     name: string;
     email: string;
     role: string;
+    responsibility?: string;
 }
 
 export default function AdminUsersPage() {
@@ -27,6 +28,7 @@ export default function AdminUsersPage() {
         phone: '',
         password: '',
         role: 'user',
+        responsibility: '',
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -78,7 +80,7 @@ export default function AdminUsersPage() {
             }
 
             setSuccess('User created successfully');
-            setFormData({ name: '', email: '', phone: '', password: '', role: 'user' });
+            setFormData({ name: '', email: '', phone: '', password: '', role: 'user', responsibility: '' });
             fetchUsers(); // Refresh list
         } catch (err: any) {
             setError(err.message);
@@ -125,6 +127,17 @@ export default function AdminUsersPage() {
                                         </Select>
                                     </div>
                                     <div className="space-y-2">
+                                        <label className="text-sm font-medium">Responsibility</label>
+                                        <Select name="responsibility" value={formData.responsibility} onChange={handleChange}>
+                                            <option value="">Select Responsibility</option>
+                                            <option value="Principal">Principal</option>
+                                            <option value="Admin Head">Admin Head</option>
+                                            <option value="Accountant">Accountant</option>
+                                            <option value="Management Committee">Management Committee</option>
+                                            <option value="Other">Other</option>
+                                        </Select>
+                                    </div>
+                                    <div className="space-y-2">
                                         <label className="text-sm font-medium">Password</label>
                                         <Input name="password" type="password" value={formData.password} onChange={handleChange} required />
                                     </div>
@@ -153,12 +166,13 @@ export default function AdminUsersPage() {
                                                 <th className="text-left p-3 font-medium text-slate-500">Name</th>
                                                 <th className="text-left p-3 font-medium text-slate-500">Email</th>
                                                 <th className="text-left p-3 font-medium text-slate-500">Role</th>
+                                                <th className="text-left p-3 font-medium text-slate-500">Responsibility</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             {users.length === 0 ? (
                                                 <tr>
-                                                    <td colSpan={3} className="p-4 text-center text-slate-500">No users found</td>
+                                                    <td colSpan={4} className="p-4 text-center text-slate-500">No users found</td>
                                                 </tr>
                                             ) : (
                                                 users.map((user) => (
@@ -171,6 +185,7 @@ export default function AdminUsersPage() {
                                                                 {user.role}
                                                             </span>
                                                         </td>
+                                                        <td className="p-3">{user.responsibility || '-'}</td>
                                                     </tr>
                                                 ))
                                             )}

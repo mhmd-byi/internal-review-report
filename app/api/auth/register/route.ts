@@ -6,7 +6,7 @@ import User from '@/models/User';
 export async function POST(request: Request) {
     try {
         await dbConnect();
-        const { name, email, phone, password, role } = await request.json();
+        const { name, email, phone, password, role, responsibility } = await request.json();
 
         if (!name || !email || !phone || !password) {
             return NextResponse.json(
@@ -31,6 +31,7 @@ export async function POST(request: Request) {
             phone,
             password: hashedPassword,
             role: role || 'user',
+            responsibility: responsibility || '',
         });
 
         return NextResponse.json(

@@ -6,6 +6,7 @@ export interface IUser extends Document {
     phone: string;
     password?: string;
     role: 'admin' | 'user';
+    responsibility?: string;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -16,6 +17,7 @@ const UserSchema = new Schema<IUser>({
     phone: { type: String, required: true },
     password: { type: String, required: true },
     role: { type: String, enum: ['admin', 'user'], default: 'user' },
+    responsibility: { type: String },
 }, { timestamps: true });
 
 // Prevent overwrite model error
