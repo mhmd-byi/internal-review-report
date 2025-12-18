@@ -30,6 +30,11 @@ interface ReportContextType {
         closed: number;
         financialCount: number;
         financialImpact: number;
+        responsibilityMatrix: Record<string, { High: number; Medium: number; Low: number }>;
+        statusMatrix: Record<string, { High: number; Medium: number; Low: number }>;
+        areaMatrix: Record<string, { High: number; Medium: number; Low: number }>;
+        timelineBands: { overdue: number; day0_7: number; day8_15: number; day16_30: number; day30p: number };
+        quality: { complete: number; missingAP: number; missingTL: number; missingResp: number };
     };
 }
 
@@ -44,8 +49,10 @@ export function ReportProvider({ children }: { children: ReactNode }) {
     const [observations, setObservations] = useState<IObservation[]>([]);
 
     // Initialize with one observation
+    const initialized = React.useRef(false);
     useEffect(() => {
-        if (observations.length === 0) {
+        if (!initialized.current && observations.length === 0) {
+            initialized.current = true;
             addObservation();
         }
     }, []);
@@ -85,20 +92,84 @@ export function ReportProvider({ children }: { children: ReactNode }) {
         (acc, obs) => {
             if (obs.isNA) return acc;
             acc.total++;
+
+            // Risk Counts
             if (obs.risk === 'High') acc.high++;
-            if (obs.risk === 'Medium') acc.medium++;
-            if (obs.risk === 'Low') acc.low++;
+            else if (obs.risk === 'Medium') acc.medium++;
+            else if (obs.risk === 'Low') acc.low++;
 
+            // Status Counts
             if (obs.status === 'Open') acc.open++;
-            if (obs.status === 'In-Progress') acc.inProgress++;
-            if (obs.status === 'Closed') acc.closed++;
+            else if (obs.status === 'In-Progress') acc.inProgress++;
+            else if (obs.status === 'Closed') acc.closed++;
 
+            // Financial Impact
             if (obs.type === 'Financial') {
                 acc.financialCount++;
                 if (obs.financialImpact) {
                     acc.financialImpact += Number(obs.financialImpact);
                 }
             }
+
+            // --- v47 New Matrices & Logic ---
+
+            // 1. Responsibility x Risk
+            const resp = obs.responsibility || 'Other';
+            if (!acc.responsibilityMatrix[resp]) {
+                acc.responsibilityMatrix[resp] = { High: 0, Medium: 0, Low: 0 };
+            }
+            if (obs.risk) acc.responsibilityMatrix[resp][obs.risk]++;
+
+            // 2. Status x Risk
+            const st = obs.status || 'Open';
+            if (!acc.statusMatrix[st]) {
+                acc.statusMatrix[st] = { High: 0, Medium: 0, Low: 0 };
+            }
+            if (obs.risk) acc.statusMatrix[st][obs.risk]++;
+
+            // 3. Area x Risk
+            const area = obs.area || 'Other';
+            if (!acc.areaMatrix[area]) {
+                acc.areaMatrix[area] = { High: 0, Medium: 0, Low: 0 };
+            }
+            if (obs.risk) acc.areaMatrix[area][obs.risk]++;
+
+            // 4. Timeline Banding
+            // Logic: Calculate diffDays between targetDate and NOW (or auditDate? v47 uses 'now')
+            // v47 logic: diffDays = targetDate - now. 
+            // If diff < 0 -> Overdue. 0-7, 8-15, 16-30, 30+
+            if (obs.status !== 'Closed' && obs.targetDate) {
+                const target = new Date(obs.targetDate);
+                const now = new Date();
+                // Reset times for simpler day calc
+                target.setHours(0, 0, 0, 0);
+                now.setHours(0, 0, 0, 0);
+
+                const diffTime = target.getTime() - now.getTime();
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                if (diffDays < 0) acc.timelineBands.overdue++;
+                else if (diffDays <= 7) acc.timelineBands.day0_7++;
+                else if (diffDays <= 15) acc.timelineBands.day8_15++;
+                else if (diffDays <= 30) acc.timelineBands.day16_30++;
+                else acc.timelineBands.day30p++;
+            } else if (obs.status !== 'Closed' && !obs.targetDate) {
+                // No date set = treat as long term or unassigned? v47 puts missing date into 30+ or separate?
+                // v47: "missing date -> 30+ bucket"
+                acc.timelineBands.day30p++;
+            }
+
+            // 5. Documentation Quality
+            // Complete if: ActionPlan + TargetDate + Responsibility are present
+            const hasAP = obs.actionPlan && obs.actionPlan.trim() !== '';
+            const hasTL = !!obs.targetDate;
+            const hasResp = !!obs.responsibility;
+
+            if (hasAP && hasTL && hasResp) acc.quality.complete++;
+            if (!hasAP) acc.quality.missingAP++;
+            if (!hasTL) acc.quality.missingTL++;
+            if (!hasResp) acc.quality.missingResp++;
+
             return acc;
         },
         {
@@ -111,6 +182,11 @@ export function ReportProvider({ children }: { children: ReactNode }) {
             closed: 0,
             financialCount: 0,
             financialImpact: 0,
+            responsibilityMatrix: {} as Record<string, { High: number; Medium: number; Low: number }>,
+            statusMatrix: {} as Record<string, { High: number; Medium: number; Low: number }>,
+            areaMatrix: {} as Record<string, { High: number; Medium: number; Low: number }>,
+            timelineBands: { overdue: 0, day0_7: 0, day8_15: 0, day16_30: 0, day30p: 0 },
+            quality: { complete: 0, missingAP: 0, missingTL: 0, missingResp: 0 }
         }
     );
 

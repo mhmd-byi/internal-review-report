@@ -77,3 +77,40 @@
     @apply bg-background text-foreground;
   }
 }
+
+@media print {
+  body {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    background: white !important;
+  }
+
+  /* Ensure no scrollbars in print, force full height */
+  textarea {
+    display: none !important;
+  }
+
+  /* We will use a sibling div with .print-only to show text */
+  .print-only {
+    display: block !important;
+    white-space: pre-wrap;
+  }
+
+  /* Hide non-printable elements */
+  .no-print {
+    display: none !important;
+  }
+
+  /* Page breaks */
+  .break-before-page {
+    page-break-before: always;
+  }
+
+  .break-inside-avoid {
+    page-break-inside: avoid;
+  }
+}
+
+.print-only {
+  display: none;
+}

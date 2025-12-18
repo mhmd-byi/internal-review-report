@@ -10,9 +10,9 @@ import { cn } from '@/lib/utils';
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 export function Dashboard() {
-    const { stats, observations } = useReport();
+    const { stats } = useReport();
 
-    // Chart Data
+    // Chart Data (Keep existing charts logic for visual quick view)
     const typeData = {
         labels: ['Financial', 'Non Financial'],
         datasets: [{
@@ -40,101 +40,249 @@ export function Dashboard() {
         }],
     };
 
+    const respData = {
+        labels: Object.keys(stats.responsibilityMatrix),
+        datasets: [{
+            data: Object.values(stats.responsibilityMatrix).map(r => r.High + r.Medium + r.Low),
+            backgroundColor: ['#f97316', '#6366f1', '#14b8a6', '#ec4899', '#84cc16'], // Colors from v47
+            borderWidth: 0,
+        }]
+    };
+
     const chartOptions = {
-        plugins: {
-            legend: {
-                display: false
-            }
-        },
+        plugins: { legend: { display: false } },
         cutout: '60%',
         responsive: true,
         maintainAspectRatio: true
     };
 
-    return (
-        <div className="mt-8 p-5 bg-white/20 backdrop-blur-md border border-white/40 rounded-2xl shadow-xl print:break-before-page">
-            <div className="text-xs text-gray-500 italic mb-2">Internal Review Dashboard – consolidated analytics for Management overview.</div>
-
-            <div className="flex justify-between items-center mb-4">
-                <h3 className="text-sm font-bold text-slate-900">Dashboard Summary</h3>
-                {/* Controls could go here */}
+    // Helper to render Matrix Tables matching v47 style
+    const MatrixTable = ({ title, columns, rows }: { title: string, columns: string[], rows: { label: string, high: number, med: number, low: number, total: number }[] }) => (
+        <div className="bg-slate-50/95 border border-slate-300 rounded-xl p-3 shadow-sm h-full flex flex-col">
+            <h4 className="text-xs font-bold text-slate-800 mb-2">{title}</h4>
+            <table className="w-full text-xs border-collapse">
+                <thead>
+                    <tr className="bg-slate-100 border-b border-slate-200">
+                        {columns.map((col, i) => <th key={i} className="text-left p-1 font-semibold text-slate-600 border border-slate-200">{col}</th>)}
+                    </tr>
+                </thead>
+                <tbody>
+                    {rows.map((row, i) => (
+                        <tr key={i} className="border-b border-slate-200">
+                            <td className="p-1 border border-slate-200 font-medium">{row.label}</td>
+                            <td className="p-1 border border-slate-200 text-center">{row.high}</td>
+                            <td className="p-1 border border-slate-200 text-center">{row.med}</td>
+                            <td className="p-1 border border-slate-200 text-center">{row.low}</td>
+                            <td className="p-1 border border-slate-200 text-center font-bold">{row.total}</td>
+                        </tr>
+                    ))}
+                    {/* Grand Total Row Calculation */}
+                    <tr className="bg-slate-50 font-bold border-t-2 border-slate-300">
+                        <td className="p-1 border border-slate-200">Total</td>
+                        <td className="p-1 border border-slate-200 text-center text-red-600">{rows.reduce((a, b) => a + b.high, 0)}</td>
+                        <td className="p-1 border border-slate-200 text-center text-yellow-600">{rows.reduce((a, b) => a + b.med, 0)}</td>
+                        <td className="p-1 border border-slate-200 text-center text-green-600">{rows.reduce((a, b) => a + b.low, 0)}</td>
+                        <td className="p-1 border border-slate-200 text-center">{rows.reduce((a, b) => a + b.total, 0)}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div className="mt-auto pt-2 text-[10px] text-slate-400 flex gap-2">
+                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded bg-red-100 border border-red-200"></span> High</span>
+                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded bg-yellow-100 border border-yellow-200"></span> Med</span>
+                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded bg-green-100 border border-green-200"></span> Low</span>
             </div>
+        </div>
+    );
+
+    // Prepare rows for matrices
+    const statusRows = Object.entries(stats.statusMatrix).map(([label, val]) => ({
+        label, high: val.High, med: val.Medium, low: val.Low, total: val.High + val.Medium + val.Low
+    }));
+
+    const respRows = Object.entries(stats.responsibilityMatrix).map(([label, val]) => ({
+        label, high: val.High, med: val.Medium, low: val.Low, total: val.High + val.Medium + val.Low
+    }));
+
+    // Sort Area Rows
+    const AREA_ORDER = [
+        'INTERNAL CONTROLS AND FINANCIAL MANAGEMENT',
+        'REVENUE & INCOME RECOGNITION',
+        'EXPENSES & COST MANAGEMENT',
+        'FIXED ASSETS',
+        'LEGAL AND STATUTORY COMPLIANCE',
+        'Other'
+    ];
+
+    const areaRows = Object.entries(stats.areaMatrix)
+        .map(([label, val]) => ({
+            label, high: val.High, med: val.Medium, low: val.Low, total: val.High + val.Medium + val.Low
+        }))
+        .sort((a, b) => {
+            const idxA = AREA_ORDER.findIndex(order => order.toLowerCase() === a.label.toLowerCase());
+            const idxB = AREA_ORDER.findIndex(order => order.toLowerCase() === b.label.toLowerCase());
+
+            if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+            if (idxA !== -1) return -1;
+            if (idxB !== -1) return 1;
+            return a.label.localeCompare(b.label);
+        });
+
+
+    return (
+        <div className="mt-8 p-5 bg-white/40 backdrop-blur-md border border-white/60 rounded-2xl shadow-xl print:shadow-none print:border-none print:p-0 print:bg-white print:break-before-page">
+            <div className="text-xs text-gray-500 italic mb-2 print:hidden">Internal Review Dashboard v2.0 – Consolidated Analytics</div>
 
             {/* KPI Row */}
-            <div className="flex flex-wrap gap-3 mb-4">
-                <div className="flex-1 min-w-[150px] p-3 rounded-xl bg-slate-50/90 border border-slate-200">
-                    <div className="text-xs text-slate-500">Observations</div>
-                    <div className="text-sm font-semibold mt-1">Total: {stats.total}</div>
-                    <div className="text-xs font-semibold text-slate-700">High: {stats.high} | Med: {stats.medium} | Low: {stats.low}</div>
+            <div className="flex flex-wrap gap-4 mb-6">
+                <div className="flex-1 min-w-[140px] p-3 rounded-xl bg-slate-50 border border-slate-200 shadow-sm">
+                    <div className="text-xs font-bold text-slate-500 uppercase tracking-wider">Observations</div>
+                    <div className="text-2xl font-bold mt-1 text-slate-800">{stats.total}</div>
+                    <div className="text-[11px] font-semibold text-slate-600 mt-1">High: {stats.high} | Med: {stats.medium} | Low: {stats.low}</div>
                 </div>
-                <div className="flex-1 min-w-[150px] p-3 rounded-xl bg-slate-50/90 border border-slate-200">
-                    <div className="text-xs text-slate-500">Status</div>
-                    <div className="text-sm font-semibold mt-1">Filled: {stats.open + stats.inProgress + stats.closed}</div>
-                    <div className="text-xs font-semibold text-slate-700 flex gap-2">
-                        <span className="text-sky-600">Open: {stats.open}</span>
-                        <span className="text-purple-600">In-Prog: {stats.inProgress}</span>
-                        <span className="text-green-600">Closed: {stats.closed}</span>
+                <div className="flex-1 min-w-[140px] p-3 rounded-xl bg-slate-50 border border-slate-200 shadow-sm">
+                    <div className="text-xs font-bold text-slate-500 uppercase tracking-wider">Status</div>
+                    <div className="text-2xl font-bold mt-1 text-slate-800">{stats.total}</div>
+                    <div className="text-[11px] font-semibold text-slate-600 mt-1 flex gap-2">
+                        <span className="text-sky-700">Open: {stats.open}</span>
+                        <span className="text-purple-700">In-Prog: {stats.inProgress}</span>
+                        <span className="text-green-700">Closed: {stats.closed}</span>
                     </div>
                 </div>
-                <div className="flex-1 min-w-[150px] p-3 rounded-xl bg-slate-50/90 border border-slate-200">
-                    <div className="text-xs text-slate-500">Financial Impact</div>
-                    <div className="text-lg font-bold text-slate-900">₹ {formatIndianNumber(stats.financialImpact)}</div>
-                    <div className="text-[10px] text-slate-500">{numberToIndianWords(stats.financialImpact)}</div>
+                <div className="flex-1 min-w-[140px] p-3 rounded-xl bg-slate-50 border border-slate-200 shadow-sm">
+                    <div className="text-xs font-bold text-slate-500 uppercase tracking-wider">Financial Obs</div>
+                    <div className="text-2xl font-bold mt-1 text-slate-800">{stats.financialCount}</div>
+                    <div className="text-[10px] text-slate-500 mt-1">With Impact Filled: {stats.financialCount}</div>
+                </div>
+                <div className="flex-[1.5] min-w-[200px] p-3 rounded-xl bg-slate-50 border border-slate-200 shadow-sm">
+                    <div className="text-xs font-bold text-slate-500 uppercase tracking-wider">Est. Financial Impact</div>
+                    <div className="text-2xl font-bold mt-1 text-blue-900 underline decoration-blue-200/50 underline-offset-4">₹ {formatIndianNumber(stats.financialImpact)}</div>
+                    <div className="text-[10px] text-slate-500 italic mt-1">{numberToIndianWords(stats.financialImpact)}</div>
+                </div>
+            </div>
+
+            {/* Charts Grid (Small Pie Charts) */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 print:grid-cols-2">
+                <div className="bg-slate-50/50 p-3 rounded-xl border border-slate-200 flex flex-col items-center">
+                    <h5 className="text-[10px] font-bold text-slate-600 mb-2 self-start">By Type</h5>
+                    <div className="w-16 h-16"><Pie data={typeData} options={chartOptions} /></div>
+                    <div className="mt-2 text-[9px] w-full space-y-0.5">
+                        <div className="flex justify-between"><span>Fin</span> <strong>{stats.financialCount}</strong></div>
+                        <div className="flex justify-between"><span>Non-Fin</span> <strong>{stats.total - stats.financialCount}</strong></div>
+                    </div>
+                </div>
+                <div className="bg-slate-50/50 p-3 rounded-xl border border-slate-200 flex flex-col items-center">
+                    <h5 className="text-[10px] font-bold text-slate-600 mb-2 self-start">By Risk</h5>
+                    <div className="w-16 h-16"><Pie data={riskData} options={chartOptions} /></div>
+                    <div className="mt-2 text-[9px] w-full space-y-0.5">
+                        <div className="flex justify-between text-red-700"><span>High</span> <strong>{stats.high}</strong></div>
+                        <div className="flex justify-between text-yellow-700"><span>Med</span> <strong>{stats.medium}</strong></div>
+                        <div className="flex justify-between text-green-700"><span>Low</span> <strong>{stats.low}</strong></div>
+                    </div>
+                </div>
+                <div className="bg-slate-50/50 p-3 rounded-xl border border-slate-200 flex flex-col items-center">
+                    <h5 className="text-[10px] font-bold text-slate-600 mb-2 self-start">By Status</h5>
+                    <div className="w-16 h-16"><Pie data={statusData} options={chartOptions} /></div>
+                    <div className="mt-2 text-[9px] w-full space-y-0.5">
+                        <div className="flex justify-between text-sky-700"><span>Open</span> <strong>{stats.open}</strong></div>
+                        <div className="flex justify-between text-purple-700"><span>In-Prg</span> <strong>{stats.inProgress}</strong></div>
+                        <div className="flex justify-between text-green-700"><span>Closed</span> <strong>{stats.closed}</strong></div>
+                    </div>
+                </div>
+                <div className="bg-slate-50/50 p-3 rounded-xl border border-slate-200 flex flex-col items-center">
+                    <h5 className="text-[10px] font-bold text-slate-600 mb-2 self-start">By Resp</h5>
+                    <div className="w-16 h-16"><Pie data={respData} options={chartOptions} /></div>
                 </div>
             </div>
 
-            {/* Charts Row */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
-                {/* Type Chart */}
-                <div className="p-3 rounded-xl bg-slate-50/95 border border-slate-200 flex flex-col items-center">
-                    <h4 className="text-xs font-semibold text-slate-700 mb-2 w-full">By Type</h4>
-                    <div className="w-24 h-24 relative">
-                        <Pie data={typeData} options={chartOptions} />
-                    </div>
-                    <div className="mt-2 text-[10px] space-y-1 w-full">
-                        <div className="flex items-center gap-1"><span className="w-2 h-2 rounded bg-blue-700"></span> Fin: {stats.financialCount}</div>
-                        <div className="flex items-center gap-1"><span className="w-2 h-2 rounded bg-green-500"></span> Non-Fin: {stats.total - stats.financialCount}</div>
-                    </div>
+            {/* Matrix & Tables Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 print:grid-cols-1 print:gap-4">
+                {/* Status x Risk */}
+                <div className="h-full">
+                    <MatrixTable
+                        title="Status × Risk Matrix"
+                        columns={['Status', 'High', 'Med', 'Low', 'Total']}
+                        rows={statusRows}
+                    />
                 </div>
-
-                {/* Risk Chart */}
-                <div className="p-3 rounded-xl bg-slate-50/95 border border-slate-200 flex flex-col items-center">
-                    <h4 className="text-xs font-semibold text-slate-700 mb-2 w-full">By Risk</h4>
-                    <div className="w-24 h-24 relative">
-                        <Pie data={riskData} options={chartOptions} />
-                    </div>
-                    <div className="mt-2 text-[10px] space-y-1 w-full">
-                        <div className="flex items-center gap-1"><span className="w-2 h-2 rounded bg-red-600"></span> High: {stats.high}</div>
-                        <div className="flex items-center gap-1"><span className="w-2 h-2 rounded bg-yellow-400"></span> Med: {stats.medium}</div>
-                        <div className="flex items-center gap-1"><span className="w-2 h-2 rounded bg-green-600"></span> Low: {stats.low}</div>
-                    </div>
-                </div>
-
-                {/* Status Chart */}
-                <div className="p-3 rounded-xl bg-slate-50/95 border border-slate-200 flex flex-col items-center">
-                    <h4 className="text-xs font-semibold text-slate-700 mb-2 w-full">By Status</h4>
-                    <div className="w-24 h-24 relative">
-                        <Pie data={statusData} options={chartOptions} />
-                    </div>
-                    <div className="mt-2 text-[10px] space-y-1 w-full">
-                        <div className="flex items-center gap-1"><span className="w-2 h-2 rounded bg-sky-500"></span> Open: {stats.open}</div>
-                        <div className="flex items-center gap-1"><span className="w-2 h-2 rounded bg-purple-500"></span> In-Prog: {stats.inProgress}</div>
-                        <div className="flex items-center gap-1"><span className="w-2 h-2 rounded bg-green-500"></span> Closed: {stats.closed}</div>
-                    </div>
-                </div>
-
-                {/* Matrix / Other */}
-                <div className="p-3 rounded-xl bg-slate-50/95 border border-slate-200">
-                    <h4 className="text-xs font-semibold text-slate-700 mb-2">Risk Load</h4>
-                    <div className={cn("inline-flex items-center px-2 py-1 rounded-full text-[10px] font-medium border",
-                        stats.high >= 5 ? "bg-red-50 border-red-200 text-red-700" :
-                            stats.high >= 1 ? "bg-yellow-50 border-yellow-200 text-yellow-800" :
-                                "bg-green-50 border-green-200 text-green-700"
-                    )}>
-                        {stats.high >= 5 ? "High Risk Load" : stats.high >= 1 ? "Moderate Risk" : "Low Risk Load"}
-                    </div>
+                {/* Responsibility x Risk */}
+                <div className="h-full">
+                    <MatrixTable
+                        title="Responsibility × Risk Matrix"
+                        columns={['Responsibility', 'High', 'Med', 'Low', 'Total']}
+                        rows={respRows}
+                    />
                 </div>
             </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 print:grid-cols-1 print:gap-4">
+                {/* Documentation Quality & Alerts */}
+                <div className="bg-slate-50/95 border border-slate-300 rounded-xl p-3 shadow-sm h-full flex flex-col">
+                    <h4 className="text-xs font-bold text-slate-800 mb-2">Action Plan Documentation & Alerts</h4>
+                    <table className="w-full text-xs border-collapse mb-4">
+                        <tbody>
+                            <tr className="border-b"><th className="text-left p-1 bg-slate-100 border">Action Plan defined</th><td className="p-1 border text-center font-bold">{stats.quality.complete}</td></tr>
+                            <tr className="border-b"><th className="text-left p-1 bg-slate-100 border">Missing Action Plan</th><td className="p-1 border text-center font-bold text-red-600">{stats.quality.missingAP}</td></tr>
+                            <tr className="border-b"><th className="text-left p-1 bg-slate-100 border">Missing Timeline</th><td className="p-1 border text-center font-bold text-red-600">{stats.quality.missingTL}</td></tr>
+                            <tr className="border-b"><th className="text-left p-1 bg-slate-100 border">Missing Responsibility</th><td className="p-1 border text-center font-bold text-red-600">{stats.quality.missingResp}</td></tr>
+                        </tbody>
+                    </table>
+
+                    <div className="flex flex-wrap gap-2 mt-auto">
+                        <span className={cn("px-2 py-1 rounded-full text-[10px] font-semibold border",
+                            stats.high >= 5 ? "bg-red-50 border-red-200 text-red-700" : stats.high >= 1 ? "bg-yellow-50 border-yellow-200 text-yellow-700" : "bg-green-50 border-green-200 text-green-700"
+                        )}>
+                            Risk Load: {stats.high >= 5 ? "High (≥5)" : stats.high >= 1 ? "Moderate" : "OK"}
+                        </span>
+                        <span className={cn("px-2 py-1 rounded-full text-[10px] font-semibold border",
+                            stats.timelineBands.overdue > 0 ? "bg-red-50 border-red-200 text-red-700" : "bg-green-50 border-green-200 text-green-700"
+                        )}>
+                            Overdue: {stats.timelineBands.overdue > 0 ? `${stats.timelineBands.overdue} Past Due` : "None"}
+                        </span>
+                        <span className={cn("px-2 py-1 rounded-full text-[10px] font-semibold border",
+                            (stats.quality.missingAP / stats.total > 0.5) ? "bg-red-50 border-red-200 text-red-700" : "bg-green-50 border-green-200 text-green-700"
+                        )}>
+                            Docs: {stats.quality.missingAP > 0 ? "Incomplete" : "Healthy"}
+                        </span>
+                    </div>
+                </div>
+
+                {/* Area Risk Matrix */}
+                <div className="h-full">
+                    <MatrixTable
+                        title="Area-wise Risk Matrix"
+                        columns={['Area', 'High', 'Med', 'Low', 'Total']}
+                        rows={areaRows}
+                    />
+                </div>
+            </div>
+
+            {/* Timeline Banding */}
+            <div className="bg-slate-50/95 border border-slate-300 rounded-xl p-3 shadow-sm mb-6 print:break-inside-avoid">
+                <h4 className="text-xs font-bold text-slate-800 mb-3">Timeline Deadlines (Items not Closed)</h4>
+                <div className="flex gap-1 h-8 w-full rounded-lg overflow-hidden bg-slate-200 text-[10px] font-bold text-center leading-8 text-white">
+                    {stats.timelineBands.overdue > 0 && (
+                        <div style={{ flex: stats.timelineBands.overdue }} className="bg-red-600 p-1 truncate">Overdue ({stats.timelineBands.overdue})</div>
+                    )}
+                    {stats.timelineBands.day0_7 > 0 && (
+                        <div style={{ flex: stats.timelineBands.day0_7 }} className="bg-orange-500 p-1 truncate">0-7 Days ({stats.timelineBands.day0_7})</div>
+                    )}
+                    {stats.timelineBands.day8_15 > 0 && (
+                        <div style={{ flex: stats.timelineBands.day8_15 }} className="bg-yellow-500 p-1 truncate">8-15 Days ({stats.timelineBands.day8_15})</div>
+                    )}
+                    {stats.timelineBands.day16_30 > 0 && (
+                        <div style={{ flex: stats.timelineBands.day16_30 }} className="bg-blue-500 p-1 truncate">16-30 Days ({stats.timelineBands.day16_30})</div>
+                    )}
+                    {stats.timelineBands.day30p > 0 && (
+                        <div style={{ flex: stats.timelineBands.day30p }} className="bg-slate-500 p-1 truncate">30+ Days ({stats.timelineBands.day30p})</div>
+                    )}
+                    {(stats.total - stats.closed) === 0 && <div className="flex-1 bg-green-500">All Closed</div>}
+                </div>
+                <div className="flex justify-between text-[10px] text-slate-500 mt-2">
+                    <span>Total Open/In-Progress: {stats.total - stats.closed}</span>
+                    <span>Timeline visualization requires Target Date set on observations.</span>
+                </div>
+            </div>
+
         </div>
     );
 }

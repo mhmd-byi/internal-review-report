@@ -13,10 +13,10 @@ import { getTargetDateFromAudit } from '@/utils/dates';
 
 interface ObservationCardProps {
     observation: IObservation;
-    index: number;
+    obsNumber: string; // Changed from index number to string for "1.1" format
 }
 
-export function ObservationCard({ observation, index }: ObservationCardProps) {
+export function ObservationCard({ observation, obsNumber }: ObservationCardProps) {
     const { updateObservation, deleteObservation, auditDate } = useReport();
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [templates, setTemplates] = useState<any[]>([]);
@@ -53,6 +53,19 @@ export function ObservationCard({ observation, index }: ObservationCardProps) {
                 }
             })
             .catch(err => console.error('Failed to fetch templates:', err));
+    }, []);
+
+    useEffect(() => {
+        const handleCollapse = () => setIsCollapsed(true);
+        const handleExpand = () => setIsCollapsed(false);
+
+        window.addEventListener('report:collapse-all', handleCollapse);
+        window.addEventListener('report:expand-all', handleExpand);
+
+        return () => {
+            window.removeEventListener('report:collapse-all', handleCollapse);
+            window.removeEventListener('report:expand-all', handleExpand);
+        };
     }, []);
 
     useEffect(() => {
@@ -115,7 +128,7 @@ export function ObservationCard({ observation, index }: ObservationCardProps) {
             <div className="mb-6 print:hidden">
                 <div className="p-4 bg-slate-100 border border-slate-200 rounded-lg flex justify-between items-center opacity-75 hover:opacity-100 transition-opacity">
                     <div className="flex items-center gap-3">
-                        <span className="text-sm font-bold text-slate-500">Observation {index + 1}</span>
+                        <span className="text-sm font-bold text-slate-500">Observation {obsNumber}</span>
                         <span className="text-xs bg-slate-200 text-slate-600 px-2 py-0.5 rounded-full font-medium">Not Applicable</span>
                     </div>
                     <label className="flex items-center gap-2 text-sm cursor-pointer text-slate-600 hover:text-slate-900">
@@ -141,7 +154,7 @@ export function ObservationCard({ observation, index }: ObservationCardProps) {
                 <div className={cn("p-3 flex items-center justify-between bg-gradient-to-r rounded-lg", getRiskColor(risk))}>
                     <div className="flex items-center gap-4 text-white">
                         <span className="font-bold text-sm bg-white/20 w-6 h-6 flex items-center justify-center rounded-full">
-                            {index + 1}
+                            {obsNumber}
                         </span>
                         <span className="font-semibold text-sm truncate max-w-[300px] md:max-w-[500px]">
                             {title || 'Untitled Observation'}
@@ -266,7 +279,7 @@ export function ObservationCard({ observation, index }: ObservationCardProps) {
                     {/* Controls Row */}
                     <div className="flex items-center justify-between pt-2 border-t border-white/10">
                         <div className="text-xs font-medium text-white/80">
-                            Observation #{index + 1}
+                            Observation #{obsNumber}
                         </div>
                         <div className="flex items-center gap-4">
                             <label className="flex items-center gap-2 text-xs text-white/90 cursor-pointer hover:text-white transition-colors">
@@ -298,8 +311,9 @@ export function ObservationCard({ observation, index }: ObservationCardProps) {
                         placeholder="Example: Management meetings are held monthly..."
                         value={background}
                         onChange={(e) => handleUpdate('background', e.target.value)}
-                        className="min-h-[50px] text-sm"
+                        className="min-h-[50px] text-sm print:hidden"
                     />
+                    <div className="hidden print:block text-sm whitespace-pre-wrap text-slate-800">{background || '-'}</div>
                 </div>
 
                 {/* Observation */}
@@ -310,8 +324,9 @@ export function ObservationCard({ observation, index }: ObservationCardProps) {
                         placeholder="Example: No Minutes Register is maintained..."
                         value={obsText}
                         onChange={(e) => handleUpdate('observation', e.target.value)}
-                        className="min-h-[50px] text-sm"
+                        className="min-h-[50px] text-sm print:hidden"
                     />
+                    <div className="hidden print:block text-sm whitespace-pre-wrap text-slate-800">{obsText || '-'}</div>
                 </div>
 
                 {/* Recommendation */}
@@ -322,8 +337,9 @@ export function ObservationCard({ observation, index }: ObservationCardProps) {
                         placeholder="Example: Introduce a formal Minutes Register..."
                         value={recommendation}
                         onChange={(e) => handleUpdate('recommendation', e.target.value)}
-                        className="min-h-[50px] text-sm"
+                        className="min-h-[50px] text-sm print:hidden"
                     />
+                    <div className="hidden print:block text-sm whitespace-pre-wrap text-slate-800">{recommendation || '-'}</div>
                 </div>
 
                 {/* Implication */}
@@ -334,8 +350,9 @@ export function ObservationCard({ observation, index }: ObservationCardProps) {
                         placeholder="Example: Risk of decisions not being implemented..."
                         value={implication}
                         onChange={(e) => handleUpdate('implication', e.target.value)}
-                        className="min-h-[50px] text-sm"
+                        className="min-h-[50px] text-sm print:hidden"
                     />
+                    <div className="hidden print:block text-sm whitespace-pre-wrap text-slate-800">{implication || '-'}</div>
                 </div>
 
                 {/* Management Response */}
@@ -348,9 +365,10 @@ export function ObservationCard({ observation, index }: ObservationCardProps) {
                         placeholder="Detail the exact steps management will take..."
                         value={actionPlan}
                         onChange={(e) => handleUpdate('actionPlan', e.target.value)}
-                        className="min-h-[60px] text-sm"
+                        className="min-h-[60px] text-sm print:hidden"
                     />
-                    <p className="text-[10px] text-slate-400 italic mt-1">Suggested structure: Specific Action Plan aligned to the observation.</p>
+                    <div className="hidden print:block text-sm whitespace-pre-wrap text-slate-800">{actionPlan || '-'}</div>
+                    <p className="text-[10px] text-slate-400 italic mt-1 print:hidden">Suggested structure: Specific Action Plan aligned to the observation.</p>
                 </div>
 
                 {/* Timeline & Responsibility Grid */}
