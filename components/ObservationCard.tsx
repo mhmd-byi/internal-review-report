@@ -39,6 +39,7 @@ export function ObservationCard({ observation, obsNumber }: ObservationCardProps
         targetDate,
         status,
         responsibility,
+        reviewerNotes,
     } = observation;
 
     useEffect(() => {
@@ -149,41 +150,6 @@ export function ObservationCard({ observation, obsNumber }: ObservationCardProps
         );
     }
 
-    if (isCollapsed) {
-        return (
-            <Card
-                className="mb-4 border-slate-200 shadow-sm hover:shadow-md transition-all cursor-pointer group"
-                onClick={() => setIsCollapsed(false)}
-            >
-                <div className={cn("p-3 flex items-center justify-between bg-gradient-to-r rounded-lg", getRiskColor(risk))}>
-                    <div className="flex items-center gap-4 text-white">
-                        <span className="font-bold text-sm bg-white/20 w-6 h-6 flex items-center justify-center rounded-full">
-                            {obsNumber}
-                        </span>
-                        <span className="font-semibold text-sm truncate max-w-[300px] md:max-w-[500px]">
-                            {title || 'Untitled Observation'}
-                        </span>
-                        {area && (
-                            <span className="hidden md:inline-block text-xs bg-white/10 px-2 py-0.5 rounded text-white/90 border border-white/10">
-                                {area}
-                            </span>
-                        )}
-                    </div>
-                    <div className="flex items-center gap-3">
-                        <span className="text-xs px-2 py-0.5 rounded font-bold bg-white/20 text-white border border-white/10">
-                            {risk}
-                        </span>
-                        <span className="hidden md:inline text-xs text-white/80 font-medium">
-                            {status}
-                        </span>
-                        <div className="text-white/70 group-hover:text-white transition-colors">
-                            <span className="text-xs font-medium">Expand</span>
-                        </div>
-                    </div>
-                </div>
-            </Card>
-        );
-    }
 
     return (
         <Card className="mb-6 border-slate-200 shadow-lg overflow-hidden transition-all">
@@ -286,117 +252,123 @@ export function ObservationCard({ observation, obsNumber }: ObservationCardProps
                             Observation #{obsNumber}
                         </div>
                         <div className="flex items-center gap-4">
-                            <label className="flex items-center gap-2 text-xs text-white/90 cursor-pointer hover:text-white transition-colors">
-                                <input
-                                    type="checkbox"
-                                    checked={isNA}
-                                    onChange={(e) => handleUpdate('isNA', e.target.checked)}
-                                    className="rounded border-white/30 bg-white/10 text-indigo-500 focus:ring-offset-0 focus:ring-1 focus:ring-white/50"
-                                />
-                                Mark as N/A
-                            </label>
-                            <button
-                                onClick={() => setIsCollapsed(!isCollapsed)}
-                                className="text-xs bg-white/10 hover:bg-white/20 px-4 py-1 rounded-full border border-white/20 transition-all font-medium"
-                            >
-                                {isCollapsed ? 'Expand' : 'Collapse'}
-                            </button>
+                            <div className="flex items-center gap-2">
+                                <label className="flex items-center gap-2 text-sm text-slate-600 cursor-pointer select-none">
+                                    <input
+                                        type="checkbox"
+                                        checked={isNA}
+                                        onChange={(e) => updateObservation(id, { isNA: e.target.checked })}
+                                        className="rounded border-slate-300 text-sky-600 focus:ring-sky-500"
+                                    />
+                                    Not Applicable
+                                </label>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => setIsCollapsed(!isCollapsed)}
+                                    className="text-slate-500 hover:text-slate-700"
+                                >
+                                    {isCollapsed ? 'Expand' : 'Collapse'}
+                                </Button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <CardContent className="p-4 bg-white/90 space-y-4">
-                {/* Background */}
-                <div className="bg-slate-50 p-3 rounded-lg border border-slate-200">
-                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Background</label>
-                    <p className="text-xs text-slate-400 mb-2">Briefly describe the current process / practice followed at the school for this area.</p>
-                    <Textarea
-                        placeholder="Example: Management meetings are held monthly..."
-                        value={background}
-                        onChange={(e) => handleUpdate('background', e.target.value)}
-                        className="min-h-[50px] text-sm print:hidden"
-                    />
-                    <div className="hidden print:block text-sm whitespace-pre-wrap text-slate-800">{background || '-'}</div>
-                </div>
+            {/* Body - Only visible when NOT collapsed */}
+            {!isCollapsed && (
+                <div className="p-4 space-y-6">
+                    <div className="space-y-4">
+                        <div className="space-y-1">
+                            <label className="text-sm font-medium text-slate-700">Background</label>
+                            <p className="text-xs text-slate-500">Briefly describe the current process / practice followed at the school for this area.</p>
+                            <Textarea
+                                value={background}
+                                onChange={(e) => updateObservation(id, { background: e.target.value })}
+                                placeholder="Describe current process..."
+                                className="min-h-[80px]"
+                            />
+                        </div>
 
-                {/* Observation */}
-                <div className="bg-slate-50 p-3 rounded-lg border border-slate-200">
-                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Observation</label>
-                    <p className="text-xs text-slate-400 mb-2">Highlight the specific issue identified during the review.</p>
-                    <Textarea
-                        placeholder="Example: No Minutes Register is maintained..."
-                        value={obsText}
-                        onChange={(e) => handleUpdate('observation', e.target.value)}
-                        className="min-h-[50px] text-sm print:hidden"
-                    />
-                    <div className="hidden print:block text-sm whitespace-pre-wrap text-slate-800">{obsText || '-'}</div>
-                </div>
+                        <div className="space-y-1">
+                            <label className="text-sm font-medium text-slate-700">Observation</label>
+                            <p className="text-xs text-slate-500">Highlight the specific issue identified during the review.</p>
+                            <Textarea
+                                value={obsText}
+                                onChange={(e) => updateObservation(id, { observation: e.target.value })}
+                                placeholder="Describe the issue..."
+                                className="min-h-[80px]"
+                            />
+                        </div>
 
-                {/* Recommendation */}
-                <div className="bg-slate-50 p-3 rounded-lg border border-slate-200">
-                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Recommendation</label>
-                    <p className="text-xs text-slate-400 mb-2">Recommended corrective action as suggested by auditors.</p>
-                    <Textarea
-                        placeholder="Example: Introduce a formal Minutes Register..."
-                        value={recommendation}
-                        onChange={(e) => handleUpdate('recommendation', e.target.value)}
-                        className="min-h-[50px] text-sm print:hidden"
-                    />
-                    <div className="hidden print:block text-sm whitespace-pre-wrap text-slate-800">{recommendation || '-'}</div>
-                </div>
+                        <div className="space-y-1">
+                            <label className="text-sm font-medium text-slate-700">Recommendation</label>
+                            <p className="text-xs text-slate-500">Recommended corrective action as suggested by auditors.</p>
+                            <Textarea
+                                value={recommendation}
+                                onChange={(e) => updateObservation(id, { recommendation: e.target.value })}
+                                placeholder="Suggest improvements..."
+                                className="min-h-[80px]"
+                            />
+                        </div>
 
-                {/* Implication */}
-                <div className="bg-slate-50 p-3 rounded-lg border border-slate-200">
-                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Implication</label>
-                    <p className="text-xs text-slate-400 mb-2">Potential qualitative / quantitative impact.</p>
-                    <Textarea
-                        placeholder="Example: Risk of decisions not being implemented..."
-                        value={implication}
-                        onChange={(e) => handleUpdate('implication', e.target.value)}
-                        className="min-h-[50px] text-sm print:hidden"
-                    />
-                    <div className="hidden print:block text-sm whitespace-pre-wrap text-slate-800">{implication || '-'}</div>
-                </div>
+                        <div className="space-y-1">
+                            <label className="text-sm font-medium text-slate-700">Implication</label>
+                            <p className="text-xs text-slate-500">Potential qualitative / quantitative impact.</p>
+                            <Textarea
+                                value={implication}
+                                onChange={(e) => updateObservation(id, { implication: e.target.value })}
+                                placeholder="Describe impact..."
+                                className="min-h-[80px]"
+                            />
+                        </div>
 
-                {/* Management Response */}
-                <div className="bg-slate-50 p-3 rounded-lg border border-slate-200">
-                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Management Response</label>
-                    <p className="text-xs text-slate-400 mb-2">Structured response from management, including Action Plan.</p>
+                        <div className="space-y-4 pt-4 border-t border-slate-100">
+                            <h4 className="font-semibold text-slate-900">Management Response</h4>
 
-                    <label className="block text-xs font-semibold text-slate-600 mt-2 mb-1">Action Plan</label>
-                    <Textarea
-                        placeholder="Detail the exact steps management will take..."
-                        value={actionPlan}
-                        onChange={(e) => handleUpdate('actionPlan', e.target.value)}
-                        className="min-h-[60px] text-sm print:hidden"
-                    />
-                    <div className="hidden print:block text-sm whitespace-pre-wrap text-slate-800">{actionPlan || '-'}</div>
-                    <p className="text-[10px] text-slate-400 italic mt-1 print:hidden">Suggested structure: Specific Action Plan aligned to the observation.</p>
-                </div>
-
-                {/* Timeline & Responsibility Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="bg-slate-50 p-3 rounded-lg border border-slate-200">
-                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Timelines (Tracker)</label>
-                        <p className="text-xs text-slate-400 mb-2">Due date for implementation.</p>
-
-                        <div className="flex gap-3">
-                            <div className="flex-1">
-                                <span className="text-xs font-medium block mb-1">Target Date:</span>
-                                <Input
-                                    type="date"
-                                    value={targetDate ? new Date(targetDate).toISOString().split('T')[0] : ''}
-                                    onChange={(e) => handleUpdate('targetDate', e.target.value ? new Date(e.target.value) : undefined)}
-                                    className="bg-white font-bold"
+                            <div className="space-y-1">
+                                <label className="text-sm font-medium text-slate-700">Action Plan</label>
+                                <Textarea
+                                    value={actionPlan}
+                                    onChange={(e) => updateObservation(id, { actionPlan: e.target.value })}
+                                    placeholder="Detail the exact steps management will take..."
+                                    className="min-h-[80px]"
                                 />
                             </div>
-                            <div className="flex-1">
-                                <span className="text-xs font-medium block mb-1">Status:</span>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="space-y-1">
+                                    <label className="text-sm font-medium text-slate-700">Target Date</label>
+                                    <Input
+                                        type="date"
+                                        value={targetDate ? new Date(targetDate).toISOString().split('T')[0] : ''}
+                                        onChange={(e) => updateObservation(id, { targetDate: e.target.value ? new Date(e.target.value) : undefined })}
+                                    />
+                                </div>
+                                <div className="space-y-1">
+                                    <label className="text-sm font-medium text-slate-700">Responsibility</label>
+                                    <select
+                                        className="w-full h-9 rounded-md border border-input bg-white px-3 py-1 text-sm shadow-sm"
+                                        value={responsibility}
+                                        onChange={(e) => updateObservation(id, { responsibility: e.target.value })}
+                                    >
+                                        <option value="">Select Responsibility</option>
+                                        <option value="Principal">Principal</option>
+                                        <option value="Admin Head">Admin Head</option>
+                                        <option value="Accountant">Accountant</option>
+                                        <option value="Management Committee">Management Committee</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div className="space-y-1">
+                                <label className="text-sm font-medium text-slate-700">Status</label>
                                 <select
-                                    className="w-full h-9 rounded-md border border-input bg-white px-3 py-1 text-sm shadow-sm font-bold"
+                                    className="w-full h-9 rounded-md border border-input bg-white px-3 py-1 text-sm shadow-sm"
                                     value={status}
-                                    onChange={(e) => handleUpdate('status', e.target.value as any)}
+                                    onChange={(e) => updateObservation(id, { status: e.target.value as any })}
                                 >
                                     <option value="Open">Open</option>
                                     <option value="In-Progress">In-Progress</option>
@@ -406,25 +378,23 @@ export function ObservationCard({ observation, obsNumber }: ObservationCardProps
                         </div>
                     </div>
 
-                    <div className="bg-slate-50 p-3 rounded-lg border border-slate-200">
-                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Responsibility</label>
-                        <p className="text-xs text-slate-400 mb-2">Responsibility assigned for implementation.</p>
-                        <select
-                            className="w-full h-9 rounded-md border border-input bg-white px-3 py-1 text-sm shadow-sm"
-                            value={responsibility}
-                            onChange={(e) => handleUpdate('responsibility', e.target.value)}
-                        >
-                            <option value="" disabled>Select Responsible Person</option>
-                            <option value="Principal">Principal</option>
-                            <option value="Admin Head">Admin Head</option>
-                            <option value="Accountant">Accountant</option>
-                            <option value="Management Committee">Management Committee</option>
-                            <option value="Other">Other</option>
-                        </select>
+                </div>
+            )}
+
+            {/* Collapsed View - Reviewer Notes */}
+            {isCollapsed && (
+                <div className="p-4 bg-slate-50 border-t border-slate-100">
+                    <div className="space-y-1">
+                        <label className="text-sm font-medium text-slate-700">Reviewer Notes</label>
+                        <Textarea
+                            value={reviewerNotes || ''}
+                            onChange={(e) => updateObservation(id, { reviewerNotes: e.target.value })}
+                            placeholder="Add notes for reviewer..."
+                            className="min-h-[60px] bg-white"
+                        />
                     </div>
                 </div>
-
-            </CardContent>
+            )}
         </Card>
     );
 }
