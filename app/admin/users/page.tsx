@@ -34,6 +34,8 @@ export default function AdminUsersPage() {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
 
+    const [editingId, setEditingId] = useState<string | null>(null);
+
     useEffect(() => {
         if (session?.user?.role !== 'admin') {
             // router.push('/'); // Middleware handles this
@@ -60,6 +62,47 @@ export default function AdminUsersPage() {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
+    const handleEdit = (user: User & { phone?: string }) => {
+        setEditingId(user._id);
+        setFormData({
+            name: user.name,
+            email: user.email,
+            phone: user.phone || '', // Ensure phone is handled if present in model
+            role: user.role,
+            responsibility: user.responsibility || '',
+            password: '', // Password intentionally blank
+        });
+        setError('');
+        setSuccess('');
+    };
+
+    const handleCancelEdit = () => {
+        setEditingId(null);
+        setFormData({ name: '', email: '', phone: '', password: '', role: 'user', responsibility: '' });
+        setError('');
+        setSuccess('');
+    };
+
+    const handleDelete = async (id: string, name: string) => {
+        if (!confirm(`Are you sure you want to delete user "${name}"?`)) return;
+
+        try {
+            const res = await fetch(`/api/users/${id}`, {
+                method: 'DELETE',
+            });
+
+            if (res.ok) {
+                setSuccess('User deleted successfully');
+                fetchUsers();
+            } else {
+                const data = await res.json();
+                setError(data.error || 'Failed to delete user');
+            }
+        } catch (err: any) {
+            setError(err.message);
+        }
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
@@ -67,8 +110,11 @@ export default function AdminUsersPage() {
         setSuccess('');
 
         try {
-            const res = await fetch('/api/auth/register', {
-                method: 'POST',
+            const url = editingId ? `/api/users/${editingId}` : '/api/auth/register';
+            const method = editingId ? 'PUT' : 'POST';
+
+            const res = await fetch(url, {
+                method: method,
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData),
             });
@@ -76,12 +122,20 @@ export default function AdminUsersPage() {
             const data = await res.json();
 
             if (!res.ok) {
-                throw new Error(data.error || 'Failed to create user');
+                throw new Error(data.error || 'Operation failed');
             }
 
-            setSuccess('User created successfully');
-            setFormData({ name: '', email: '', phone: '', password: '', role: 'user', responsibility: '' });
-            fetchUsers(); // Refresh list
+            setSuccess(`User ${editingId ? 'updated' : 'created'} successfully`);
+
+            if (!editingId) {
+                setFormData({ name: '', email: '', phone: '', password: '', role: 'user', responsibility: '' });
+            } else {
+                // If editing, maybe clear password field but keep others? Or reset?
+                // Typically reset form or keep it. Let's reset to exit edit mode.
+                handleCancelEdit();
+            }
+
+            fetchUsers();
         } catch (err: any) {
             setError(err.message);
         } finally {
@@ -103,7 +157,7 @@ export default function AdminUsersPage() {
                     <div className="lg:col-span-1">
                         <Card>
                             <CardHeader>
-                                <CardTitle>Create New User</CardTitle>
+                                <CardTitle>{editingId ? 'Edit User' : 'Create New User'}</CardTitle>
                             </CardHeader>
                             <CardContent>
                                 <form onSubmit={handleSubmit} className="space-y-4">
@@ -138,16 +192,23 @@ export default function AdminUsersPage() {
                                         </Select>
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-sm font-medium">Password</label>
-                                        <Input name="password" type="password" value={formData.password} onChange={handleChange} required />
+                                        <label className="text-sm font-medium">Password {editingId && '(Leave blank to keep)'}</label>
+                                        <Input name="password" type="password" value={formData.password} onChange={handleChange} required={!editingId} placeholder={editingId ? "********" : ""} />
                                     </div>
 
                                     {error && <p className="text-red-500 text-sm">{error}</p>}
                                     {success && <p className="text-green-500 text-sm">{success}</p>}
 
-                                    <Button type="submit" className="w-full" disabled={loading}>
-                                        {loading ? 'Creating...' : 'Create User'}
-                                    </Button>
+                                    <div className="flex gap-2">
+                                        {editingId && (
+                                            <Button type="button" variant="outline" onClick={handleCancelEdit} className="flex-1">
+                                                Cancel
+                                            </Button>
+                                        )}
+                                        <Button type="submit" className="flex-1" disabled={loading}>
+                                            {loading ? 'Saving...' : (editingId ? 'Update User' : 'Create User')}
+                                        </Button>
+                                    </div>
                                 </form>
                             </CardContent>
                         </Card>
@@ -167,12 +228,13 @@ export default function AdminUsersPage() {
                                                 <th className="text-left p-3 font-medium text-slate-500">Email</th>
                                                 <th className="text-left p-3 font-medium text-slate-500">Role</th>
                                                 <th className="text-left p-3 font-medium text-slate-500">Responsibility</th>
+                                                <th className="text-right p-3 font-medium text-slate-500">Actions</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             {users.length === 0 ? (
                                                 <tr>
-                                                    <td colSpan={4} className="p-4 text-center text-slate-500">No users found</td>
+                                                    <td colSpan={5} className="p-4 text-center text-slate-500">No users found</td>
                                                 </tr>
                                             ) : (
                                                 users.map((user) => (
@@ -186,6 +248,24 @@ export default function AdminUsersPage() {
                                                             </span>
                                                         </td>
                                                         <td className="p-3">{user.responsibility || '-'}</td>
+                                                        <td className="p-3 text-right space-x-2">
+                                                            <Button
+                                                                variant="outline"
+                                                                size="sm"
+                                                                onClick={() => handleEdit(user as any)}
+                                                            >
+                                                                Edit
+                                                            </Button>
+                                                            <Button
+                                                                variant="destructive"
+                                                                size="sm"
+                                                                onClick={() => handleDelete(user._id, user.name)}
+                                                                disabled={user._id === session?.user?.id}
+                                                                title={user._id === session?.user?.id ? "Cannot delete yourself" : "Delete user"}
+                                                            >
+                                                                Delete
+                                                            </Button>
+                                                        </td>
                                                     </tr>
                                                 ))
                                             )}
