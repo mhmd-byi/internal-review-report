@@ -1,9 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import { useSession, signOut } from 'next-auth/react';
+import { useSession } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, LogOut, User } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
+import { UserDropdown } from '@/components/UserDropdown';
 
 export function AppHeader({ title }: { title?: string }) {
     const { data: session } = useSession();
@@ -28,14 +29,8 @@ export function AppHeader({ title }: { title?: string }) {
 
                 <div className="flex items-center gap-4">
                     {session?.user && (
-                        <div className="flex items-center gap-2 text-sm text-slate-600">
-                            <User className="w-4 h-4" />
-                            <span>{session.user.name}</span>
-                        </div>
+                        <UserDropdown user={session.user} />
                     )}
-                    <Button variant="ghost" size="icon" onClick={() => signOut()} title="Logout">
-                        <LogOut className="w-4 h-4" />
-                    </Button>
                 </div>
             </div>
         </header>

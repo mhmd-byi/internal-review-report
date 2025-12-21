@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardContent, CardTitle, CardDescription } from '@/components/ui/card';
 import { FileText, Users, LogOut, PlusCircle, Clock, ChevronRight } from 'lucide-react';
+import { UserDropdown } from '@/components/UserDropdown';
 
 interface ReportSummary {
     _id: string;
@@ -43,9 +44,7 @@ export default function DashboardPage() {
                         <h1 className="text-3xl font-bold text-slate-900">Dashboard</h1>
                         <p className="text-slate-500 mt-1">Welcome back, {session?.user?.name}</p>
                     </div>
-                    <Button variant="outline" onClick={() => signOut()} className="gap-2">
-                        <LogOut className="w-4 h-4" /> Logout
-                    </Button>
+                    {session?.user && <UserDropdown user={session.user} />}
                 </header>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
@@ -149,7 +148,7 @@ export default function DashboardPage() {
                         </Card>
                     )}
                 </div>
-            </div>
-        </div>
+            </div >
+        </div >
     );
 }
