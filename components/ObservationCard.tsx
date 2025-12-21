@@ -253,12 +253,12 @@ export function ObservationCard({ observation, obsNumber }: ObservationCardProps
                         </div>
                         <div className="flex items-center gap-4">
                             <div className="flex items-center gap-2">
-                                <label className="flex items-center gap-2 text-sm text-slate-600 cursor-pointer select-none">
+                                <label className="flex items-center gap-2 text-sm cursor-pointer select-none">
                                     <input
                                         type="checkbox"
                                         checked={isNA}
                                         onChange={(e) => updateObservation(id, { isNA: e.target.checked })}
-                                        className="rounded border-slate-300 text-sky-600 focus:ring-sky-500"
+                                        className="rounded border-slate-300 text-white focus:ring-sky-500"
                                     />
                                     Not Applicable
                                 </label>
@@ -266,7 +266,7 @@ export function ObservationCard({ observation, obsNumber }: ObservationCardProps
                                     variant="ghost"
                                     size="sm"
                                     onClick={() => setIsCollapsed(!isCollapsed)}
-                                    className="text-slate-500 hover:text-slate-700"
+                                    className="text-white hover:text-slate-700"
                                 >
                                     {isCollapsed ? 'Expand' : 'Collapse'}
                                 </Button>
