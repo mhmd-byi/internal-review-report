@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import { IObservation, IReport } from '@/models/Report';
 import { getCurrentDateISO, getTargetDateFromAudit } from '@/utils/dates';
 
@@ -19,6 +19,7 @@ interface ReportContextType {
     addObservation: () => void;
     updateObservation: (id: string, updates: Partial<IObservation>) => void;
     deleteObservation: (id: string) => void; // Optional, if we want delete
+    setAllObservations: (obs: IObservation[]) => void;
     loadReport: (reportData: any) => void;
     stats: {
         total: number;
@@ -48,16 +49,16 @@ export function ReportProvider({ children }: { children: ReactNode }) {
     const [preparedBy, setPreparedBy] = useState('Internal Audit Team');
     const [observations, setObservations] = useState<IObservation[]>([]);
 
-    // Initialize with one observation
-    const initialized = React.useRef(false);
-    useEffect(() => {
-        if (!initialized.current && observations.length === 0) {
-            initialized.current = true;
-            addObservation();
-        }
-    }, []);
+    // Initialize with one observation - REMOVED for Template Auto-Population
+    // const initialized = React.useRef(false);
+    // useEffect(() => {
+    //     if (!initialized.current && observations.length === 0) {
+    //         initialized.current = true;
+    //         addObservation();
+    //     }
+    // }, []);
 
-    const addObservation = () => {
+    const addObservation = useCallback(() => {
         const newObs: IObservation = {
             id: crypto.randomUUID(),
             title: '',
@@ -75,17 +76,21 @@ export function ReportProvider({ children }: { children: ReactNode }) {
             targetDate: undefined, // Will be set by default logic in UI if needed, or user input
         };
         setObservations((prev) => [...prev, newObs]);
-    };
+    }, []);
 
-    const updateObservation = (id: string, updates: Partial<IObservation>) => {
+    const updateObservation = useCallback((id: string, updates: Partial<IObservation>) => {
         setObservations((prev) =>
             prev.map((obs) => (obs.id === id ? { ...obs, ...updates } : obs))
         );
-    };
+    }, []);
 
-    const deleteObservation = (id: string) => {
+    const deleteObservation = useCallback((id: string) => {
         setObservations((prev) => prev.filter((obs) => obs.id !== id));
-    };
+    }, []);
+
+    const setAllObservations = useCallback((obs: IObservation[]) => {
+        setObservations(obs);
+    }, []);
 
     // Calculate Stats
     const stats = observations.reduce(
@@ -190,14 +195,14 @@ export function ReportProvider({ children }: { children: ReactNode }) {
         }
     );
 
-    const loadReport = (reportData: IReport) => {
+    const loadReport = useCallback((reportData: IReport) => {
         setSchoolName(reportData.schoolName);
         setLocation(reportData.location);
         setPeriod(reportData.period);
         setAuditDate(new Date(reportData.auditDate).toISOString().split('T')[0]);
         setPreparedBy(reportData.preparedBy);
         setObservations(reportData.observations);
-    };
+    }, []);
 
     return (
         <ReportContext.Provider
@@ -216,6 +221,7 @@ export function ReportProvider({ children }: { children: ReactNode }) {
                 addObservation,
                 updateObservation,
                 deleteObservation,
+                setAllObservations,
                 loadReport,
                 stats,
             }}
