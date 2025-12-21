@@ -118,22 +118,27 @@ export function Toolbar() {
                 )}
 
                 {/* Collapse Controls */}
-                <div className="flex bg-slate-100 rounded-lg p-0.5 border border-slate-200">
-                    <button
+                {/* Collapse Controls */}
+                <div className="flex items-center gap-1 bg-slate-100 rounded-lg p-1 border border-slate-200">
+                    <Button
+                        variant="ghost"
+                        size="sm"
                         onClick={() => toggleCollapseAll(false)}
-                        className="p-1.5 hover:bg-white rounded-md text-slate-600 hover:text-indigo-600 hover:shadow-sm transition-all"
+                        className="h-7 px-2 text-xs text-slate-600 hover:text-indigo-600 hover:bg-white"
                         title="Expand All"
                     >
-                        <ChevronsDown size={14} />
-                    </button>
-                    <div className="w-px bg-slate-300 my-1 mx-0.5"></div>
-                    <button
+                        <ChevronsDown className="w-3 h-3 mr-1" /> Expand All
+                    </Button>
+                    <div className="w-px h-4 bg-slate-300"></div>
+                    <Button
+                        variant="ghost"
+                        size="sm"
                         onClick={() => toggleCollapseAll(true)}
-                        className="p-1.5 hover:bg-white rounded-md text-slate-600 hover:text-indigo-600 hover:shadow-sm transition-all"
+                        className="h-7 px-2 text-xs text-slate-600 hover:text-indigo-600 hover:bg-white"
                         title="Collapse All"
                     >
-                        <ChevronsUp size={14} />
-                    </button>
+                        <ChevronsUp className="w-3 h-3 mr-1" /> Collapse All
+                    </Button>
                 </div>
             </div>
 
