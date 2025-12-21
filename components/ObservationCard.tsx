@@ -101,7 +101,11 @@ export function ObservationCard({ observation, obsNumber }: ObservationCardProps
         handleUpdate('title', selectedTitle);
         if (template) {
             handleUpdate('risk', template.risk);
-            handleUpdate('actionPlan', template.actionPlan);
+            handleUpdate('actionPlan', template.actionPlan || '');
+            handleUpdate('background', template.background || '');
+            if (template.observation) handleUpdate('observation', template.observation);
+            handleUpdate('recommendation', template.recommendation || '');
+            handleUpdate('implication', template.implication || '');
         }
     };
 

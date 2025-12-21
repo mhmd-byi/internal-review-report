@@ -5,6 +5,10 @@ export interface ITemplate extends Document {
     title: string;
     risk: 'High' | 'Medium' | 'Low';
     actionPlan: string;
+    background?: string;
+    observation?: string;
+    recommendation?: string;
+    implication?: string;
 }
 
 const TemplateSchema = new Schema<ITemplate>({
@@ -12,6 +16,10 @@ const TemplateSchema = new Schema<ITemplate>({
     title: { type: String, required: true },
     risk: { type: String, enum: ['High', 'Medium', 'Low'], default: 'Medium' },
     actionPlan: { type: String, default: '' },
+    background: { type: String, default: '' },
+    observation: { type: String, default: '' },
+    recommendation: { type: String, default: '' },
+    implication: { type: String, default: '' },
 }, { timestamps: true });
 
 // Prevent overwrite model error
