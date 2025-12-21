@@ -46,3 +46,20 @@ export function formatHeaderDate(dateStr: string): string {
 
     return `${MMM} ${DD}, ${YYYY} [${DDD}]`;
 }
+
+export function formatMMMDDYY(dateStr: string): string {
+    if (!dateStr) return "";
+    const parts = dateStr.split("-");
+    if (parts.length !== 3) return dateStr;
+
+    const [y, m, d] = parts;
+    const dt = new Date(`${y}-${m}-${d}T00:00:00`);
+    if (isNaN(dt.getTime())) return dateStr;
+
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const month = months[dt.getMonth()];
+    const day = String(dt.getDate()).padStart(2, "0");
+    const year = String(dt.getFullYear()).slice(-2);
+
+    return `${month} ${day}, ${year}`;
+}

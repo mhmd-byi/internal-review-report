@@ -9,6 +9,8 @@ import { Dashboard } from '@/components/Dashboard';
 import { ObservationList } from '@/components/ObservationList';
 import { PrintSummary } from '@/components/PrintSummary';
 
+import { ReportRightSidebar } from '@/components/ReportRightSidebar';
+
 import { AppHeader } from '@/components/AppHeader';
 
 function ReportContent() {
@@ -33,7 +35,9 @@ function ReportContent() {
     <div id="report-container" className="min-h-screen bg-gradient-to-br from-sky-50 via-slate-50 to-gray-100 font-serif text-slate-800">
       <AppHeader title="Internal Review Report" />
       <div className="p-4 md:p-8">
-        <div className="max-w-[1100px] mx-auto pb-20">
+        <div className="max-w-[1100px] mx-auto pb-20 pr-12">
+
+          <ReportRightSidebar />
 
           <ReportHeader />
 
