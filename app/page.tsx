@@ -5,7 +5,7 @@ import { useSession, signOut } from 'next-auth/react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardContent, CardTitle, CardDescription } from '@/components/ui/card';
-import { FileText, Users, LogOut, PlusCircle, Clock, ChevronRight } from 'lucide-react';
+import { FileText, Users, LogOut, PlusCircle, Clock, ChevronRight, Trash2, Edit } from 'lucide-react';
 import { UserDropdown } from '@/components/UserDropdown';
 
 interface ReportSummary {
@@ -22,19 +22,40 @@ export default function DashboardPage() {
     const [recentReports, setRecentReports] = useState<ReportSummary[]>([]);
     const [loading, setLoading] = useState(true);
 
+    const fetchReports = () => {
+        setLoading(true);
+        fetch('/api/reports')
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    setRecentReports(data.data.slice(0, 5)); // Show top 5
+                }
+            })
+            .catch(err => console.error('Failed to fetch reports:', err))
+            .finally(() => setLoading(false));
+    };
+
     useEffect(() => {
         if (session) {
-            fetch('/api/reports')
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        setRecentReports(data.data.slice(0, 5)); // Show top 5
-                    }
-                })
-                .catch(err => console.error('Failed to fetch reports:', err))
-                .finally(() => setLoading(false));
+            fetchReports();
         }
     }, [session]);
+
+    const handleDeleteReport = async (e: React.MouseEvent, id: string, name: string) => {
+        e.preventDefault(); // Prevent navigation
+        if (!confirm(`Are you sure you want to delete report for "${name}"?`)) return;
+
+        try {
+            const res = await fetch(`/api/reports/${id}`, { method: 'DELETE' });
+            if (res.ok) {
+                fetchReports();
+            } else {
+                alert('Failed to delete report');
+            }
+        } catch (err) {
+            console.error('Error deleting report:', err);
+        }
+    };
 
     return (
         <div className="min-h-screen bg-slate-50 p-8">
@@ -134,7 +155,26 @@ export default function DashboardPage() {
                                                     Audit Date: {new Date(report.auditDate).toLocaleDateString()}
                                                 </p>
                                             </div>
-                                            <ChevronRight className="w-5 h-5 text-slate-400 group-hover:text-sky-500 transition-colors" />
+                                            <div className="flex items-center gap-2">
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="opacity-0 group-hover:opacity-100 transition-opacity text-slate-400 hover:text-sky-600"
+                                                    title="Edit Report"
+                                                >
+                                                    <Edit className="w-4 h-4" />
+                                                </Button>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="opacity-0 group-hover:opacity-100 transition-opacity text-slate-400 hover:text-red-600"
+                                                    onClick={(e) => handleDeleteReport(e, report._id, report.schoolName)}
+                                                    title="Delete Report"
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                </Button>
+                                                <ChevronRight className="w-5 h-5 text-slate-400 group-hover:text-sky-500 transition-colors" />
+                                            </div>
                                         </CardContent>
                                     </Card>
                                 </Link>
