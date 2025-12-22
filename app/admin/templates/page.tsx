@@ -154,8 +154,11 @@ export default function AdminTemplatesPage() {
             // TODO: Ensure API handles updates or add PUT endpoint if strictly required. 
             // Assuming current task focus is UI Refactor.
 
-            const res = await fetch('/api/templates', {
-                method: 'POST',
+            const url = editingId ? `/api/templates/${editingId}` : '/api/templates';
+            const method = editingId ? 'PUT' : 'POST';
+
+            const res = await fetch(url, {
+                method,
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData),
             });
@@ -171,7 +174,19 @@ export default function AdminTemplatesPage() {
 
     const handleDelete = async (id: string) => {
         if (!confirm("Are you sure?")) return;
-        alert("Delete functionality coming soon (requires API update)");
+        try {
+            const res = await fetch(`/api/templates/${id}`, {
+                method: 'DELETE',
+            });
+
+            if (res.ok) {
+                fetchTemplates();
+            } else {
+                alert("Failed to delete template");
+            }
+        } catch (error) {
+            console.error('Failed to delete template:', error);
+        }
     };
 
     if (session.data?.user?.role !== 'admin') {
