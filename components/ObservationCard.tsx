@@ -10,6 +10,7 @@ import { useReport } from '@/components/ReportContext';
 import { IObservation } from '@/models/Report';
 import { cn } from '@/lib/utils';
 import { getTargetDateFromAudit } from '@/utils/dates';
+import { useSession } from 'next-auth/react';
 
 interface ObservationCardProps {
     observation: IObservation;
@@ -17,7 +18,21 @@ interface ObservationCardProps {
 }
 
 export function ObservationCard({ observation, obsNumber }: ObservationCardProps) {
+    const { data: session } = useSession();
     const { updateObservation, deleteObservation, auditDate } = useReport();
+    const isManagement = session?.user?.role === 'management';
+
+    // ... inside return ...
+    // Update inputs to add `disabled={isManagement}`
+
+    // Example for Title/Risk/Type/Area/Inputs:
+    // ... disabled={isManagement} ...
+    // Note: I will apply this to all non-management inputs.
+
+    // Can I apply a "readOnly" or "disabled" prop to all these elements?
+    // I'll do it block by block.
+
+    // ... (Code continues below)
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [templates, setTemplates] = useState<any[]>([]);
     const [availableAreas, setAvailableAreas] = useState<string[]>([]);
@@ -142,6 +157,7 @@ export function ObservationCard({ observation, obsNumber }: ObservationCardProps
                             checked={isNA}
                             onChange={(e) => handleUpdate('isNA', e.target.checked)}
                             className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                            disabled={isManagement}
                         />
                         Mark as Applicable
                     </label>
@@ -166,6 +182,7 @@ export function ObservationCard({ observation, obsNumber }: ObservationCardProps
                                 className="w-full bg-white/10 border border-white/20 rounded px-3 py-2 text-sm text-white font-medium focus:outline-none focus:bg-white/20 focus:border-white/50 transition-colors cursor-pointer"
                                 value={area}
                                 onChange={(e) => handleUpdate('area', e.target.value)}
+                                disabled={isManagement}
                             >
                                 <option value="" className="text-slate-800">Select Area...</option>
                                 {availableAreas.map(a => (
@@ -184,6 +201,7 @@ export function ObservationCard({ observation, obsNumber }: ObservationCardProps
                                     className={cn("h-[38px] rounded px-3 text-xs font-bold border-none focus:ring-0 cursor-pointer shadow-sm", getRiskBg(risk))}
                                     value={risk}
                                     onChange={(e) => handleUpdate('risk', e.target.value as any)}
+                                    disabled={isManagement}
                                 >
                                     <option value="High">High Risk</option>
                                     <option value="Medium">Medium Risk</option>
@@ -198,6 +216,7 @@ export function ObservationCard({ observation, obsNumber }: ObservationCardProps
                                     className="h-[38px] bg-white/10 border border-white/20 rounded px-3 text-xs text-white font-medium focus:outline-none focus:bg-white/20 cursor-pointer"
                                     value={type}
                                     onChange={(e) => handleUpdate('type', e.target.value as any)}
+                                    disabled={isManagement}
                                 >
                                     <option value="Financial" className="text-slate-800">Financial</option>
                                     <option value="Non Financial" className="text-slate-800">Non-Financial</option>
@@ -214,6 +233,7 @@ export function ObservationCard({ observation, obsNumber }: ObservationCardProps
                                         placeholder="0.00"
                                         value={financialImpact || ''}
                                         onChange={(e) => handleUpdate('financialImpact', e.target.value)}
+                                        disabled={isManagement}
                                     />
                                 </div>
                             )}
@@ -228,6 +248,7 @@ export function ObservationCard({ observation, obsNumber }: ObservationCardProps
                                 className="w-full bg-white/10 border border-white/20 rounded px-3 py-2 text-lg text-white font-semibold focus:outline-none focus:bg-white/20 focus:border-white/50 transition-colors cursor-pointer appearance-none"
                                 value={title}
                                 onChange={handleTitleChange}
+                                disabled={isManagement}
                             >
                                 <option value="" className="text-slate-800">Select Observation Title...</option>
                                 {filteredTitles.map(t => (
@@ -242,6 +263,7 @@ export function ObservationCard({ observation, obsNumber }: ObservationCardProps
                                 placeholder="Enter Observation Title..."
                                 value={title}
                                 onChange={(e) => handleUpdate('title', e.target.value)}
+                                disabled={isManagement}
                             />
                         )}
                     </div>
@@ -259,6 +281,7 @@ export function ObservationCard({ observation, obsNumber }: ObservationCardProps
                                         checked={isNA}
                                         onChange={(e) => updateObservation(id, { isNA: e.target.checked })}
                                         className="rounded border-slate-300 text-white focus:ring-sky-500"
+                                        disabled={isManagement}
                                     />
                                     Not Applicable
                                 </label>
@@ -288,6 +311,7 @@ export function ObservationCard({ observation, obsNumber }: ObservationCardProps
                                 onChange={(e) => updateObservation(id, { background: e.target.value })}
                                 placeholder="Describe current process..."
                                 className="min-h-[80px]"
+                                disabled={isManagement}
                             />
                         </div>
 
@@ -299,6 +323,7 @@ export function ObservationCard({ observation, obsNumber }: ObservationCardProps
                                 onChange={(e) => updateObservation(id, { observation: e.target.value })}
                                 placeholder="Describe the issue..."
                                 className="min-h-[80px]"
+                                disabled={isManagement}
                             />
                         </div>
 
@@ -310,6 +335,7 @@ export function ObservationCard({ observation, obsNumber }: ObservationCardProps
                                 onChange={(e) => updateObservation(id, { recommendation: e.target.value })}
                                 placeholder="Suggest improvements..."
                                 className="min-h-[80px]"
+                                disabled={isManagement}
                             />
                         </div>
 
@@ -321,6 +347,7 @@ export function ObservationCard({ observation, obsNumber }: ObservationCardProps
                                 onChange={(e) => updateObservation(id, { implication: e.target.value })}
                                 placeholder="Describe impact..."
                                 className="min-h-[80px]"
+                                disabled={isManagement}
                             />
                         </div>
 

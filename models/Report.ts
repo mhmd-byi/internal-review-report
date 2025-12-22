@@ -30,6 +30,9 @@ export interface IReport extends Document {
     creatorName?: string;
     createdAt: Date;
     updatedAt: Date;
+    assignedTo?: mongoose.Schema.Types.ObjectId;
+    assignedToName?: string;
+    workflowStatus?: 'Draft' | 'Sent to Management' | 'Completed';
 }
 
 const ObservationSchema = new Schema<IObservation>({
@@ -60,6 +63,9 @@ const ReportSchema = new Schema<IReport>({
     observations: [ObservationSchema],
     createdBy: { type: Schema.Types.ObjectId, ref: 'User' },
     creatorName: { type: String },
+    assignedTo: { type: Schema.Types.ObjectId, ref: 'User' },
+    assignedToName: { type: String },
+    workflowStatus: { type: String, enum: ['Draft', 'Sent to Management', 'Completed'], default: 'Draft' },
 }, { timestamps: true });
 
 // Prevent overwrite model error

@@ -14,7 +14,7 @@ interface User {
     name: string;
     email: string;
     role: string;
-    responsibility?: string;
+    // responsibility removed
 }
 
 export default function AdminUsersPage() {
@@ -28,7 +28,7 @@ export default function AdminUsersPage() {
         phone: '',
         password: '',
         role: 'user',
-        responsibility: '',
+        // responsibility removed
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -69,7 +69,7 @@ export default function AdminUsersPage() {
             email: user.email,
             phone: user.phone || '', // Ensure phone is handled if present in model
             role: user.role,
-            responsibility: user.responsibility || '',
+            // responsibility removed
             password: '', // Password intentionally blank
         });
         setError('');
@@ -78,7 +78,7 @@ export default function AdminUsersPage() {
 
     const handleCancelEdit = () => {
         setEditingId(null);
-        setFormData({ name: '', email: '', phone: '', password: '', role: 'user', responsibility: '' });
+        setFormData({ name: '', email: '', phone: '', password: '', role: 'user' });
         setError('');
         setSuccess('');
     };
@@ -128,7 +128,7 @@ export default function AdminUsersPage() {
             setSuccess(`User ${editingId ? 'updated' : 'created'} successfully`);
 
             if (!editingId) {
-                setFormData({ name: '', email: '', phone: '', password: '', role: 'user', responsibility: '' });
+                setFormData({ name: '', email: '', phone: '', password: '', role: 'user' });
             } else {
                 // If editing, maybe clear password field but keep others? Or reset?
                 // Typically reset form or keep it. Let's reset to exit edit mode.
@@ -177,20 +177,11 @@ export default function AdminUsersPage() {
                                         <label className="text-sm font-medium">Role</label>
                                         <Select name="role" value={formData.role} onChange={handleChange}>
                                             <option value="user">User</option>
+                                            <option value="management">Management</option>
                                             <option value="admin">Admin</option>
                                         </Select>
                                     </div>
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-medium">Responsibility</label>
-                                        <Select name="responsibility" value={formData.responsibility} onChange={handleChange}>
-                                            <option value="">Select Responsibility</option>
-                                            <option value="Principal">Principal</option>
-                                            <option value="Admin Head">Admin Head</option>
-                                            <option value="Accountant">Accountant</option>
-                                            <option value="Management Committee">Management Committee</option>
-                                            <option value="Other">Other</option>
-                                        </Select>
-                                    </div>
+                                    {/* Responsibility Removed */}
                                     <div className="space-y-2">
                                         <label className="text-sm font-medium">Password {editingId && '(Leave blank to keep)'}</label>
                                         <Input name="password" type="password" value={formData.password} onChange={handleChange} required={!editingId} placeholder={editingId ? "********" : ""} />
@@ -227,14 +218,14 @@ export default function AdminUsersPage() {
                                                 <th className="text-left p-3 font-medium text-slate-500">Name</th>
                                                 <th className="text-left p-3 font-medium text-slate-500">Email</th>
                                                 <th className="text-left p-3 font-medium text-slate-500">Role</th>
-                                                <th className="text-left p-3 font-medium text-slate-500">Responsibility</th>
+                                                {/* Responsibility Header Removed */}
                                                 <th className="text-right p-3 font-medium text-slate-500">Actions</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             {users.length === 0 ? (
                                                 <tr>
-                                                    <td colSpan={5} className="p-4 text-center text-slate-500">No users found</td>
+                                                    <td colSpan={4} className="p-4 text-center text-slate-500">No users found</td>
                                                 </tr>
                                             ) : (
                                                 users.map((user) => (
@@ -242,12 +233,14 @@ export default function AdminUsersPage() {
                                                         <td className="p-3">{user.name}</td>
                                                         <td className="p-3">{user.email}</td>
                                                         <td className="p-3 capitalize">
-                                                            <span className={`px-2 py-1 rounded-full text-xs font-semibold ${user.role === 'admin' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'
+                                                            <span className={`px-2 py-1 rounded-full text-xs font-semibold ${user.role === 'admin' ? 'bg-purple-100 text-purple-700' :
+                                                                user.role === 'management' ? 'bg-emerald-100 text-emerald-700' :
+                                                                    'bg-blue-100 text-blue-700'
                                                                 }`}>
                                                                 {user.role}
                                                             </span>
                                                         </td>
-                                                        <td className="p-3">{user.responsibility || '-'}</td>
+                                                        {/* Responsibility Cell Removed */}
                                                         <td className="p-3 text-right space-x-2">
                                                             <Button
                                                                 variant="outline"
