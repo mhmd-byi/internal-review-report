@@ -53,13 +53,19 @@ export function ObservationList() {
                         </div>
 
                         <div className="space-y-6">
-                            {groupedObs[area].map((obs, obsIdx) => (
-                                <ObservationCard
-                                    key={obs.id}
-                                    observation={obs}
-                                    obsNumber={`${areaIdx + 1}.${obsIdx + 1}`}
-                                />
-                            ))}
+                            {(() => {
+                                let validObsCount = 0;
+                                return groupedObs[area].map((obs) => {
+                                    const displayNum = obs.isNA ? 'N/A' : `${areaIdx + 1}.${++validObsCount}`;
+                                    return (
+                                        <ObservationCard
+                                            key={obs.id}
+                                            observation={obs}
+                                            obsNumber={displayNum}
+                                        />
+                                    );
+                                });
+                            })()}
                         </div>
                     </div>
                 ))}
