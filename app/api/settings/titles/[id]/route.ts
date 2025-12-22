@@ -13,7 +13,6 @@ export async function DELETE(
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Await params before using
     const { id } = await params;
 
     await dbConnect();
@@ -22,5 +21,36 @@ export async function DELETE(
         return NextResponse.json({ success: true });
     } catch (error) {
         return NextResponse.json({ error: 'Failed to delete title' }, { status: 500 });
+    }
+}
+
+export async function PUT(
+    request: Request,
+    { params }: { params: Promise<{ id: string }> }
+) {
+    const session = await getServerSession(authOptions);
+    if (session?.user?.role !== 'admin') {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { id } = await params;
+    const body = await request.json();
+    const { title, area } = body;
+
+    await dbConnect();
+    try {
+        const updatedTitle = await ObservationTitle.findByIdAndUpdate(
+            id,
+            { title, area },
+            { new: true, runValidators: true }
+        );
+
+        if (!updatedTitle) {
+            return NextResponse.json({ error: 'Title not found' }, { status: 404 });
+        }
+
+        return NextResponse.json(updatedTitle);
+    } catch (error) {
+        return NextResponse.json({ error: 'Failed to update title' }, { status: 500 });
     }
 }

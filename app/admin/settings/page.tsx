@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Select } from '@/components/ui/select'; // If needed for Title-Area link, though simpler text match might suffice for now
-import { Plus, Trash, Settings, ShieldCheck, FileType } from 'lucide-react';
+import { Plus, Trash, Settings, ShieldCheck, FileType, Pencil, Check, X } from 'lucide-react';
 
 interface Area {
     _id: string;
@@ -108,6 +108,34 @@ export default function SettingsPage() {
         }
     };
 
+    // Edit Title State
+    const [editingTitle, setEditingTitle] = useState<Title | null>(null);
+
+    const startEditingTitle = (title: Title) => {
+        setEditingTitle(title);
+    };
+
+    const cancelEditingTitle = () => {
+        setEditingTitle(null);
+    };
+
+    const saveEditingTitle = async () => {
+        if (!editingTitle) return;
+        try {
+            const res = await fetch(`/api/settings/titles/${editingTitle._id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title: editingTitle.title, area: editingTitle.area })
+            });
+            if (res.ok) {
+                setEditingTitle(null);
+                fetchData();
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
     if (session.data?.user?.role !== 'admin') {
         return <div className="p-8 text-center text-red-500">Access Denied</div>;
     }
@@ -202,19 +230,57 @@ export default function SettingsPage() {
 
                             <div className="space-y-2 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
                                 {titles.map(title => (
-                                    <div key={title._id} className="flex justify-between items-center p-3 bg-slate-50 rounded border border-slate-100 group">
-                                        <div>
-                                            <div className="font-medium text-slate-700">{title.title}</div>
-                                            {title.area && <div className="text-xs text-slate-400">{title.area}</div>}
-                                        </div>
-                                        <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            className="opacity-0 group-hover:opacity-100 text-red-500 hover:text-red-700 hover:bg-red-50"
-                                            onClick={() => handleDeleteTitle(title._id)}
-                                        >
-                                            <Trash className="w-4 h-4" />
-                                        </Button>
+                                    <div key={title._id} className="flex flex-col p-3 bg-slate-50 rounded border border-slate-100 group">
+                                        {editingTitle?._id === title._id ? (
+                                            <div className="flex flex-col gap-2 w-full">
+                                                <select
+                                                    className="w-full h-8 px-2 text-xs bg-white border border-slate-300 rounded"
+                                                    value={editingTitle.area || ''}
+                                                    onChange={e => setEditingTitle({ ...editingTitle, area: e.target.value })}
+                                                >
+                                                    <option value="">(No Area)</option>
+                                                    {areas.map(a => <option key={a._id} value={a.name}>{a.name}</option>)}
+                                                </select>
+                                                <Input
+                                                    className="h-8 text-sm"
+                                                    value={editingTitle.title}
+                                                    onChange={e => setEditingTitle({ ...editingTitle, title: e.target.value })}
+                                                />
+                                                <div className="flex justify-end gap-2 mt-1">
+                                                    <Button size="sm" variant="ghost" onClick={cancelEditingTitle} className="h-7 w-7 p-0 text-slate-500">
+                                                        <X className="w-4 h-4" />
+                                                    </Button>
+                                                    <Button size="sm" variant="ghost" onClick={saveEditingTitle} className="h-7 w-7 p-0 text-green-600 hover:bg-green-50">
+                                                        <Check className="w-4 h-4" />
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <div className="flex justify-between items-center w-full">
+                                                <div>
+                                                    <div className="font-medium text-slate-700">{title.title}</div>
+                                                    {title.area && <div className="text-xs text-slate-400">{title.area}</div>}
+                                                </div>
+                                                <div className="flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        className="h-8 w-8 p-0 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50"
+                                                        onClick={() => startEditingTitle(title)}
+                                                    >
+                                                        <Pencil className="w-3.5 h-3.5" />
+                                                    </Button>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        className="h-8 w-8 p-0 text-slate-400 hover:text-red-700 hover:bg-red-50 ml-1"
+                                                        onClick={() => handleDeleteTitle(title._id)}
+                                                    >
+                                                        <Trash className="w-3.5 h-3.5" />
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
                                 ))}
                                 {titles.length === 0 && !loading && <div className="text-center text-slate-400 text-sm py-4">No titles defined</div>}
