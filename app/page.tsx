@@ -14,6 +14,7 @@ interface ReportSummary {
     location: string;
     auditDate: string;
     createdAt: string;
+    creatorName?: string;
 }
 
 export default function DashboardPage() {
@@ -154,6 +155,11 @@ export default function DashboardPage() {
                                                 <p className="text-sm text-slate-500 mt-1">
                                                     Audit Date: {new Date(report.auditDate).toLocaleDateString()}
                                                 </p>
+                                                {session?.user?.role === 'admin' && (
+                                                    <p className="text-xs text-indigo-600 mt-0.5 font-medium">
+                                                        Created by: {report.creatorName || 'User'}
+                                                    </p>
+                                                )}
                                             </div>
                                             <div className="flex items-center gap-2">
                                                 <Button

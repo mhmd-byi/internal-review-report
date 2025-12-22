@@ -5,8 +5,20 @@ import Report from '@/models/Report';
 export async function POST(request: Request) {
     try {
         await dbConnect();
+        const session = await getServerSession(authOptions);
+
+        if (!session || !session.user) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
         const body = await request.json();
-        const report = await Report.create(body);
+        const reportData = {
+            ...body,
+            createdBy: session.user.id,
+            creatorName: session.user.name
+        };
+
+        const report = await Report.create(reportData);
         return NextResponse.json({ success: true, data: report }, { status: 201 });
     } catch (error: unknown) {
         const errorMessage = error instanceof Error ? error.message : 'Unknown error';

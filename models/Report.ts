@@ -26,6 +26,8 @@ export interface IReport extends Document {
     auditDate: Date;
     preparedBy: string;
     observations: IObservation[];
+    createdBy?: mongoose.Schema.Types.ObjectId;
+    creatorName?: string;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -56,6 +58,8 @@ const ReportSchema = new Schema<IReport>({
     auditDate: { type: Date, default: Date.now },
     preparedBy: { type: String, default: 'Internal Audit Team' },
     observations: [ObservationSchema],
+    createdBy: { type: Schema.Types.ObjectId, ref: 'User' },
+    creatorName: { type: String },
 }, { timestamps: true });
 
 // Prevent overwrite model error
