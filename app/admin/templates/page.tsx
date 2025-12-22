@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
-import { Plus, Trash, Edit, X } from 'lucide-react';
+import { Plus, Trash, Edit, X, ChevronDown, ChevronUp, ChevronsDown, ChevronsUp } from 'lucide-react';
 
 interface ITemplate {
     _id: string;
@@ -37,6 +37,28 @@ export default function AdminTemplatesPage() {
         recommendation: '',
         implication: ''
     });
+
+    // Grouping State and Logic
+    const [collapsedAreas, setCollapsedAreas] = useState<Record<string, boolean>>({});
+
+    const groupedTemplates = templates.reduce((acc, template) => {
+        const area = template.area || 'Other';
+        if (!acc[area]) acc[area] = [];
+        acc[area].push(template);
+        return acc;
+    }, {} as Record<string, ITemplate[]>);
+
+    const sortedAreas = Object.keys(groupedTemplates).sort();
+
+    const toggleArea = (area: string) => {
+        setCollapsedAreas(prev => ({ ...prev, [area]: !prev[area] }));
+    };
+
+    const toggleAll = (collapse: boolean) => {
+        const newCollapsed: Record<string, boolean> = {};
+        sortedAreas.forEach(area => newCollapsed[area] = collapse);
+        setCollapsedAreas(newCollapsed);
+    };
 
     useEffect(() => {
         fetchTemplates();
@@ -131,14 +153,39 @@ export default function AdminTemplatesPage() {
         <div className="min-h-screen bg-slate-50 relative">
             <AppHeader title="Manage Templates" />
             <div className="p-8 max-w-6xl mx-auto">
-                <div className="flex justify-between items-center mb-8">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
                     <div>
                         <h1 className="text-3xl font-bold text-slate-900">Observation Templates</h1>
                         <p className="text-slate-500">Manage standard observations for quick reporting.</p>
                     </div>
-                    <Button onClick={openAddModal} className="bg-indigo-600 hover:bg-indigo-700 text-white">
-                        <Plus className="w-4 h-4 mr-2" /> Add New Template
-                    </Button>
+                    <div className="flex items-center gap-3">
+                        {/* Collapse Controls */}
+                        <div className="flex items-center gap-1 bg-white rounded-lg p-1 border border-slate-200 shadow-sm">
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => toggleAll(false)}
+                                className="h-8 px-2 text-slate-600 hover:text-indigo-600"
+                                title="Expand All"
+                            >
+                                <ChevronsDown className="w-4 h-4 mr-1" /> Expand
+                            </Button>
+                            <div className="w-px h-4 bg-slate-200"></div>
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => toggleAll(true)}
+                                className="h-8 px-2 text-slate-600 hover:text-indigo-600"
+                                title="Collapse All"
+                            >
+                                <ChevronsUp className="w-4 h-4 mr-1" /> Collapse
+                            </Button>
+                        </div>
+
+                        <Button onClick={openAddModal} className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-md">
+                            <Plus className="w-4 h-4 mr-2" /> Add Template
+                        </Button>
+                    </div>
                 </div>
 
                 {/* List Section - Full Width */}
@@ -150,44 +197,65 @@ export default function AdminTemplatesPage() {
                             No templates found. Create one to get started.
                         </div>
                     ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {templates.map(t => (
-                                <Card key={t._id} className="hover:shadow-md transition-shadow group relative">
-                                    <CardContent className="p-5">
-                                        <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                            <Button size="sm" variant="ghost" className="h-8 w-8 p-0 bg-white shadow-sm border" onClick={() => openEditModal(t)}>
-                                                <Edit className="w-4 h-4 text-slate-600" />
-                                            </Button>
-                                            <Button size="sm" variant="ghost" className="h-8 w-8 p-0 bg-white shadow-sm border hover:bg-red-50" onClick={() => handleDelete(t._id)}>
-                                                <Trash className="w-4 h-4 text-red-500" />
-                                            </Button>
+                        <div className="space-y-6">
+                            {sortedAreas.map(area => (
+                                <div key={area} className="border border-slate-200 rounded-xl bg-white shadow-sm overflow-hidden transition-all hover:shadow-md">
+                                    <div
+                                        className="px-6 py-4 bg-slate-50/50 flex items-center justify-between cursor-pointer hover:bg-slate-50 transition-colors select-none group"
+                                        onClick={() => toggleArea(area)}
+                                    >
+                                        <h3 className="font-bold text-lg text-slate-800 flex items-center gap-3">
+                                            {area}
+                                            <span className="text-xs font-medium text-slate-500 bg-white px-2.5 py-0.5 rounded-full border border-slate-200 shadow-sm group-hover:border-indigo-200 group-hover:text-indigo-600 transition-colors">
+                                                {groupedTemplates[area].length}
+                                            </span>
+                                        </h3>
+                                        <div className="p-1 rounded-full text-slate-400 group-hover:text-indigo-600 group-hover:bg-indigo-50 transition-all">
+                                            {collapsedAreas[area] ? <ChevronDown className="w-5 h-5" /> : <ChevronUp className="w-5 h-5" />}
                                         </div>
+                                    </div>
 
-                                        <div className="mb-3">
-                                            <div className="flex items-center gap-2 mb-2">
-                                                <span className="px-2.5 py-0.5 bg-slate-100 text-slate-600 text-[10px] uppercase tracking-wider rounded-full font-bold border border-slate-200">
-                                                    {t.area}
-                                                </span>
-                                                <span className={`px-2.5 py-0.5 text-[10px] uppercase tracking-wider rounded-full font-bold border ${t.risk === 'High' ? 'bg-red-50 text-red-700 border-red-200' :
-                                                        t.risk === 'Medium' ? 'bg-yellow-50 text-yellow-700 border-yellow-200' :
-                                                            'bg-green-50 text-green-700 border-green-200'
-                                                    }`}>
-                                                    {t.risk}
-                                                </span>
-                                            </div>
-                                            <h3 className="font-bold text-slate-900 text-lg leading-tight">{t.title}</h3>
-                                        </div>
+                                    {!collapsedAreas[area] && (
+                                        <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-4 border-t border-slate-100 animate-in slide-in-from-top-2 duration-200">
+                                            {groupedTemplates[area].map(t => (
+                                                <Card key={t._id} className="hover:shadow-md transition-shadow group/card relative border-slate-200">
+                                                    <CardContent className="p-5">
+                                                        <div className="absolute top-3 right-3 flex gap-1 opacity-0 group-hover/card:opacity-100 transition-opacity z-10">
+                                                            <Button size="sm" variant="ghost" className="h-7 w-7 p-0 bg-white shadow-sm border text-slate-500 hover:text-indigo-600 hover:bg-indigo-50" onClick={() => openEditModal(t)}>
+                                                                <Edit className="w-3.5 h-3.5" />
+                                                            </Button>
+                                                            <Button size="sm" variant="ghost" className="h-7 w-7 p-0 bg-white shadow-sm border text-slate-500 hover:text-red-600 hover:bg-red-50" onClick={() => handleDelete(t._id)}>
+                                                                <Trash className="w-3.5 h-3.5" />
+                                                            </Button>
+                                                        </div>
 
-                                        <div className="space-y-3">
-                                            {t.actionPlan && (
-                                                <div className="text-sm text-slate-600 bg-slate-50 p-2.5 rounded border border-slate-100">
-                                                    <span className="font-bold text-[10px] uppercase text-slate-400 block mb-1">Action Plan</span>
-                                                    <p className="line-clamp-2">{t.actionPlan}</p>
-                                                </div>
-                                            )}
+                                                        <div className="mb-3">
+                                                            <div className="flex items-center gap-2 mb-2">
+                                                                {/* Area badge removed as it is now grouped */}
+                                                                <span className={`px-2 py-0.5 text-[10px] uppercase tracking-wider rounded-full font-bold border ${t.risk === 'High' ? 'bg-red-50 text-red-700 border-red-200' :
+                                                                    t.risk === 'Medium' ? 'bg-yellow-50 text-yellow-700 border-yellow-200' :
+                                                                        'bg-green-50 text-green-700 border-green-200'
+                                                                    }`}>
+                                                                    {t.risk}
+                                                                </span>
+                                                            </div>
+                                                            <h3 className="font-bold text-slate-900 text-base leading-tight pr-6">{t.title}</h3>
+                                                        </div>
+
+                                                        <div className="space-y-3">
+                                                            {t.actionPlan && (
+                                                                <div className="text-xs text-slate-600 bg-slate-50 p-2.5 rounded border border-slate-100/80">
+                                                                    <span className="font-bold text-[9px] uppercase text-slate-400 block mb-1 tracking-wider">Action Plan</span>
+                                                                    <p className="line-clamp-2 leading-relaxed">{t.actionPlan}</p>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </CardContent>
+                                                </Card>
+                                            ))}
                                         </div>
-                                    </CardContent>
-                                </Card>
+                                    )}
+                                </div>
                             ))}
                         </div>
                     )}
