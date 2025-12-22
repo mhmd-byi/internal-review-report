@@ -28,6 +28,13 @@ export function AppHeader({ title }: { title?: string }) {
                 </div>
 
                 <div className="flex items-center gap-4">
+                    {session?.user?.role === 'admin' && (
+                        <Link href="/admin/settings">
+                            <Button variant="ghost" size="sm" className="gap-2 text-slate-600 hover:text-slate-900">
+                                Settings
+                            </Button>
+                        </Link>
+                    )}
                     {session?.user && (
                         <UserDropdown user={session.user} />
                     )}

@@ -21,9 +21,24 @@ interface ITemplate {
     implication?: string;
 }
 
+interface MetaArea {
+    _id: string;
+    name: string;
+}
+
+interface MetaTitle {
+    _id: string;
+    title: string;
+    area?: string;
+}
+
 export default function AdminTemplatesPage() {
     const session = useSession();
     const [templates, setTemplates] = useState<ITemplate[]>([]);
+    // Metadata State
+    const [metaAreas, setMetaAreas] = useState<MetaArea[]>([]);
+    const [metaTitles, setMetaTitles] = useState<MetaTitle[]>([]);
+
     const [loading, setLoading] = useState(true);
     const [editingId, setEditingId] = useState<string | null>(null);
     const [showModal, setShowModal] = useState(false);
@@ -62,7 +77,21 @@ export default function AdminTemplatesPage() {
 
     useEffect(() => {
         fetchTemplates();
+        fetchMetadata();
     }, []);
+
+    const fetchMetadata = async () => {
+        try {
+            const [areasRes, titlesRes] = await Promise.all([
+                fetch('/api/settings/areas'),
+                fetch('/api/settings/titles')
+            ]);
+            if (areasRes.ok) setMetaAreas(await areasRes.json());
+            if (titlesRes.ok) setMetaTitles(await titlesRes.json());
+        } catch (error) {
+            console.error('Failed to fetch metadata:', error);
+        }
+    };
 
     const fetchTemplates = async () => {
         try {
@@ -285,13 +314,17 @@ export default function AdminTemplatesPage() {
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="col-span-2 md:col-span-1">
                                         <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 block">Area</label>
-                                        <Input
+                                        <select
+                                            className="w-full h-10 rounded-md border border-input bg-white px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                                             value={formData.area}
                                             onChange={e => setFormData({ ...formData, area: e.target.value })}
-                                            placeholder="e.g. Fixed Assets"
                                             required
-                                            className="font-medium"
-                                        />
+                                        >
+                                            <option value="">Select Area...</option>
+                                            {metaAreas.map(area => (
+                                                <option key={area._id} value={area.name}>{area.name}</option>
+                                            ))}
+                                        </select>
                                     </div>
                                     <div className="col-span-2 md:col-span-1">
                                         <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 block">Risk Level</label>
@@ -309,13 +342,19 @@ export default function AdminTemplatesPage() {
 
                                 <div>
                                     <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 block">Observation Title</label>
-                                    <Input
+                                    <select
+                                        className="w-full h-10 rounded-md border border-input bg-white px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 font-bold text-slate-700"
                                         value={formData.title}
                                         onChange={e => setFormData({ ...formData, title: e.target.value })}
-                                        placeholder="Enter a descriptive title..."
                                         required
-                                        className="font-bold text-lg"
-                                    />
+                                    >
+                                        <option value="">Select Observation Title...</option>
+                                        {metaTitles
+                                            .filter(t => !formData.area || !t.area || t.area === formData.area)
+                                            .map(title => (
+                                                <option key={title._id} value={title.title}>{title.title}</option>
+                                            ))}
+                                    </select>
                                 </div>
 
                                 <div className="space-y-4 pt-2 border-t border-slate-100/80">
