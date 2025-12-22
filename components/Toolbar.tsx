@@ -16,7 +16,10 @@ const AREA_ORDER = [
     'Other'
 ];
 
+import { useSession } from 'next-auth/react';
+
 export function Toolbar() {
+    const { data: session } = useSession(); // Get session
     const { stats, location, addObservation, observations, schoolName, period, auditDate, preparedBy } = useReport();
     const [isSaving, setIsSaving] = useState(false);
     const [isSendModalOpen, setIsSendModalOpen] = useState(false);
@@ -204,13 +207,15 @@ export function Toolbar() {
 
                 {/* Right Actions */}
                 <div className="flex items-center gap-2 pr-1">
-                    <Button
-                        onClick={handleOpenSendModal}
-                        size="sm"
-                        className="rounded-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs h-8 px-3 shadow-sm hover:shadow"
-                    >
-                        Send to Management
-                    </Button>
+                    {session?.user?.role !== 'management' && (
+                        <Button
+                            onClick={handleOpenSendModal}
+                            size="sm"
+                            className="rounded-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs h-8 px-3 shadow-sm hover:shadow"
+                        >
+                            Send to Management
+                        </Button>
+                    )}
 
                     <Button
                         onClick={addObservation}
