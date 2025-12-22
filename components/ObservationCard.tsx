@@ -19,7 +19,7 @@ interface ObservationCardProps {
 
 export function ObservationCard({ observation, obsNumber }: ObservationCardProps) {
     const { data: session } = useSession();
-    const { updateObservation, deleteObservation, auditDate } = useReport();
+    const { updateObservation, deleteObservation, auditDate, observations } = useReport();
     const isManagement = session?.user?.role === 'management';
 
     // ... inside return ...
@@ -86,12 +86,17 @@ export function ObservationCard({ observation, obsNumber }: ObservationCardProps
 
     useEffect(() => {
         if (area) {
-            const titles = templates.filter(t => t.area === area);
+            // Get titles used in OTHER cards
+            const usedTitles = observations
+                .filter(o => o.id !== id && o.title)
+                .map(o => o.title);
+
+            const titles = templates.filter(t => t.area === area && !usedTitles.includes(t.title));
             setFilteredTitles(titles);
         } else {
             setFilteredTitles([]);
         }
-    }, [area, templates]);
+    }, [area, templates, observations, id]);
 
     // Auto-set target date if empty
     useEffect(() => {
@@ -107,10 +112,6 @@ export function ObservationCard({ observation, obsNumber }: ObservationCardProps
 
     const handleTitleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const selectedTitle = e.target.value;
-        if (selectedTitle === 'custom') {
-            handleUpdate('title', '');
-            return;
-        }
 
         const template = templates.find(t => t.title === selectedTitle && t.area === area);
 
@@ -254,7 +255,6 @@ export function ObservationCard({ observation, obsNumber }: ObservationCardProps
                                 {filteredTitles.map(t => (
                                     <option key={t._id} value={t.title} className="text-slate-800">{t.title}</option>
                                 ))}
-                                <option value="custom" className="text-slate-800 font-bold">-- Custom Title --</option>
                             </select>
                         ) : (
                             <input
