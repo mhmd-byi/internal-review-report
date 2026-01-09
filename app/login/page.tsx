@@ -10,8 +10,10 @@ import Link from 'next/link';
 
 export default function LoginPage() {
     const router = useRouter();
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+    const [formData, setFormData] = useState({
+        identifier: '',
+        password: '',
+    });
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
@@ -22,9 +24,9 @@ export default function LoginPage() {
 
         try {
             const res = await signIn('credentials', {
-                email,
-                password,
                 redirect: false,
+                identifier: formData.identifier,
+                password: formData.password,
             });
 
             if (res?.error) {
@@ -50,14 +52,18 @@ export default function LoginPage() {
                 <CardContent>
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div className="space-y-2">
-                            <label className="text-sm font-medium">Email</label>
+                            <label className="text-sm font-medium">Email or ITS ID</label>
                             <Input
-                                type="email"
-                                placeholder="m@example.com"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
+                                type="text"
+                                name="identifier"
+                                placeholder="Email or ITS ID"
+                                value={identifier}
+                                onChange={(e) => setIdentifier(e.target.value)}
                                 required
                             />
+                            <p className="text-xs text-slate-500 mt-1">
+                                Enter your email address or 8-digit ITS ID
+                            </p>
                         </div>
                         <div className="space-y-2">
                             <label className="text-sm font-medium">Password</label>

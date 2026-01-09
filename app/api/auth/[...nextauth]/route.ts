@@ -9,16 +9,22 @@ export const authOptions: AuthOptions = {
         CredentialsProvider({
             name: "Credentials",
             credentials: {
-                email: { label: "Email", type: "email" },
+                identifier: { label: "Email or ITS ID", type: "text" },
                 password: { label: "Password", type: "password" },
             },
             async authorize(credentials) {
-                if (!credentials?.email || !credentials?.password) {
-                    throw new Error("Missing email or password");
+                if (!credentials?.identifier || !credentials?.password) {
+                    throw new Error("Missing credentials");
                 }
 
                 await dbConnect();
-                const user = await User.findOne({ email: credentials.email });
+
+                // Check if identifier is ITS ID (8 digits) or email
+                const isItsId = /^\d{8}$/.test(credentials.identifier);
+
+                const user = isItsId
+                    ? await User.findOne({ itsId: credentials.identifier })
+                    : await User.findOne({ email: credentials.identifier });
 
                 if (!user) {
                     throw new Error("No user found");
@@ -34,6 +40,7 @@ export const authOptions: AuthOptions = {
                     id: user._id.toString(),
                     name: user.name,
                     email: user.email,
+                    itsId: user.itsId,
                     role: user.role,
                     responsibility: user.responsibility,
                 };
@@ -45,6 +52,7 @@ export const authOptions: AuthOptions = {
             if (user) {
                 token.role = user.role;
                 token.id = user.id;
+                token.itsId = user.itsId;
                 token.responsibility = user.responsibility;
             }
             return token;
@@ -53,6 +61,7 @@ export const authOptions: AuthOptions = {
             if (session.user) {
                 session.user.role = token.role as string;
                 session.user.id = token.id as string;
+                session.user.itsId = (token.itsId || '') as string;
                 session.user.responsibility = token.responsibility as string;
             }
             return session;

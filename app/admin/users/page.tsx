@@ -26,6 +26,7 @@ export default function AdminUsersPage() {
         name: '',
         email: '',
         phone: '',
+        itsId: '',
         password: '',
         role: 'user',
         // responsibility removed
@@ -62,12 +63,13 @@ export default function AdminUsersPage() {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    const handleEdit = (user: User & { phone?: string }) => {
+    const handleEdit = (user: User & { phone?: string, itsId?: string }) => {
         setEditingId(user._id);
         setFormData({
             name: user.name,
             email: user.email,
             phone: user.phone || '', // Ensure phone is handled if present in model
+            itsId: user.itsId || '',
             role: user.role,
             // responsibility removed
             password: '', // Password intentionally blank
@@ -78,7 +80,7 @@ export default function AdminUsersPage() {
 
     const handleCancelEdit = () => {
         setEditingId(null);
-        setFormData({ name: '', email: '', phone: '', password: '', role: 'user' });
+        setFormData({ name: '', email: '', phone: '', itsId: '', password: '', role: 'user' });
         setError('');
         setSuccess('');
     };
@@ -128,7 +130,7 @@ export default function AdminUsersPage() {
             setSuccess(`User ${editingId ? 'updated' : 'created'} successfully`);
 
             if (!editingId) {
-                setFormData({ name: '', email: '', phone: '', password: '', role: 'user' });
+                setFormData({ name: '', email: '', phone: '', itsId: '', password: '', role: 'user' });
             } else {
                 // If editing, maybe clear password field but keep others? Or reset?
                 // Typically reset form or keep it. Let's reset to exit edit mode.
@@ -172,6 +174,23 @@ export default function AdminUsersPage() {
                                     <div className="space-y-2">
                                         <label className="text-sm font-medium">Phone</label>
                                         <Input name="phone" value={formData.phone} onChange={handleChange} required />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium">ITS ID *</label>
+                                        <Input
+                                            name="itsId"
+                                            value={formData.itsId}
+                                            onChange={(e) => {
+                                                const value = e.target.value.replace(/\D/g, '');
+                                                if (value.length <= 8) {
+                                                    setFormData({ ...formData, itsId: value });
+                                                }
+                                            }}
+                                            maxLength={8}
+                                            placeholder="12345678"
+                                            required
+                                        />
+                                        <p className="text-xs text-slate-500">8-digit numeric ID</p>
                                     </div>
                                     <div className="space-y-2">
                                         <label className="text-sm font-medium">Role</label>
