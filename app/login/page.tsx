@@ -17,6 +17,10 @@ export default function LoginPage() {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
@@ -57,8 +61,8 @@ export default function LoginPage() {
                                 type="text"
                                 name="identifier"
                                 placeholder="Email or ITS ID"
-                                value={identifier}
-                                onChange={(e) => setIdentifier(e.target.value)}
+                                value={formData.identifier}
+                                onChange={handleChange}
                                 required
                             />
                             <p className="text-xs text-slate-500 mt-1">
@@ -69,8 +73,9 @@ export default function LoginPage() {
                             <label className="text-sm font-medium">Password</label>
                             <Input
                                 type="password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
+                                name="password"
+                                value={formData.password}
+                                onChange={handleChange}
                                 required
                             />
                         </div>
