@@ -58,17 +58,40 @@ export function ObservationCard({ observation, obsNumber }: ObservationCardProps
     } = observation;
 
     useEffect(() => {
-        // Fetch templates on mount
-        fetch('/api/templates')
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    setTemplates(data.data);
-                    const areas = Array.from(new Set(data.data.map((t: any) => t.area)));
-                    setAvailableAreas(areas as string[]);
-                }
-            })
-            .catch(err => console.error('Failed to fetch templates:', err));
+        // Function to fetch templates
+        const fetchTemplates = () => {
+            console.log('Fetching templates for ObservationCard...');
+            fetch('/api/templates')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        console.log('Templates fetched successfully:', data.data.length, 'templates');
+                        setTemplates(data.data);
+                        const areas = Array.from(new Set(data.data.map((t: any) => t.area)));
+                        setAvailableAreas(areas as string[]);
+                    }
+                })
+                .catch(err => console.error('Failed to fetch templates:', err));
+        };
+
+        // Initial fetch on mount
+        fetchTemplates();
+
+        // Refetch templates when page becomes visible (user returns from another tab/window)
+        const handleVisibilityChange = () => {
+            if (!document.hidden) {
+                console.log('Page became visible, refetching templates...');
+                fetchTemplates();
+            }
+        };
+
+        // Listen for visibility changes
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+
+        // Cleanup
+        return () => {
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+        };
     }, []);
 
     useEffect(() => {
