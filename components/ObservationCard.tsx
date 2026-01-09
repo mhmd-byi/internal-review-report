@@ -54,6 +54,7 @@ export function ObservationCard({ observation, obsNumber }: ObservationCardProps
         targetDate,
         status,
         responsibility,
+        responsibilityPersonName,
         reviewerNotes,
     } = observation;
 
@@ -412,6 +413,21 @@ export function ObservationCard({ observation, obsNumber }: ObservationCardProps
                                         <option value="Other">Other</option>
                                     </select>
                                 </div>
+                                {/* Conditional Person Name Field */}
+                                {(responsibility === 'Management Committee' || responsibility === 'Other') && (
+                                    <div className="space-y-1 md:col-span-2">
+                                        <label className="text-sm font-medium text-slate-700">
+                                            Person Name
+                                            <span className="text-xs text-slate-500 ml-1">(Required for {responsibility})</span>
+                                        </label>
+                                        <Input
+                                            type="text"
+                                            placeholder="Enter person's name"
+                                            value={responsibilityPersonName || ''}
+                                            onChange={(e) => updateObservation(id, { responsibilityPersonName: e.target.value })}
+                                        />
+                                    </div>
+                                )}
                             </div>
 
                             <div className="space-y-1">

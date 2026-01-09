@@ -16,6 +16,7 @@ export interface IObservation {
     targetDate?: Date;
     status: 'Open' | 'In-Progress' | 'Closed';
     responsibility: string;
+    responsibilityPersonName?: string;
     reviewerNotes?: string;
 }
 
@@ -59,6 +60,7 @@ const ObservationSchema = new Schema<IObservation>({
     targetDate: { type: Date },
     status: { type: String, enum: ['Open', 'In-Progress', 'Closed'], default: 'Open' },
     responsibility: { type: String, default: '' },
+    responsibilityPersonName: { type: String, default: '' },
     reviewerNotes: { type: String, default: '' },
 }, { _id: false }); // Subdocument, no need for separate _id usually, but can have if needed.
 
