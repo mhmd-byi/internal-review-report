@@ -53,6 +53,14 @@ export default function AdminTemplatesPage() {
         implication: ''
     });
 
+    // Quick-add state for Areas and Titles
+    const [showQuickAddArea, setShowQuickAddArea] = useState(false);
+    const [showQuickAddTitle, setShowQuickAddTitle] = useState(false);
+    const [quickAddAreaValue, setQuickAddAreaValue] = useState('');
+    const [quickAddTitleValue, setQuickAddTitleValue] = useState('');
+    const [quickAddLoading, setQuickAddLoading] = useState(false);
+    const [quickAddError, setQuickAddError] = useState<string | null>(null);
+
     // Grouping State and Logic
     const [collapsedAreas, setCollapsedAreas] = useState<Record<string, boolean>>({});
 
@@ -141,6 +149,7 @@ export default function AdminTemplatesPage() {
             recommendation: '',
             implication: ''
         });
+        closeQuickAddPopups();
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -187,6 +196,124 @@ export default function AdminTemplatesPage() {
         } catch (error) {
             console.error('Failed to delete template:', error);
         }
+    };
+
+    // Quick-add handlers
+    const handleQuickAddArea = async () => {
+        if (!quickAddAreaValue.trim()) return;
+
+        setQuickAddLoading(true);
+        setQuickAddError(null);
+
+        try {
+            console.log('Creating new area:', quickAddAreaValue.trim());
+            const res = await fetch('/api/settings/areas', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: quickAddAreaValue.trim() }),
+            });
+
+            if (res.ok) {
+                const newArea = await res.json();
+                console.log('Area created successfully:', newArea);
+
+                // Validate response
+                if (!newArea._id || !newArea.name) {
+                    console.error('Invalid area response:', newArea);
+                    setQuickAddError('Invalid response from server');
+                    return;
+                }
+
+                // Add new area and sort alphabetically
+                const updatedAreas = [...metaAreas, newArea].sort((a, b) =>
+                    a.name.localeCompare(b.name)
+                );
+                setMetaAreas(updatedAreas);
+
+                // Auto-select the new area
+                setFormData({ ...formData, area: newArea.name });
+
+                // Clear and close popup
+                setQuickAddAreaValue('');
+                setShowQuickAddArea(false);
+
+                console.log('Updated areas list:', updatedAreas);
+            } else {
+                const errorData = await res.json();
+                console.error('Failed to create area:', errorData);
+                setQuickAddError(errorData.error || 'Failed to create area');
+            }
+        } catch (error) {
+            console.error('Network error creating area:', error);
+            setQuickAddError('Network error. Please try again.');
+        } finally {
+            setQuickAddLoading(false);
+        }
+    };
+
+    const handleQuickAddTitle = async () => {
+        if (!quickAddTitleValue.trim()) return;
+
+        setQuickAddLoading(true);
+        setQuickAddError(null);
+
+        try {
+            const payload = {
+                title: quickAddTitleValue.trim(),
+                area: formData.area || undefined
+            };
+            console.log('Creating new observation title:', payload);
+
+            const res = await fetch('/api/settings/titles', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+            });
+
+            if (res.ok) {
+                const newTitle = await res.json();
+                console.log('Observation title created successfully:', newTitle);
+
+                // Validate response
+                if (!newTitle._id || !newTitle.title) {
+                    console.error('Invalid title response:', newTitle);
+                    setQuickAddError('Invalid response from server');
+                    return;
+                }
+
+                // Add new title and sort alphabetically
+                const updatedTitles = [...metaTitles, newTitle].sort((a, b) =>
+                    a.title.localeCompare(b.title)
+                );
+                setMetaTitles(updatedTitles);
+
+                // Auto-select the new title
+                setFormData({ ...formData, title: newTitle.title });
+
+                // Clear and close popup
+                setQuickAddTitleValue('');
+                setShowQuickAddTitle(false);
+
+                console.log('Updated titles list:', updatedTitles);
+            } else {
+                const errorData = await res.json();
+                console.error('Failed to create title:', errorData);
+                setQuickAddError(errorData.error || 'Failed to create title');
+            }
+        } catch (error) {
+            console.error('Network error creating title:', error);
+            setQuickAddError('Network error. Please try again.');
+        } finally {
+            setQuickAddLoading(false);
+        }
+    };
+
+    const closeQuickAddPopups = () => {
+        setShowQuickAddArea(false);
+        setShowQuickAddTitle(false);
+        setQuickAddAreaValue('');
+        setQuickAddTitleValue('');
+        setQuickAddError(null);
     };
 
     if (session.data?.user?.role !== 'admin') {
@@ -329,17 +456,82 @@ export default function AdminTemplatesPage() {
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="col-span-2 md:col-span-1">
                                         <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 block">Area</label>
-                                        <select
-                                            className="w-full h-10 rounded-md border border-input bg-white px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                                            value={formData.area}
-                                            onChange={e => setFormData({ ...formData, area: e.target.value })}
-                                            required
-                                        >
-                                            <option value="">Select Area...</option>
-                                            {metaAreas.map(area => (
-                                                <option key={area._id} value={area.name}>{area.name}</option>
-                                            ))}
-                                        </select>
+                                        <div className="flex gap-2 relative w-full">
+                                            <select
+                                                className="flex-1 min-w-0 h-10 rounded-md border border-input bg-white px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                                                value={formData.area}
+                                                onChange={e => setFormData({ ...formData, area: e.target.value })}
+                                                required
+                                            >
+                                                <option value="">Select Area...</option>
+                                                {metaAreas.map(area => (
+                                                    <option key={area._id} value={area.name}>{area.name}</option>
+                                                ))}
+                                            </select>
+                                            <Button
+                                                type="button"
+                                                size="sm"
+                                                variant="outline"
+                                                className="h-10 w-10 p-0 shrink-0 border-indigo-200 text-indigo-600 hover:bg-indigo-50 hover:text-indigo-700"
+                                                onClick={() => setShowQuickAddArea(!showQuickAddArea)}
+                                                title="Add New Area"
+                                            >
+                                                <Plus className="w-4 h-4" />
+                                            </Button>
+
+                                            {/* Quick Add Area Popup */}
+                                            {showQuickAddArea && (
+                                                <div className="absolute top-full left-0 right-0 mt-2 p-3 bg-white border border-slate-200 rounded-lg shadow-lg z-50 space-y-2">
+                                                    <div className="flex items-center justify-between">
+                                                        <span className="text-xs font-bold text-slate-700">Add New Area</span>
+                                                        <button
+                                                            type="button"
+                                                            onClick={closeQuickAddPopups}
+                                                            className="text-slate-400 hover:text-slate-600"
+                                                        >
+                                                            <X className="w-3.5 h-3.5" />
+                                                        </button>
+                                                    </div>
+                                                    <Input
+                                                        type="text"
+                                                        placeholder="Enter area name..."
+                                                        value={quickAddAreaValue}
+                                                        onChange={(e) => setQuickAddAreaValue(e.target.value)}
+                                                        onKeyDown={(e) => {
+                                                            if (e.key === 'Enter') {
+                                                                e.preventDefault();
+                                                                handleQuickAddArea();
+                                                            }
+                                                        }}
+                                                        className="h-8 text-sm"
+                                                        autoFocus
+                                                    />
+                                                    {quickAddError && (
+                                                        <p className="text-xs text-red-600">{quickAddError}</p>
+                                                    )}
+                                                    <div className="flex gap-2">
+                                                        <Button
+                                                            type="button"
+                                                            size="sm"
+                                                            onClick={handleQuickAddArea}
+                                                            disabled={quickAddLoading || !quickAddAreaValue.trim()}
+                                                            className="flex-1 h-7 bg-indigo-600 hover:bg-indigo-700 text-xs"
+                                                        >
+                                                            {quickAddLoading ? 'Adding...' : 'Add Area'}
+                                                        </Button>
+                                                        <Button
+                                                            type="button"
+                                                            size="sm"
+                                                            variant="outline"
+                                                            onClick={closeQuickAddPopups}
+                                                            className="h-7 text-xs"
+                                                        >
+                                                            Cancel
+                                                        </Button>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
                                     <div className="col-span-2 md:col-span-1">
                                         <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 block">Risk Level</label>
@@ -357,19 +549,89 @@ export default function AdminTemplatesPage() {
 
                                 <div>
                                     <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 block">Observation Title</label>
-                                    <select
-                                        className="w-full h-10 rounded-md border border-input bg-white px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 font-bold text-slate-700"
-                                        value={formData.title}
-                                        onChange={e => setFormData({ ...formData, title: e.target.value })}
-                                        required
-                                    >
-                                        <option value="">Select Observation Title...</option>
-                                        {metaTitles
-                                            .filter(t => !formData.area || !t.area || t.area === formData.area)
-                                            .map(title => (
-                                                <option key={title._id} value={title.title}>{title.title}</option>
-                                            ))}
-                                    </select>
+                                    <div className="flex gap-2 relative w-full">
+                                        <select
+                                            className="flex-1 min-w-0 h-10 rounded-md border border-input bg-white px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 font-bold text-slate-700"
+                                            value={formData.title}
+                                            onChange={e => setFormData({ ...formData, title: e.target.value })}
+                                            required
+                                        >
+                                            <option value="">Select Observation Title...</option>
+                                            {metaTitles
+                                                .filter(t => !formData.area || !t.area || t.area === formData.area)
+                                                .map(title => (
+                                                    <option key={title._id} value={title.title}>{title.title}</option>
+                                                ))}
+                                        </select>
+                                        <Button
+                                            type="button"
+                                            size="sm"
+                                            variant="outline"
+                                            className="h-10 w-10 p-0 shrink-0 border-indigo-200 text-indigo-600 hover:bg-indigo-50 hover:text-indigo-700"
+                                            onClick={() => setShowQuickAddTitle(!showQuickAddTitle)}
+                                            title="Add New Observation Title"
+                                        >
+                                            <Plus className="w-4 h-4" />
+                                        </Button>
+
+                                        {/* Quick Add Title Popup */}
+                                        {showQuickAddTitle && (
+                                            <div className="absolute top-full left-0 right-0 mt-2 p-3 bg-white border border-slate-200 rounded-lg shadow-lg z-50 space-y-2">
+                                                <div className="flex items-center justify-between">
+                                                    <span className="text-xs font-bold text-slate-700">Add New Observation Title</span>
+                                                    <button
+                                                        type="button"
+                                                        onClick={closeQuickAddPopups}
+                                                        className="text-slate-400 hover:text-slate-600"
+                                                    >
+                                                        <X className="w-3.5 h-3.5" />
+                                                    </button>
+                                                </div>
+                                                <Input
+                                                    type="text"
+                                                    placeholder="Enter observation title..."
+                                                    value={quickAddTitleValue}
+                                                    onChange={(e) => setQuickAddTitleValue(e.target.value)}
+                                                    onKeyDown={(e) => {
+                                                        if (e.key === 'Enter') {
+                                                            e.preventDefault();
+                                                            handleQuickAddTitle();
+                                                        }
+                                                    }}
+                                                    className="h-8 text-sm"
+                                                    autoFocus
+                                                />
+                                                {formData.area && (
+                                                    <p className="text-xs text-slate-500">
+                                                        Will be associated with area: <span className="font-semibold">{formData.area}</span>
+                                                    </p>
+                                                )}
+                                                {quickAddError && (
+                                                    <p className="text-xs text-red-600">{quickAddError}</p>
+                                                )}
+                                                <div className="flex gap-2">
+                                                    <Button
+                                                        type="button"
+                                                        size="sm"
+                                                        onClick={handleQuickAddTitle}
+                                                        disabled={quickAddLoading || !quickAddTitleValue.trim()}
+                                                        className="flex-1 h-7 bg-indigo-600 hover:bg-indigo-700 text-xs"
+                                                    >
+                                                        {quickAddLoading ? 'Adding...' : 'Add Title'}
+                                                    </Button>
+                                                    <Button
+                                                        type="button"
+                                                        size="sm"
+                                                        variant="outline"
+                                                        onClick={closeQuickAddPopups}
+                                                        className="h-7 text-xs"
+                                                    >
+                                                        Cancel
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
 
                                 <div className="space-y-4 pt-2 border-t border-slate-100/80">
