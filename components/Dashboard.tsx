@@ -6,11 +6,16 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { Pie } from 'react-chartjs-2';
 import { formatIndianNumber, numberToIndianWords } from '@/utils/format';
 import { cn } from '@/lib/utils';
+import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
+import { FileCheck } from 'lucide-react';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 export function Dashboard() {
     const { stats } = useReport();
+    const router = useRouter();
+    const { data: session } = useSession();
 
     // Chart Data (Keep existing charts logic for visual quick view)
     const typeData = {
@@ -153,6 +158,22 @@ export function Dashboard() {
                     <div className="text-2xl font-bold mt-1 text-slate-800">{stats.financialCount}</div>
                     <div className="text-[10px] text-slate-500 mt-1">With Impact Filled: {stats.financialCount}</div>
                 </div>
+
+                {/* Report Review Tile (Admin Only) */}
+                {session?.user?.role === 'admin' && (
+                    <div
+                        onClick={() => router.push('/admin/reports')}
+                        className="flex-1 min-w-[140px] p-3 rounded-xl bg-gradient-to-br from-indigo-50 to-blue-50 border-2 border-indigo-200 shadow-sm cursor-pointer hover:shadow-md hover:border-indigo-400 transition-all group"
+                    >
+                        <div className="text-xs font-bold text-indigo-600 uppercase tracking-wider flex items-center gap-1">
+                            <FileCheck className="w-3 h-3" />
+                            Report Review
+                        </div>
+                        <div className="text-2xl font-bold mt-1 text-indigo-900 group-hover:text-indigo-600 transition-colors">→</div>
+                        <div className="text-[10px] text-indigo-600 mt-1 font-semibold">Click to review reports</div>
+                    </div>
+                )}
+
                 <div className="flex-[1.5] min-w-[200px] p-3 rounded-xl bg-slate-50 border border-slate-200 shadow-sm">
                     <div className="text-xs font-bold text-slate-500 uppercase tracking-wider">Est. Financial Impact</div>
                     <div className="text-2xl font-bold mt-1 text-blue-900 underline decoration-blue-200/50 underline-offset-4">₹ {formatIndianNumber(stats.financialImpact)}</div>

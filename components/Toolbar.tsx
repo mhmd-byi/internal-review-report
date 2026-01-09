@@ -26,6 +26,9 @@ export function Toolbar() {
     const [managementUsers, setManagementUsers] = useState<{ _id: string, name: string, email: string }[]>([]);
     const [selectedUserId, setSelectedUserId] = useState<string>('');
     const [isSending, setIsSending] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [reportId, setReportId] = useState<string | null>(null);
+    const [workflowStatus, setWorkflowStatus] = useState<string>('Draft');
 
     const handleOpenSendModal = async () => {
         setIsSendModalOpen(true);
@@ -71,6 +74,10 @@ export function Toolbar() {
 
             if (!response.ok) throw new Error('Failed to send report');
 
+            const result = await response.json();
+            setReportId(result.data._id);
+            setWorkflowStatus('Sent to Management');
+
             alert(`Report sent to ${selectedUser?.name} successfully!`);
             setIsSendModalOpen(false);
 
@@ -79,6 +86,40 @@ export function Toolbar() {
             alert('Failed to send report');
         } finally {
             setIsSending(false);
+        }
+    };
+
+    const handleSubmitForReview = async () => {
+        if (!reportId) {
+            alert('Report ID not found. Please save the report first.');
+            return;
+        }
+
+        if (!confirm('Are you sure you want to submit this report for admin review? You will not be able to edit it after submission.')) {
+            return;
+        }
+
+        setIsSubmitting(true);
+
+        try {
+            const response = await fetch(`/api/reports/${reportId}/submit`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error || 'Failed to submit report');
+            }
+
+            const result = await response.json();
+            setWorkflowStatus('Submitted by Management');
+            alert('Report submitted successfully for admin review!');
+        } catch (error: any) {
+            console.error('Error submitting report:', error);
+            alert(error.message || 'Failed to submit report');
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -207,6 +248,26 @@ export function Toolbar() {
 
                 {/* Right Actions */}
                 <div className="flex items-center gap-2 pr-1">
+                    {/* Submit for Review btn (Management Only) */}
+                    {session?.user?.role === 'management' && workflowStatus === 'Sent to Management' && (
+                        <Button
+                            onClick={handleSubmitForReview}
+                            size="sm"
+                            disabled={isSubmitting}
+                            className="rounded-full bg-green-600 hover:bg-green-700 text-white text-xs h-8 px-3 shadow-sm hover:shadow"
+                        >
+                            {isSubmitting ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : null}
+                            Submit for Review
+                        </Button>
+                    )}
+
+                    {/* Status badge (Management Only) */}
+                    {session?.user?.role === 'management' && workflowStatus === 'Submitted by Management' && (
+                        <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold">
+                            ✓ Submitted
+                        </span>
+                    )}
+
                     {session?.user?.role !== 'management' && (
                         <Button
                             onClick={handleOpenSendModal}

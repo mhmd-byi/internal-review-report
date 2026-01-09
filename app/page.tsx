@@ -5,7 +5,7 @@ import { useSession, signOut } from 'next-auth/react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardContent, CardTitle, CardDescription } from '@/components/ui/card';
-import { FileText, Users, LogOut, PlusCircle, Clock, ChevronRight, Trash2, Edit } from 'lucide-react';
+import { FileText, Users, LogOut, PlusCircle, Clock, ChevronRight, Trash2, Edit, FileCheck } from 'lucide-react';
 import { UserDropdown } from '@/components/UserDropdown';
 
 interface ReportSummary {
@@ -126,6 +126,25 @@ export default function DashboardPage() {
                                         </div>
                                         <p className="text-sm text-slate-600">
                                             Add and edit observation templates for auto-population.
+                                        </p>
+                                    </CardContent>
+                                </Card>
+                            </Link>
+
+                            <Link href="/admin/reports" className="block group">
+                                <Card className="h-full transition-all hover:shadow-lg hover:border-emerald-500 cursor-pointer">
+                                    <CardHeader>
+                                        <CardTitle className="flex items-center gap-2 group-hover:text-emerald-600 transition-colors">
+                                            <FileCheck className="w-5 h-5" /> Review Reports
+                                        </CardTitle>
+                                        <CardDescription>Approve/Decline Reports</CardDescription>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <div className="bg-emerald-50 rounded-full w-12 h-12 flex items-center justify-center mb-4 group-hover:bg-emerald-100 transition-colors">
+                                            <FileCheck className="w-6 h-6 text-emerald-600" />
+                                        </div>
+                                        <p className="text-sm text-slate-600">
+                                            Review and approve reports submitted by management.
                                         </p>
                                     </CardContent>
                                 </Card>

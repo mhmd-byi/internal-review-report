@@ -32,7 +32,15 @@ export interface IReport extends Document {
     updatedAt: Date;
     assignedTo?: mongoose.Schema.Types.ObjectId;
     assignedToName?: string;
-    workflowStatus?: 'Draft' | 'Sent to Management' | 'Completed';
+    workflowStatus?: 'Draft' | 'Sent to Management' | 'Submitted by Management' | 'Approved' | 'Declined';
+
+    // Approval workflow fields
+    submittedAt?: Date;
+    reviewedBy?: mongoose.Schema.Types.ObjectId;
+    reviewedByName?: string;
+    reviewedAt?: Date;
+    adminReviewNotes?: string;
+    declineReason?: string;
 }
 
 const ObservationSchema = new Schema<IObservation>({
@@ -65,7 +73,19 @@ const ReportSchema = new Schema<IReport>({
     creatorName: { type: String },
     assignedTo: { type: Schema.Types.ObjectId, ref: 'User' },
     assignedToName: { type: String },
-    workflowStatus: { type: String, enum: ['Draft', 'Sent to Management', 'Completed'], default: 'Draft' },
+    workflowStatus: {
+        type: String,
+        enum: ['Draft', 'Sent to Management', 'Submitted by Management', 'Approved', 'Declined'],
+        default: 'Draft'
+    },
+
+    // Approval workflow fields
+    submittedAt: { type: Date },
+    reviewedBy: { type: Schema.Types.ObjectId, ref: 'User' },
+    reviewedByName: { type: String },
+    reviewedAt: { type: Date },
+    adminReviewNotes: { type: String },
+    declineReason: { type: String },
 }, { timestamps: true });
 
 // Prevent overwrite model error
