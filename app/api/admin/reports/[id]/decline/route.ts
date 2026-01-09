@@ -7,7 +7,7 @@ import mongoose from 'mongoose';
 
 export async function POST(
     request: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         await dbConnect();
@@ -17,7 +17,7 @@ export async function POST(
             return NextResponse.json({ error: 'Unauthorized. Admin access required.' }, { status: 401 });
         }
 
-        const { id } = params;
+        const { id } = await params;
         const body = await request.json();
         const { declineReason, adminReviewNotes } = body;
 
