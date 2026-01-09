@@ -382,6 +382,7 @@ export function ObservationCard({ observation, obsNumber }: ObservationCardProps
                                     >
                                         <option value="">Select Responsibility</option>
                                         <option value="Principal">Principal</option>
+                                        <option value="Masool">Masool</option>
                                         <option value="Admin Head">Admin Head</option>
                                         <option value="Accountant">Accountant</option>
                                         <option value="Management Committee">Management Committee</option>
