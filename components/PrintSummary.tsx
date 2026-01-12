@@ -57,7 +57,7 @@ export function PrintSummary() {
                             <th className="border border-slate-200 p-2 text-left w-[8%]">No.</th>
                             <th className="border border-slate-200 p-2 text-left w-[35%]">Observation Title</th>
                             <th className="border border-slate-200 p-2 text-left w-[12%]">Risk</th>
-                            <th className="border border-slate-200 p-2 text-left">Recommendation</th>
+                            <th className="border border-slate-200 p-2 text-left">Observations</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -104,10 +104,10 @@ export function PrintSummary() {
                                             {obs.risk}
                                         </td>
                                         <td className="border border-slate-200 p-2 text-slate-600 leading-relaxed">
-                                            {obs.recommendation ? (
+                                            {obs.observation ? (
                                                 <>
-                                                    {obs.recommendation.slice(0, 230)}
-                                                    {obs.recommendation.length > 230 && '...'}
+                                                    {obs.observation.slice(0, 230)}
+                                                    {obs.observation.length > 230 && '...'}
                                                 </>
                                             ) : '-'}
                                         </td>
