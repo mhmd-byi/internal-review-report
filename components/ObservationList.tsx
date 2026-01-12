@@ -56,7 +56,8 @@ export function ObservationList() {
                             {(() => {
                                 let validObsCount = 0;
                                 return groupedObs[area].map((obs) => {
-                                    const displayNum = obs.isNA ? 'N/A' : `${areaIdx + 1}.${++validObsCount}`;
+                                    const displayNum = `${areaIdx + 1}.${++validObsCount}`;
+                                    // const displayNum = obs.isNA ? 'N/A' : `${areaIdx + 1}.${++validObsCount}`;
                                     return (
                                         <ObservationCard
                                             key={obs.id}

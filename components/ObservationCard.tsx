@@ -172,9 +172,25 @@ export function ObservationCard({ observation, obsNumber }: ObservationCardProps
         return (
             <div className="mb-6 print:hidden">
                 <div className="p-4 bg-slate-100 border border-slate-200 rounded-lg flex justify-between items-center opacity-75 hover:opacity-100 transition-opacity">
-                    <div className="flex items-center gap-3">
-                        <span className="text-sm font-bold text-slate-500">Observation {obsNumber}</span>
-                        <span className="text-xs bg-slate-200 text-slate-600 px-2 py-0.5 rounded-full font-medium">Not Applicable</span>
+                    <div className="flex flex-col gap-2 flex-1">
+                        <div className="flex items-center gap-3">
+                            <span className="text-sm font-bold text-slate-500">Observation {obsNumber}</span>
+                            <span className="text-xs bg-slate-200 text-slate-600 px-2 py-0.5 rounded-full font-medium">Not Applicable</span>
+                        </div>
+                        {(title || area) && (
+                            <div className="flex flex-col gap-1">
+                                {title && (
+                                    <span className="text-sm font-medium text-slate-700">
+                                        {title}
+                                    </span>
+                                )}
+                                {area && (
+                                    <span className="text-xs text-slate-500">
+                                        Area: {area}
+                                    </span>
+                                )}
+                            </div>
+                        )}
                     </div>
                     <label className="flex items-center gap-2 text-sm cursor-pointer text-slate-600 hover:text-slate-900">
                         <input
