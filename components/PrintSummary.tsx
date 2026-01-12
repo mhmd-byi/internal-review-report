@@ -48,7 +48,7 @@ export function PrintSummary() {
     if (sortedAreas.length === 0) return null;
 
     return (
-        <div className="mb-8 p-6 bg-white rounded-xl shadow-sm border border-slate-200 print:shadow-none print:border-none print:p-0 print:mb-4">
+        <div id="observation-summary" className="mb-8 p-6 bg-white rounded-xl shadow-sm border border-slate-200 print:shadow-none print:border-none print:p-0 print:mb-4 scroll-mt-24">
             <h3 className="text-lg font-bold text-slate-900 mb-4 border-b border-slate-100 pb-2 print:text-sm print:mb-2">Observation Summary</h3>
             <div className="overflow-x-auto">
                 <table className="w-full border-collapse text-xs">

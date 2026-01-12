@@ -9,6 +9,7 @@ import { Toolbar } from '@/components/Toolbar';
 import { Dashboard } from '@/components/Dashboard';
 import { ObservationList } from '@/components/ObservationList';
 import { PrintSummary } from '@/components/PrintSummary';
+import { JumpToSummaryButton } from '@/components/JumpToSummaryButton';
 
 import { ReportRightSidebar } from '@/components/ReportRightSidebar';
 
@@ -89,6 +90,8 @@ function ReportContent() {
           <Dashboard />
         </div>
       </div>
+
+      <JumpToSummaryButton />
     </div>
   );
 }
