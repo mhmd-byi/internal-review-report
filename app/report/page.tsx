@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import { IObservation } from '@/models/Report';
 import { ReportProvider, useReport } from '@/components/ReportContext';
 import { ReportHeader } from '@/components/ReportHeader';
@@ -16,9 +17,21 @@ import { ReportRightSidebar } from '@/components/ReportRightSidebar';
 import { AppHeader } from '@/components/AppHeader';
 
 function ReportContent() {
+  const { data: session } = useSession();
+  const router = useRouter();
   const searchParams = useSearchParams();
   const reportId = searchParams.get('id');
   const { loadReport, setAllObservations } = useReport();
+
+  // Prevent management users from creating new reports
+  useEffect(() => {
+    if (session && session.user?.role === 'management' && !reportId) {
+      // Management users cannot create new reports
+      alert('Management users cannot create new reports. You can only view reports assigned to you.');
+      router.push('/');
+      return;
+    }
+  }, [session, reportId, router]);
 
   useEffect(() => {
     if (reportId) {

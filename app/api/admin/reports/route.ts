@@ -13,12 +13,12 @@ export async function GET() {
             return NextResponse.json({ error: 'Unauthorized. Admin access required.' }, { status: 401 });
         }
 
-        // Fetch submitted reports for admin review
+        // Fetch reports for admin review (sent to management, submitted, or declined)
         const reports = await Report.find({
-            workflowStatus: { $in: ['Submitted by Management', 'Declined'] }
+            workflowStatus: { $in: ['Sent to Management', 'Submitted by Management', 'Declined', 'Approved'] }
         })
-            .sort({ submittedAt: -1 })
-            .select('schoolName location assignedToName submittedAt workflowStatus observations createdAt');
+            .sort({ submittedAt: -1, createdAt: -1 })
+            .select('schoolName location assignedToName submittedAt workflowStatus observations createdAt period auditDate');
 
         // Add observation count to each report
         const reportsWithCount = reports.map(report => ({

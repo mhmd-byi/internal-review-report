@@ -70,25 +70,49 @@ export default function DashboardPage() {
                 </header>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-                    {/* Create Report Card */}
-                    <Link href="/report" className="block group">
-                        <Card className="h-full transition-all hover:shadow-lg hover:border-sky-500 cursor-pointer">
-                            <CardHeader>
-                                <CardTitle className="flex items-center gap-2 group-hover:text-sky-600 transition-colors">
-                                    <FileText className="w-5 h-5" /> Create Report
-                                </CardTitle>
-                                <CardDescription>Start a new Internal Review Report</CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                                <div className="bg-sky-50 rounded-full w-12 h-12 flex items-center justify-center mb-4 group-hover:bg-sky-100 transition-colors">
-                                    <PlusCircle className="w-6 h-6 text-sky-600" />
-                                </div>
-                                <p className="text-sm text-slate-600">
-                                    Access the observation template, add findings, and export to PDF.
-                                </p>
-                            </CardContent>
-                        </Card>
-                    </Link>
+                    {/* Create Report Card - Hidden for Management */}
+                    {(session?.user?.role === 'admin' || session?.user?.role === 'user') && (
+                        <Link href="/report" className="block group">
+                            <Card className="h-full transition-all hover:shadow-lg hover:border-sky-500 cursor-pointer">
+                                <CardHeader>
+                                    <CardTitle className="flex items-center gap-2 group-hover:text-sky-600 transition-colors">
+                                        <FileText className="w-5 h-5" /> Create Report
+                                    </CardTitle>
+                                    <CardDescription>Start a new Internal Review Report</CardDescription>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="bg-sky-50 rounded-full w-12 h-12 flex items-center justify-center mb-4 group-hover:bg-sky-100 transition-colors">
+                                        <PlusCircle className="w-6 h-6 text-sky-600" />
+                                    </div>
+                                    <p className="text-sm text-slate-600">
+                                        Access the observation template, add findings, and export to PDF.
+                                    </p>
+                                </CardContent>
+                            </Card>
+                        </Link>
+                    )}
+
+                    {/* Review Reports Card - Only for Management */}
+                    {session?.user?.role === 'management' && (
+                        <Link href="/management/reports" className="block group">
+                            <Card className="h-full transition-all hover:shadow-lg hover:border-emerald-500 cursor-pointer">
+                                <CardHeader>
+                                    <CardTitle className="flex items-center gap-2 group-hover:text-emerald-600 transition-colors">
+                                        <FileCheck className="w-5 h-5" /> Review Assigned Reports
+                                    </CardTitle>
+                                    <CardDescription>Reports assigned to you for review</CardDescription>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="bg-emerald-50 rounded-full w-12 h-12 flex items-center justify-center mb-4 group-hover:bg-emerald-100 transition-colors">
+                                        <FileCheck className="w-6 h-6 text-emerald-600" />
+                                    </div>
+                                    <p className="text-sm text-slate-600">
+                                        View and provide feedback on reports assigned to you. Track approval status.
+                                    </p>
+                                </CardContent>
+                            </Card>
+                        </Link>
+                    )}
 
                     {/* Admin: Manage Users */}
                     {session?.user?.role === 'admin' && (
@@ -156,7 +180,8 @@ export default function DashboardPage() {
                 {/* Recent Reports Section */}
                 <div className="space-y-6">
                     <h2 className="text-xl font-semibold text-slate-900 flex items-center gap-2">
-                        <Clock className="w-5 h-5 text-slate-500" /> Recent Reports
+                        <Clock className="w-5 h-5 text-slate-500" />
+                        {session?.user?.role === 'management' ? 'Assigned Reports' : 'Recent Reports'}
                     </h2>
 
                     {loading ? (
@@ -181,23 +206,28 @@ export default function DashboardPage() {
                                                 )}
                                             </div>
                                             <div className="flex items-center gap-2">
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    className="opacity-0 group-hover:opacity-100 transition-opacity text-slate-400 hover:text-sky-600"
-                                                    title="Edit Report"
-                                                >
-                                                    <Edit className="w-4 h-4" />
-                                                </Button>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    className="opacity-0 group-hover:opacity-100 transition-opacity text-slate-400 hover:text-red-600"
-                                                    onClick={(e) => handleDeleteReport(e, report._id, report.schoolName)}
-                                                    title="Delete Report"
-                                                >
-                                                    <Trash2 className="w-4 h-4" />
-                                                </Button>
+                                                {/* Hide edit/delete buttons for management */}
+                                                {session?.user?.role !== 'management' && (
+                                                    <>
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            className="opacity-0 group-hover:opacity-100 transition-opacity text-slate-400 hover:text-sky-600"
+                                                            title="Edit Report"
+                                                        >
+                                                            <Edit className="w-4 h-4" />
+                                                        </Button>
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            className="opacity-0 group-hover:opacity-100 transition-opacity text-slate-400 hover:text-red-600"
+                                                            onClick={(e) => handleDeleteReport(e, report._id, report.schoolName)}
+                                                            title="Delete Report"
+                                                        >
+                                                            <Trash2 className="w-4 h-4" />
+                                                        </Button>
+                                                    </>
+                                                )}
                                                 <ChevronRight className="w-5 h-5 text-slate-400 group-hover:text-sky-500 transition-colors" />
                                             </div>
                                         </CardContent>
