@@ -143,7 +143,44 @@ async function runMigration() {
         console.log(`     - High: ${riskCounts.High}`);
         console.log(`     - Medium: ${riskCounts.Medium}`);
         console.log(`     - Low: ${riskCounts.Low}`);
-        console.log('\n✅ Migration completed successfully!');
+
+        // 7. Sync Areas and ObservationTitles
+        console.log('\n🔄 Syncing Areas and Observation Titles...');
+
+        const AreaSchema = new mongoose.Schema({
+            name: { type: String, required: true, unique: true },
+        }, { timestamps: true });
+
+        const ObservationTitleSchema = new mongoose.Schema({
+            title: { type: String, required: true, unique: true },
+            area: { type: String },
+        }, { timestamps: true });
+
+        const Area = mongoose.models.Area || mongoose.model('Area', AreaSchema);
+        const ObservationTitle = mongoose.models.ObservationTitle || mongoose.model('ObservationTitle', ObservationTitleSchema);
+
+        // Clear and insert areas
+        await Area.deleteMany({});
+        const areaDocuments = areas.map(name => ({ name }));
+        await Area.insertMany(areaDocuments);
+        console.log(`   ✅ Synced ${areaDocuments.length} areas`);
+
+        // Clear and insert observation titles with area mapping
+        await ObservationTitle.deleteMany({});
+        const titleMap = new Map();
+        templates.forEach(t => {
+            if (t.title && !titleMap.has(t.title)) {
+                titleMap.set(t.title, t.area);
+            }
+        });
+        const titleDocuments = Array.from(titleMap.entries()).map(([title, area]) => ({
+            title,
+            area
+        }));
+        await ObservationTitle.insertMany(titleDocuments);
+        console.log(`   ✅ Synced ${titleDocuments.length} observation titles`);
+
+        console.log('\n✅ Migration and synchronization completed successfully!');
 
         await mongoose.connection.close();
         process.exit(0);
