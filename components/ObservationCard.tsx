@@ -193,7 +193,7 @@ export function ObservationCard({ observation, obsNumber }: ObservationCardProps
 
 
     return (
-        <Card className="mb-6 border-slate-200 shadow-lg overflow-hidden transition-all">
+        <Card id={`obs-${id}`} className="mb-6 border-slate-200 shadow-lg overflow-hidden transition-all scroll-mt-24">
             {/* Header Section */}
             <div className={cn("p-4 text-white bg-gradient-to-r", getRiskColor(risk))}>
                 <div className="flex flex-col gap-4">
