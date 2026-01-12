@@ -6,9 +6,9 @@ import User from '@/models/User';
 export async function POST(request: Request) {
     try {
         await dbConnect();
-        const { name, email, phone, password, role, responsibility } = await request.json();
+        const { name, email, phone, itsId, password, role, responsibility } = await request.json();
 
-        if (!name || !email || !phone || !password) {
+        if (!name || !email || !phone || !itsId || !password) {
             return NextResponse.json(
                 { success: false, error: 'Missing required fields' },
                 { status: 400 }
@@ -29,6 +29,7 @@ export async function POST(request: Request) {
             name,
             email,
             phone,
+            itsId,
             password: hashedPassword,
             role: role || 'user',
             responsibility: responsibility || '',

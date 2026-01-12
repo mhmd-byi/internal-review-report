@@ -16,7 +16,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
 
         const { id } = await params;
         const body = await req.json();
-        const { name, email, phone, role, responsibility, password } = body;
+        const { name, email, phone, itsId, role, responsibility, password } = body;
 
         await dbConnect();
 
@@ -29,6 +29,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
         user.name = name || user.name;
         user.email = email || user.email;
         user.phone = phone || user.phone;
+        user.itsId = itsId || user.itsId;
         user.role = role || user.role;
         user.responsibility = responsibility || user.responsibility;
 
