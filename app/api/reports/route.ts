@@ -29,7 +29,7 @@ export async function POST(request: Request) {
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 
-export async function GET() {
+export async function GET(request: Request) {
     try {
         await dbConnect();
         const session = await getServerSession(authOptions);
@@ -38,16 +38,28 @@ export async function GET() {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
+        // Parse query parameters
+        const { searchParams } = new URL(request.url);
+        const isDraftParam = searchParams.get('isDraft');
+
         let query: any = {};
         if (session.user.role === 'admin') {
-            // Admin sees all
-            query = {};
+            // Admin sees all, but can filter by isDraft
+            if (isDraftParam !== null) {
+                query.isDraft = isDraftParam === 'true';
+            }
         } else if (session.user.role === 'management') {
             // Management sees assigned reports
             query = { assignedTo: session.user.id };
+            if (isDraftParam !== null) {
+                query.isDraft = isDraftParam === 'true';
+            }
         } else if (session.user.responsibility) {
             // Regular user responsible for specific area (legacy logic, keep if needed)
             query = { "observations.responsibility": session.user.responsibility };
+            if (isDraftParam !== null) {
+                query.isDraft = isDraftParam === 'true';
+            }
         } else {
             return NextResponse.json({ success: true, data: [] });
         }

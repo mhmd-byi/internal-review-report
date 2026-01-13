@@ -5,7 +5,7 @@ import { useSession, signOut } from 'next-auth/react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardContent, CardTitle, CardDescription } from '@/components/ui/card';
-import { FileText, Users, LogOut, PlusCircle, Clock, ChevronRight, Trash2, Edit, FileCheck } from 'lucide-react';
+import { FileText, Users, LogOut, PlusCircle, Clock, ChevronRight, Trash2, Edit, FileCheck, Save, FilePlus } from 'lucide-react';
 import { UserDropdown } from '@/components/UserDropdown';
 
 interface ReportSummary {
@@ -15,30 +15,43 @@ interface ReportSummary {
     auditDate: string;
     createdAt: string;
     creatorName?: string;
+    isDraft?: boolean;
 }
 
 export default function DashboardPage() {
     const sessionObj = useSession();
     const session = sessionObj?.data;
-    const [recentReports, setRecentReports] = useState<ReportSummary[]>([]);
+    const [savedReports, setSavedReports] = useState<ReportSummary[]>([]);
+    const [draftReports, setDraftReports] = useState<ReportSummary[]>([]);
     const [loading, setLoading] = useState(true);
 
-    const fetchReports = () => {
-        setLoading(true);
-        fetch('/api/reports')
+    const fetchSavedReports = () => {
+        fetch('/api/reports?isDraft=false')
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
-                    setRecentReports(data.data.slice(0, 5)); // Show top 5
+                    setSavedReports(data.data.slice(0, 5)); // Show top 5
                 }
             })
-            .catch(err => console.error('Failed to fetch reports:', err))
-            .finally(() => setLoading(false));
+            .catch(err => console.error('Failed to fetch saved reports:', err));
+    };
+
+    const fetchDraftReports = () => {
+        fetch('/api/reports?isDraft=true')
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    setDraftReports(data.data.slice(0, 5)); // Show top 5
+                }
+            })
+            .catch(err => console.error('Failed to fetch draft reports:', err));
     };
 
     useEffect(() => {
         if (session) {
-            fetchReports();
+            setLoading(true);
+            Promise.all([fetchSavedReports(), fetchDraftReports()])
+                .finally(() => setLoading(false));
         }
     }, [session]);
 
@@ -49,7 +62,8 @@ export default function DashboardPage() {
         try {
             const res = await fetch(`/api/reports/${id}`, { method: 'DELETE' });
             if (res.ok) {
-                fetchReports();
+                fetchSavedReports();
+                fetchDraftReports();
             } else {
                 alert('Failed to delete report');
             }
@@ -177,72 +191,129 @@ export default function DashboardPage() {
                     )}
                 </div>
 
-                {/* Recent Reports Section */}
-                <div className="space-y-6">
-                    <h2 className="text-xl font-semibold text-slate-900 flex items-center gap-2">
-                        <Clock className="w-5 h-5 text-slate-500" />
-                        {session?.user?.role === 'management' ? 'Assigned Reports' : 'Recent Reports'}
-                    </h2>
+                {/* Saved Reports Section - Admin Only */}
+                {session?.user?.role === 'admin' && (
+                    <div className="space-y-6 mb-8">
+                        <h2 className="text-xl font-semibold text-slate-900 flex items-center gap-2">
+                            <Save className="w-5 h-5 text-indigo-600" />
+                            Saved Reports
+                        </h2>
 
-                    {loading ? (
-                        <p className="text-slate-500">Loading reports...</p>
-                    ) : recentReports.length > 0 ? (
-                        <div className="grid gap-4">
-                            {recentReports.map((report) => (
-                                <Link key={report._id} href={`/report?id=${report._id}`} className="block group">
-                                    <Card className="hover:shadow-md transition-all border-l-4 border-l-transparent hover:border-l-sky-500">
-                                        <CardContent className="p-6 flex items-center justify-between">
-                                            <div>
-                                                <h3 className="font-semibold text-slate-900 group-hover:text-sky-700 transition-colors">
-                                                    {report.schoolName} - {report.location}
-                                                </h3>
-                                                <p className="text-sm text-slate-500 mt-1">
-                                                    Audit Date: {new Date(report.auditDate).toLocaleDateString()}
-                                                </p>
-                                                {session?.user?.role === 'admin' && (
+                        {loading ? (
+                            <p className="text-slate-500">Loading reports...</p>
+                        ) : savedReports.length > 0 ? (
+                            <div className="grid gap-4">
+                                {savedReports.map((report: ReportSummary) => (
+                                    <Link key={report._id} href={`/report?id=${report._id}`} className="block group">
+                                        <Card className="hover:shadow-md transition-all border-l-4 border-l-transparent hover:border-l-indigo-500">
+                                            <CardContent className="p-6 flex items-center justify-between">
+                                                <div>
+                                                    <h3 className="font-semibold text-slate-900 group-hover:text-indigo-700 transition-colors">
+                                                        {report.schoolName} - {report.location}
+                                                    </h3>
+                                                    <p className="text-sm text-slate-500 mt-1">
+                                                        Audit Date: {new Date(report.auditDate).toLocaleDateString()}
+                                                    </p>
                                                     <p className="text-xs text-indigo-600 mt-0.5 font-medium">
                                                         Created by: {report.creatorName || 'User'}
                                                     </p>
-                                                )}
-                                            </div>
-                                            <div className="flex items-center gap-2">
-                                                {/* Hide edit/delete buttons for management */}
-                                                {session?.user?.role !== 'management' && (
-                                                    <>
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="icon"
-                                                            className="opacity-0 group-hover:opacity-100 transition-opacity text-slate-400 hover:text-sky-600"
-                                                            title="Edit Report"
-                                                        >
-                                                            <Edit className="w-4 h-4" />
-                                                        </Button>
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="icon"
-                                                            className="opacity-0 group-hover:opacity-100 transition-opacity text-slate-400 hover:text-red-600"
-                                                            onClick={(e) => handleDeleteReport(e, report._id, report.schoolName)}
-                                                            title="Delete Report"
-                                                        >
-                                                            <Trash2 className="w-4 h-4" />
-                                                        </Button>
-                                                    </>
-                                                )}
-                                                <ChevronRight className="w-5 h-5 text-slate-400 group-hover:text-sky-500 transition-colors" />
-                                            </div>
-                                        </CardContent>
-                                    </Card>
-                                </Link>
-                            ))}
-                        </div>
-                    ) : (
-                        <Card className="bg-slate-50 border-dashed">
-                            <CardContent className="p-8 text-center text-slate-500">
-                                No reports found. Create your first report to see it here.
-                            </CardContent>
-                        </Card>
-                    )}
-                </div>
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="opacity-0 group-hover:opacity-100 transition-opacity text-slate-400 hover:text-indigo-600"
+                                                        title="Edit Report"
+                                                    >
+                                                        <Edit className="w-4 h-4" />
+                                                    </Button>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="opacity-0 group-hover:opacity-100 transition-opacity text-slate-400 hover:text-red-600"
+                                                        onClick={(e) => handleDeleteReport(e, report._id, report.schoolName)}
+                                                        title="Delete Report"
+                                                    >
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </Button>
+                                                    <ChevronRight className="w-5 h-5 text-slate-400 group-hover:text-indigo-500 transition-colors" />
+                                                </div>
+                                            </CardContent>
+                                        </Card>
+                                    </Link>
+                                ))}
+                            </div>
+                        ) : (
+                            <Card className="bg-slate-50 border-dashed">
+                                <CardContent className="p-8 text-center text-slate-500">
+                                    No saved reports found.
+                                </CardContent>
+                            </Card>
+                        )}
+                    </div>
+                )}
+
+                {/* Draft Reports Section - Admin Only */}
+                {session?.user?.role === 'admin' && (
+                    <div className="space-y-6">
+                        <h2 className="text-xl font-semibold text-slate-900 flex items-center gap-2">
+                            <FilePlus className="w-5 h-5 text-sky-600" />
+                            Draft Reports
+                        </h2>
+
+                        {loading ? (
+                            <p className="text-slate-500">Loading drafts...</p>
+                        ) : draftReports.length > 0 ? (
+                            <div className="grid gap-4">
+                                {draftReports.map((report: ReportSummary) => (
+                                    <Link key={report._id} href={`/report?id=${report._id}`} className="block group">
+                                        <Card className="hover:shadow-md transition-all border-l-4 border-l-transparent hover:border-l-sky-500">
+                                            <CardContent className="p-6 flex items-center justify-between">
+                                                <div>
+                                                    <h3 className="font-semibold text-slate-900 group-hover:text-sky-700 transition-colors">
+                                                        {report.schoolName} - {report.location}
+                                                    </h3>
+                                                    <p className="text-sm text-slate-500 mt-1">
+                                                        Audit Date: {new Date(report.auditDate).toLocaleDateString()}
+                                                    </p>
+                                                    <p className="text-xs text-sky-600 mt-0.5 font-medium">
+                                                        Created by: {report.creatorName || 'User'}
+                                                    </p>
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="opacity-0 group-hover:opacity-100 transition-opacity text-slate-400 hover:text-sky-600"
+                                                        title="Edit Draft"
+                                                    >
+                                                        <Edit className="w-4 h-4" />
+                                                    </Button>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="opacity-0 group-hover:opacity-100 transition-opacity text-slate-400 hover:text-red-600"
+                                                        onClick={(e) => handleDeleteReport(e, report._id, report.schoolName)}
+                                                        title="Delete Draft"
+                                                    >
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </Button>
+                                                    <ChevronRight className="w-5 h-5 text-slate-400 group-hover:text-sky-500 transition-colors" />
+                                                </div>
+                                            </CardContent>
+                                        </Card>
+                                    </Link>
+                                ))}
+                            </div>
+                        ) : (
+                            <Card className="bg-slate-50 border-dashed">
+                                <CardContent className="p-8 text-center text-slate-500">
+                                    No draft reports found.
+                                </CardContent>
+                            </Card>
+                        )}
+                    </div>
+                )}
             </div >
         </div >
     );

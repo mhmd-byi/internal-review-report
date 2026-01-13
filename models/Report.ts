@@ -34,6 +34,7 @@ export interface IReport extends Document {
     assignedTo?: mongoose.Schema.Types.ObjectId;
     assignedToName?: string;
     workflowStatus?: 'Draft' | 'Sent to Management' | 'Submitted by Management' | 'Approved' | 'Declined';
+    isDraft?: boolean; // New field to distinguish between draft and saved reports
 
     // Approval workflow fields
     submittedAt?: Date;
@@ -80,6 +81,7 @@ const ReportSchema = new Schema<IReport>({
         enum: ['Draft', 'Sent to Management', 'Submitted by Management', 'Approved', 'Declined'],
         default: 'Draft'
     },
+    isDraft: { type: Boolean, default: false },
 
     // Approval workflow fields
     submittedAt: { type: Date },

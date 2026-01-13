@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useReport } from '@/components/ReportContext';
 import { Button } from '@/components/ui/button';
 import { Select } from '@/components/ui/select';
-import { Plus, Download, Save, Loader2, ChevronsDown, ChevronsUp } from 'lucide-react';
+import { Plus, Download, Save, Loader2, ChevronsDown, ChevronsUp, ChevronDown } from 'lucide-react';
+import { useSearchParams } from 'next/navigation';
 
 // Standard Area Order (Match ObservationList)
 const AREA_ORDER = [
@@ -20,6 +21,7 @@ import { useSession } from 'next-auth/react';
 
 export function Toolbar() {
     const { data: session } = useSession(); // Get session
+    const searchParams = useSearchParams();
     const { stats, location, addObservation, observations, schoolName, period, auditDate, preparedBy } = useReport();
     const [isSaving, setIsSaving] = useState(false);
     const [isSendModalOpen, setIsSendModalOpen] = useState(false);
@@ -29,6 +31,15 @@ export function Toolbar() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [reportId, setReportId] = useState<string | null>(null);
     const [workflowStatus, setWorkflowStatus] = useState<string>('Draft');
+    const [saveDropdownOpen, setSaveDropdownOpen] = useState(false);
+
+    // Get report ID from URL
+    useEffect(() => {
+        const id = searchParams.get('id');
+        if (id) {
+            setReportId(id);
+        }
+    }, [searchParams]);
 
     const handleOpenSendModal = async () => {
         setIsSendModalOpen(true);
@@ -158,7 +169,7 @@ export function Toolbar() {
         alert("To export as PDF, please use the browser's Print feature (Ctrl+P) and select 'Save as PDF'. The layout is optimized for A4.");
     };
 
-    const handleSave = async () => {
+    const handleSaveReport = async () => {
         setIsSaving(true);
         try {
             const reportData = {
@@ -167,16 +178,30 @@ export function Toolbar() {
                 period,
                 auditDate,
                 preparedBy,
-                observations
+                observations,
+                isDraft: false
             };
 
-            const response = await fetch('/api/reports', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(reportData),
-            });
+            let response;
+            if (reportId) {
+                // Update existing report
+                response = await fetch(`/api/reports/${reportId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(reportData),
+                });
+            } else {
+                // Create new report
+                response = await fetch('/api/reports', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(reportData),
+                });
+            }
 
             const data = await response.json();
 
@@ -184,10 +209,69 @@ export function Toolbar() {
                 throw new Error(data.error || 'Failed to save report');
             }
 
+            // If this was a new report, set the reportId
+            if (!reportId && data.data?._id) {
+                setReportId(data.data._id);
+            }
+
             alert('Report saved successfully!');
         } catch (error) {
             console.error('Error saving report:', error);
             alert('Failed to save report. Please try again.');
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
+    const handleSaveAsDraft = async () => {
+        setIsSaving(true);
+        try {
+            const reportData = {
+                schoolName,
+                location,
+                period,
+                auditDate,
+                preparedBy,
+                observations,
+                isDraft: true
+            };
+
+            let response;
+            if (reportId) {
+                // Update existing draft
+                response = await fetch(`/api/reports/${reportId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(reportData),
+                });
+            } else {
+                // Create new draft
+                response = await fetch('/api/reports', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(reportData),
+                });
+            }
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || 'Failed to save draft');
+            }
+
+            // If this was a new draft, set the reportId
+            if (!reportId && data.data?._id) {
+                setReportId(data.data._id);
+            }
+
+            alert('Draft saved successfully!');
+        } catch (error) {
+            console.error('Error saving draft:', error);
+            alert('Failed to save draft. Please try again.');
         } finally {
             setIsSaving(false);
         }
@@ -295,16 +379,62 @@ export function Toolbar() {
                         <Download className="w-3 h-3 mr-1" /> <span className="hidden sm:inline">Print/PDF</span>
                     </Button>
 
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        className="rounded-full h-8 w-8 p-0 text-slate-500 hover:text-slate-900"
-                        onClick={handleSave}
-                        disabled={isSaving}
-                        title="Save Draft"
-                    >
-                        {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                    </Button>
+                    {/* Split Save Button with Dropdown */}
+                    <div className="relative">
+                        <div className="flex items-center gap-0">
+                            {/* Main Save Button */}
+                            <Button
+                                size="sm"
+                                className="rounded-l-full h-8 text-xs bg-indigo-600 hover:bg-indigo-700 text-white pr-3"
+                                onClick={handleSaveReport}
+                                disabled={isSaving}
+                                title="Save Report"
+                            >
+                                {isSaving ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : <Save className="w-3 h-3 mr-1" />}
+                                <span className="hidden sm:inline">Save</span>
+                            </Button>
+
+                            {/* Dropdown Toggle Button */}
+                            <Button
+                                size="sm"
+                                className="rounded-r-full h-8 text-xs bg-indigo-600 hover:bg-indigo-700 text-white border-l border-indigo-500 px-1.5"
+                                onClick={() => setSaveDropdownOpen(!saveDropdownOpen)}
+                                disabled={isSaving}
+                                title="More save options"
+                            >
+                                <ChevronDown className="w-3 h-3" />
+                            </Button>
+                        </div>
+
+                        {/* Dropdown Menu */}
+                        {saveDropdownOpen && (
+                            <>
+                                {/* Backdrop to close dropdown */}
+                                <div
+                                    className="fixed inset-0 z-40"
+                                    onClick={() => setSaveDropdownOpen(false)}
+                                />
+
+                                {/* Dropdown Content */}
+                                <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border border-slate-200 py-1 z-50">
+                                    <button
+                                        className="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-sky-50 hover:text-sky-700 flex items-center gap-2 transition-colors"
+                                        onClick={() => {
+                                            setSaveDropdownOpen(false);
+                                            handleSaveAsDraft();
+                                        }}
+                                        disabled={isSaving}
+                                    >
+                                        <Save className="w-4 h-4 text-sky-600" />
+                                        <div>
+                                            <div className="font-medium">Save as Draft</div>
+                                            <div className="text-xs text-slate-500">Save work in progress</div>
+                                        </div>
+                                    </button>
+                                </div>
+                            </>
+                        )}
+                    </div>
                 </div>
             </div>
 
