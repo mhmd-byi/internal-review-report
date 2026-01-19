@@ -33,11 +33,20 @@ export function Toolbar() {
     const [workflowStatus, setWorkflowStatus] = useState<string>('Draft');
     const [saveDropdownOpen, setSaveDropdownOpen] = useState(false);
 
-    // Get report ID from URL
+    // Get report ID and workflow status from URL
     useEffect(() => {
         const id = searchParams.get('id');
         if (id) {
             setReportId(id);
+            // Fetch report to get its workflow status
+            fetch(`/api/reports/${id}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success && data.data) {
+                        setWorkflowStatus(data.data.workflowStatus || 'Draft');
+                    }
+                })
+                .catch(err => console.error('Failed to load report status:', err));
         }
     }, [searchParams]);
 
@@ -179,7 +188,8 @@ export function Toolbar() {
                 auditDate,
                 preparedBy,
                 observations,
-                isDraft: false
+                isDraft: false,
+                workflowStatus: workflowStatus || 'Draft' // Preserve existing status or set to Draft
             };
 
             let response;
@@ -209,9 +219,11 @@ export function Toolbar() {
                 throw new Error(data.error || 'Failed to save report');
             }
 
-            // If this was a new report, set the reportId
+            // If this was a new report, set the reportId and update URL
             if (!reportId && data.data?._id) {
                 setReportId(data.data._id);
+                // Update URL without page reload
+                window.history.pushState({}, '', `/report?id=${data.data._id}`);
             }
 
             alert('Report saved successfully!');
@@ -233,7 +245,8 @@ export function Toolbar() {
                 auditDate,
                 preparedBy,
                 observations,
-                isDraft: true
+                isDraft: true,
+                workflowStatus: 'Draft' // Explicitly set to Draft
             };
 
             let response;
@@ -263,9 +276,11 @@ export function Toolbar() {
                 throw new Error(data.error || 'Failed to save draft');
             }
 
-            // If this was a new draft, set the reportId
+            // If this was a new draft, set the reportId and update URL
             if (!reportId && data.data?._id) {
                 setReportId(data.data._id);
+                // Update URL without page reload
+                window.history.pushState({}, '', `/report?id=${data.data._id}`);
             }
 
             alert('Draft saved successfully!');

@@ -13,9 +13,10 @@ export async function GET() {
             return NextResponse.json({ error: 'Unauthorized. Admin access required.' }, { status: 401 });
         }
 
-        // Fetch reports for admin review (sent to management, submitted, or declined)
+        // Fetch ALL reports for admin review
+        // Including: Draft (saved reports), Sent to Management, Submitted by Management, Declined, Approved
         const reports = await Report.find({
-            workflowStatus: { $in: ['Sent to Management', 'Submitted by Management', 'Declined', 'Approved'] }
+            workflowStatus: { $in: ['Draft', 'Sent to Management', 'Submitted by Management', 'Declined', 'Approved'] }
         })
             .sort({ submittedAt: -1, createdAt: -1 })
             .select('schoolName location assignedToName submittedAt workflowStatus observations createdAt period auditDate');

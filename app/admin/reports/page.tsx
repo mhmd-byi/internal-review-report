@@ -24,7 +24,7 @@ export default function AdminReportsPage() {
     const router = useRouter();
     const [reports, setReports] = useState<ReportListItem[]>([]);
     const [loading, setLoading] = useState(true);
-    const [filter, setFilter] = useState<'all' | 'sent' | 'submitted' | 'declined' | 'approved'>('all');
+    const [filter, setFilter] = useState<'all' | 'draft' | 'sent' | 'submitted' | 'declined' | 'approved'>('all');
 
     useEffect(() => {
         fetchReports();
@@ -70,6 +70,7 @@ export default function AdminReportsPage() {
     }
 
     const filteredReports = reports.filter(report => {
+        if (filter === 'draft') return report.workflowStatus === 'Draft';
         if (filter === 'sent') return report.workflowStatus === 'Sent to Management';
         if (filter === 'submitted') return report.workflowStatus === 'Submitted by Management';
         if (filter === 'declined') return report.workflowStatus === 'Declined';
@@ -101,6 +102,14 @@ export default function AdminReportsPage() {
                         className={filter === 'all' ? 'bg-indigo-600' : ''}
                     >
                         All ({reports.length})
+                    </Button>
+                    <Button
+                        size="sm"
+                        variant={filter === 'draft' ? 'default' : 'outline'}
+                        onClick={() => setFilter('draft')}
+                        className={filter === 'draft' ? 'bg-slate-600 hover:bg-slate-700' : ''}
+                    >
+                        Saved Reports ({reports.filter(r => r.workflowStatus === 'Draft').length})
                     </Button>
                     <Button
                         size="sm"
@@ -200,6 +209,12 @@ export default function AdminReportsPage() {
                                             })}
                                         </td>
                                         <td className="px-6 py-4">
+                                            {report.workflowStatus === 'Draft' && (
+                                                <span className="px-2 py-1 bg-slate-50 text-slate-700 rounded-full text-xs font-semibold flex items-center gap-1 w-fit">
+                                                    <Clock className="w-3 h-3" />
+                                                    Saved (Draft)
+                                                </span>
+                                            )}
                                             {report.workflowStatus === 'Sent to Management' && (
                                                 <span className="px-2 py-1 bg-sky-50 text-sky-700 rounded-full text-xs font-semibold flex items-center gap-1 w-fit">
                                                     <Clock className="w-3 h-3" />

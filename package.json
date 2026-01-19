@@ -9,7 +9,8 @@
     "lint": "eslint",
     "migrate": "node scripts/migrate-from-excel.js",
     "sync": "node scripts/sync-areas-and-titles.js",
-    "import": "node scripts/migrate-from-excel.js && node scripts/sync-areas-and-titles.js"
+    "import": "node scripts/migrate-from-excel.js && node scripts/sync-areas-and-titles.js",
+    "fix-workflow": "ts-node scripts/fix-workflow-status.ts"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.4",
