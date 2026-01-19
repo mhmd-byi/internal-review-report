@@ -391,7 +391,7 @@ export function Toolbar() {
                         className="rounded-full h-8 text-xs bg-white hover:bg-slate-50 border-slate-200 text-slate-700"
                         onClick={handleExportPDF}
                     >
-                        <Download className="w-3 h-3 mr-1" /> <span className="hidden sm:inline">Print/PDF</span>
+                        <Download className="w-3 h-3 mr-1" /> <span className="hidden sm:inline">Print</span>
                     </Button>
 
                     {/* Split Save Button with Dropdown */}
