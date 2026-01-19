@@ -19,6 +19,10 @@ interface ITemplate {
     observation?: string;
     recommendation?: string;
     implication?: string;
+    createdBy?: string;
+    creatorName?: string;
+    createdAt?: string;
+    updatedAt?: string;
 }
 
 interface MetaArea {
@@ -420,6 +424,23 @@ export default function AdminTemplatesPage() {
                                                                     <p className="line-clamp-2 leading-relaxed">{t.actionPlan}</p>
                                                                 </div>
                                                             )}
+                                                            {/* Creator Information */}
+                                                            {t.creatorName && (
+                                                                <div className="flex items-center gap-2 pt-2 border-t border-slate-100">
+                                                                    <div className="flex items-center gap-1.5 text-[10px] text-slate-500">
+                                                                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                                                        </svg>
+                                                                        <span className="font-medium">Created by:</span>
+                                                                        <span className="text-slate-700 font-semibold">{t.creatorName}</span>
+                                                                    </div>
+                                                                    {t.createdAt && (
+                                                                        <span className="text-[10px] text-slate-400">
+                                                                            - {new Date(t.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                                                        </span>
+                                                                    )}
+                                                                </div>
+                                                            )}
                                                         </div>
                                                     </CardContent>
                                                 </Card>
@@ -701,3 +722,4 @@ export default function AdminTemplatesPage() {
         </div>
     );
 }
+

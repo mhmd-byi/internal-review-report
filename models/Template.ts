@@ -9,6 +9,8 @@ export interface ITemplate extends Document {
     observation?: string;
     recommendation?: string;
     implication?: string;
+    createdBy?: mongoose.Schema.Types.ObjectId;
+    creatorName?: string;
 }
 
 const TemplateSchema = new Schema<ITemplate>({
@@ -20,6 +22,8 @@ const TemplateSchema = new Schema<ITemplate>({
     observation: { type: String, default: '' },
     recommendation: { type: String, default: '' },
     implication: { type: String, default: '' },
+    createdBy: { type: Schema.Types.ObjectId, ref: 'User' },
+    creatorName: { type: String },
 }, { timestamps: true });
 
 // Prevent overwrite model error
