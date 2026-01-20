@@ -134,7 +134,7 @@ export function Dashboard() {
 
 
     return (
-        <div className="mt-8 p-5 bg-white/40 backdrop-blur-md border border-white/60 rounded-2xl shadow-xl print:shadow-none print:border-none print:p-0 print:bg-white print:break-before-page">
+        <div id="analytics-dashboard" className="mt-8 p-5 bg-white/40 backdrop-blur-md border border-white/60 rounded-2xl shadow-xl print:shadow-none print:border-none print:p-0 print:bg-white print:break-before-page">
             <div className="text-xs text-gray-500 italic mb-2 print:hidden">Internal Review Dashboard v2.0 – Consolidated Analytics</div>
 
             {/* KPI Row */}

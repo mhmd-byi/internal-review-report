@@ -191,8 +191,7 @@ export function Toolbar() {
         setJumpMenuOpen(false);
         setHoveredArea(null);
     };
-
-    const toggleCollapseAll = (collapsed: boolean) => {
+const toggleCollapseAll = (collapsed: boolean) => {
         window.dispatchEvent(new Event(collapsed ? 'report:collapse-all' : 'report:expand-all'));
     };
 
@@ -402,8 +401,7 @@ export function Toolbar() {
                                 )}
                             </div>
                         )
-                    }
-                    {/* Collapse Controls */}
+                    }{/* Collapse Controls */}
                     <div className="flex items-center gap-1 bg-slate-100 rounded-lg p-1 border border-slate-200">
                         <Button
                             variant="ghost"

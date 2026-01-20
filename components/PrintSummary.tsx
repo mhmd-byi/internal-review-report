@@ -75,7 +75,7 @@ export function PrintSummary() {
                                         <td
                                             className="border border-slate-200 p-2 text-center text-slate-500 font-mono cursor-pointer hover:bg-sky-50 hover:text-sky-700 hover:font-bold transition-all print:cursor-default print:hover:bg-transparent print:hover:text-slate-500"
                                             onClick={() => {
-                                                const element = document.getElementById(`obs-${obs.id}`);
+                                                const element = document.getElementById(`obs-card-${obs.id}`);
                                                 if (element) {
                                                     element.scrollIntoView({ behavior: 'smooth', block: 'center' });
                                                 }
@@ -87,7 +87,7 @@ export function PrintSummary() {
                                         <td
                                             className="border border-slate-200 p-2 font-medium text-slate-800 cursor-pointer hover:bg-sky-50 hover:text-sky-700 hover:underline transition-all print:cursor-default print:hover:bg-transparent print:hover:text-slate-800 print:hover:no-underline"
                                             onClick={() => {
-                                                const element = document.getElementById(`obs-${obs.id}`);
+                                                const element = document.getElementById(`obs-card-${obs.id}`);
                                                 if (element) {
                                                     element.scrollIntoView({ behavior: 'smooth', block: 'center' });
                                                 }
