@@ -403,6 +403,29 @@ export function Toolbar() {
                             </div>
                         )
                     }
+                    {/* Collapse Controls */}
+                    <div className="flex items-center gap-1 bg-slate-100 rounded-lg p-1 border border-slate-200">
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => toggleCollapseAll(false)}
+                            className="h-7 px-2 text-xs text-slate-600 hover:text-indigo-600 hover:bg-white"
+                            title="Expand All"
+                        >
+                            <ChevronsDown className="w-3 h-3 mr-1" /> Expand All
+                        </Button>
+                        <div className="w-px h-4 bg-slate-300"></div>
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => toggleCollapseAll(true)}
+                            className="h-7 px-2 text-xs text-slate-600 hover:text-indigo-600 hover:bg-white"
+                            title="Collapse All"
+                        >
+                            <ChevronsUp className="w-3 h-3 mr-1" /> Collapse All
+                        </Button>
+                    </div>
+
 
                     {/* Right Actions */}
                     <div className="flex items-center gap-2 pr-1">
