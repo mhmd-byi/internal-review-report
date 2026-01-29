@@ -191,12 +191,19 @@ export function Toolbar() {
         setJumpMenuOpen(false);
         setHoveredArea(null);
     };
-const toggleCollapseAll = (collapsed: boolean) => {
+    const toggleCollapseAll = (collapsed: boolean) => {
         window.dispatchEvent(new Event(collapsed ? 'report:collapse-all' : 'report:expand-all'));
     };
 
     const handleExportPDF = async () => {
-        alert("To export as PDF, please use the browser's Print feature (Ctrl+P) and select 'Save as PDF'. The layout is optimized for A4.");
+        // Automatically expand all observations before printing to ensure content isn't hidden
+        toggleCollapseAll(false);
+
+        // Short delay to allow expansion animations/renders to complete
+        setTimeout(() => {
+            alert("📄 Print Instructions:\n\n1. Select 'Save as PDF' as the destination.\n2. Ensure 'Background graphics' is ENABLED to see the risk colors.\n3. The layout is optimized for A4 paper size.");
+            window.print();
+        }, 300);
     };
 
     const handleSaveReport = async () => {

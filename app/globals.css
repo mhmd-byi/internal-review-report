@@ -45,6 +45,8 @@
     --input: hsl(214.3 31.8% 91.4%);
     --ring: hsl(222.2 84% 4.9%);
     --radius: 0.5rem;
+
+    --font-heading: "Bookman Old Style", "Times New Roman", serif;
   }
 
   .dark {
@@ -79,38 +81,91 @@
 }
 
 @media print {
-  body {
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
-    background: white !important;
+
+  /* Preserve colours in PDF/Print */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
 
-  /* Ensure no scrollbars in print, force full height */
-  textarea {
+  body {
+    margin: 5mm 10mm 5mm 5mm !important;
+    padding-top: 14mm !important;
+    /* room for fixed report header if needed */
+    padding-right: 0 !important;
+    background: #ffffff !important;
+    color: #000 !important;
+    font-size: 11pt !important;
+  }
+
+  /* Hide UI elements */
+  .no-print,
+  button,
+  .toolbar,
+  .app-header,
+  header {
     display: none !important;
   }
 
-  /* We will use a sibling div with .print-only to show text */
+  /* Hide native textareas and show print mirrors */
+  textarea,
+  input[type="text"],
+  input[type="date"],
+  select {
+    display: none !important;
+  }
+
   .print-only {
     display: block !important;
-    white-space: pre-wrap;
+    border-bottom: 1px solid #eee;
+    padding: 2px 0;
+    min-height: 1.2em;
   }
 
-  /* Hide non-printable elements */
-  .no-print {
-    display: none !important;
+  .print-textarea-mirror {
+    display: block !important;
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-family: inherit;
+    font-size: 10pt;
+    line-height: 1.4;
+    color: #333;
+    padding: 4px 0;
+    border: none;
+    background: transparent;
+  }
+
+  /* Dashboard Adjustments */
+  .dashboard {
+    break-before: page;
+    margin-top: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Table Adjustments */
+  table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+  }
+
+  th,
+  td {
+    border: 1px solid #e5e7eb !important;
   }
 
   /* Page breaks */
   .break-before-page {
     page-break-before: always;
+    break-before: page;
   }
 
   .break-inside-avoid {
     page-break-inside: avoid;
+    break-inside: avoid;
   }
 }
 
-.print-only {
+.print-only,
+.print-textarea-mirror {
   display: none;
 }
