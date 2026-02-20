@@ -10,7 +10,7 @@ export function ReportHeader() {
         period, setPeriod,
         auditDate, setAuditDate,
         preparedBy, setPreparedBy,
-        stats
+        stats, workflowStatus, declineReason
     } = useReport();
 
     return (
@@ -25,6 +25,24 @@ export function ReportHeader() {
                 <h1 className="text-3xl font-serif font-bold text-slate-900 mb-1">Internal Review Report</h1>
                 <h2 className="text-xl font-serif text-slate-700 font-medium">Observation Summary Template</h2>
             </div>
+
+            {/* Decline Notice */}
+            {workflowStatus === 'Declined' && declineReason && (
+                <div className="mb-6 p-4 bg-orange-50 border border-orange-200 rounded-xl shadow-sm animate-in fade-in slide-in-from-top-4 duration-300">
+                    <div className="flex items-start gap-3">
+                        <div className="mt-0.5 p-1.5 bg-orange-100 rounded-full">
+                            <svg className="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 className="text-sm font-bold text-orange-900">Report Reverted for Correction</h3>
+                            <p className="text-sm text-orange-800 mt-1 whitespace-pre-wrap">{declineReason}</p>
+                            <p className="text-xs text-orange-600 mt-2 font-medium">Please address the feedback above and resubmit the report for review.</p>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Meta Card */}
             <div className="bg-white/20 backdrop-blur-md border border-white/40 rounded-xl shadow-xl p-5 mb-6">

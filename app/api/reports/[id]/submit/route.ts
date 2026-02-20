@@ -31,7 +31,7 @@ export async function POST(
         }
 
         // Check if report is in correct state
-        if (report.workflowStatus !== 'Sent to Management') {
+        if (report.workflowStatus !== 'Sent to Management' && report.workflowStatus !== 'Declined') {
             return NextResponse.json({
                 error: `Cannot submit report from ${report.workflowStatus} state`
             }, { status: 400 });

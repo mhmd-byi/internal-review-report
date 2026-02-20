@@ -22,7 +22,7 @@ import { useSession } from 'next-auth/react';
 export function Toolbar() {
     const { data: session } = useSession(); // Get session
     const searchParams = useSearchParams();
-    const { stats, location, addObservation, observations, schoolName, period, auditDate, preparedBy } = useReport();
+    const { stats, location, addObservation, observations, schoolName, period, auditDate, preparedBy, workflowStatus, setWorkflowStatus, declineReason } = useReport();
     const [isSaving, setIsSaving] = useState(false);
     const [isSendModalOpen, setIsSendModalOpen] = useState(false);
     const [managementUsers, setManagementUsers] = useState<{ _id: string, name: string, email: string }[]>([]);
@@ -30,25 +30,15 @@ export function Toolbar() {
     const [isSending, setIsSending] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [reportId, setReportId] = useState<string | null>(null);
-    const [workflowStatus, setWorkflowStatus] = useState<string>('Draft');
     const [saveDropdownOpen, setSaveDropdownOpen] = useState(false);
     const [jumpMenuOpen, setJumpMenuOpen] = useState(false);
     const [hoveredArea, setHoveredArea] = useState<string | null>(null);
 
-    // Get report ID and workflow status from URL
+    // Get report ID from URL
     useEffect(() => {
         const id = searchParams.get('id');
         if (id) {
             setReportId(id);
-            // Fetch report to get its workflow status
-            fetch(`/api/reports/${id}`)
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success && data.data) {
-                        setWorkflowStatus(data.data.workflowStatus || 'Draft');
-                    }
-                })
-                .catch(err => console.error('Failed to load report status:', err));
         }
     }, [searchParams]);
 
@@ -428,7 +418,7 @@ const toggleCollapseAll = (collapsed: boolean) => {
                     {/* Right Actions */}
                     <div className="flex items-center gap-2 pr-1">
                         {/* Submit for Review btn (Management Only) */}
-                        {session?.user?.role === 'management' && workflowStatus === 'Sent to Management' && (
+                        {session?.user?.role === 'management' && (workflowStatus === 'Sent to Management' || workflowStatus === 'Declined') && (
                             <Button
                                 onClick={handleSubmitForReview}
                                 size="sm"
@@ -436,7 +426,7 @@ const toggleCollapseAll = (collapsed: boolean) => {
                                 className="rounded-full bg-green-600 hover:bg-green-700 text-white text-xs h-8 px-3 shadow-sm hover:shadow"
                             >
                                 {isSubmitting ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : null}
-                                Submit for Review
+                                {workflowStatus === 'Declined' ? 'Resubmit for Review' : 'Submit for Review'}
                             </Button>
                         )}
 

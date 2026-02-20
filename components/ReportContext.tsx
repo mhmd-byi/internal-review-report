@@ -21,6 +21,12 @@ interface ReportContextType {
     deleteObservation: (id: string) => void; // Optional, if we want delete
     setAllObservations: (obs: IObservation[]) => void;
     loadReport: (reportData: any) => void;
+    workflowStatus: string;
+    setWorkflowStatus: (val: string) => void;
+    declineReason: string;
+    setDeclineReason: (val: string) => void;
+    adminReviewNotes: string;
+    setAdminReviewNotes: (val: string) => void;
     stats: {
         total: number;
         high: number;
@@ -48,6 +54,9 @@ export function ReportProvider({ children }: { children: ReactNode }) {
     const [auditDate, setAuditDate] = useState(getCurrentDateISO());
     const [preparedBy, setPreparedBy] = useState('Internal Audit Team');
     const [observations, setObservations] = useState<IObservation[]>([]);
+    const [workflowStatus, setWorkflowStatus] = useState('Draft');
+    const [declineReason, setDeclineReason] = useState('');
+    const [adminReviewNotes, setAdminReviewNotes] = useState('');
 
     // Initialize with one observation - REMOVED for Template Auto-Population
     // const initialized = React.useRef(false);
@@ -202,6 +211,9 @@ export function ReportProvider({ children }: { children: ReactNode }) {
         setAuditDate(new Date(reportData.auditDate).toISOString().split('T')[0]);
         setPreparedBy(reportData.preparedBy);
         setObservations(reportData.observations);
+        setWorkflowStatus(reportData.workflowStatus || 'Draft');
+        setDeclineReason(reportData.declineReason || '');
+        setAdminReviewNotes(reportData.adminReviewNotes || '');
     }, []);
 
     return (
@@ -224,6 +236,12 @@ export function ReportProvider({ children }: { children: ReactNode }) {
                 setAllObservations,
                 loadReport,
                 stats,
+                workflowStatus,
+                setWorkflowStatus,
+                declineReason,
+                setDeclineReason,
+                adminReviewNotes,
+                setAdminReviewNotes,
             }}
         >
             {children}
