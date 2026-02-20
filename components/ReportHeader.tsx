@@ -16,14 +16,19 @@ export function ReportHeader() {
     return (
         <div className="mb-8">
             {/* Print Header (Hidden on Screen) */}
-            <div className="hidden print:block fixed top-0 left-0 right-0 bg-white z-50 border-b pb-2 text-center text-sm text-gray-600">
-                {schoolName} | {location} | {new Date(auditDate).toLocaleDateString()} | {preparedBy}
+            <div className="hidden print:block relative bg-white border-b pb-4 mb-4 text-center text-sm text-gray-600">
+                <div style={{ fontFamily: 'var(--font-heading)', fontSize: '14pt', fontWeight: 'bold', color: '#000', marginBottom: '4px' }}>
+                    {schoolName} | Internal Review Report
+                </div>
+                <div>
+                    {location} | Audit Date: {new Date(auditDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })} | Prepared By: {preparedBy}
+                </div>
             </div>
 
             {/* Screen Header */}
             <div className="text-center mb-6 pt-8">
-                <h1 className="text-3xl font-serif font-bold text-slate-900 mb-1">Internal Review Report</h1>
-                <h2 className="text-xl font-serif text-slate-700 font-medium">Observation Summary Template</h2>
+                <h1 className="text-3xl font-bold text-slate-900 mb-1" style={{ fontFamily: 'var(--font-heading)' }}>Internal Review Report</h1>
+                <h2 className="text-xl text-slate-700 font-medium" style={{ fontFamily: 'var(--font-heading)' }}>Observation Summary Template</h2>
             </div>
 
             {/* Decline Notice */}
@@ -55,6 +60,9 @@ export function ReportHeader() {
                             onChange={(e) => setSchoolName(e.target.value)}
                             className="w-full rounded-lg border-slate-300 bg-white/90 px-3 py-2 text-sm shadow-sm focus:ring-2 focus:ring-sky-500 outline-none"
                         />
+                        <div className="print-only font-bold text-slate-900 border-b border-slate-200 pb-1">
+                            {schoolName || '-'}
+                        </div>
                     </div>
                     <div className="flex-1 min-w-[200px]">
                         <label className="block text-sm font-semibold text-slate-800 mb-1">Location</label>
@@ -64,6 +72,9 @@ export function ReportHeader() {
                             onChange={(e) => setLocation(e.target.value)}
                             className="w-full rounded-lg border-slate-300 bg-white/90 px-3 py-2 text-sm shadow-sm focus:ring-2 focus:ring-sky-500 outline-none"
                         />
+                        <div className="print-only font-bold text-slate-900 border-b border-slate-200 pb-1">
+                            {location || '-'}
+                        </div>
                     </div>
                     <div className="flex-1 min-w-[200px]">
                         <label className="block text-sm font-semibold text-slate-800 mb-1">Period of Review</label>
@@ -73,6 +84,9 @@ export function ReportHeader() {
                             onChange={(e) => setPeriod(e.target.value)}
                             className="w-full rounded-lg border-slate-300 bg-white/90 px-3 py-2 text-sm shadow-sm focus:ring-2 focus:ring-sky-500 outline-none"
                         />
+                        <div className="print-only font-bold text-slate-900 border-b border-slate-200 pb-1">
+                            {period || '-'}
+                        </div>
                     </div>
                     <div className="w-[160px]">
                         <label className="block text-sm font-semibold text-slate-800 mb-1">Date of Audit</label>
@@ -82,6 +96,9 @@ export function ReportHeader() {
                             onChange={(e) => setAuditDate(e.target.value)}
                             className="w-full rounded-lg border-slate-300 bg-white/90 px-3 py-2 text-sm shadow-sm focus:ring-2 focus:ring-sky-500 outline-none"
                         />
+                        <div className="print-only font-bold text-slate-900 border-b border-slate-200 pb-1">
+                            {auditDate ? new Date(auditDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '-'}
+                        </div>
                     </div>
                     <div className="flex-1 min-w-[200px]">
                         <label className="block text-sm font-semibold text-slate-800 mb-1">Prepared By</label>
@@ -91,6 +108,9 @@ export function ReportHeader() {
                             onChange={(e) => setPreparedBy(e.target.value)}
                             className="w-full rounded-lg border-slate-300 bg-white/90 px-3 py-2 text-sm shadow-sm focus:ring-2 focus:ring-sky-500 outline-none"
                         />
+                        <div className="print-only font-bold text-slate-900 border-b border-slate-200 pb-1">
+                            {preparedBy || '-'}
+                        </div>
                     </div>
                 </div>
             </div>

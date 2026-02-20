@@ -209,7 +209,7 @@ export function ObservationCard({ observation, obsNumber }: ObservationCardProps
 
 
     return (
-        <Card id={`obs-card-${id}`} className="mb-6 border-slate-200 shadow-lg overflow-hidden transition-all scroll-mt-24">
+        <Card id={`obs-card-${id}`} className="mb-6 border-slate-200 shadow-lg overflow-hidden transition-all scroll-mt-24 print:overflow-visible print:shadow-none print:border-none">
             {/* Header Section */}
             <div className={cn("p-4 text-white bg-gradient-to-r", getRiskColor(risk))}>
                 <div className="flex flex-col gap-4">
@@ -231,6 +231,9 @@ export function ObservationCard({ observation, obsNumber }: ObservationCardProps
                                 ))}
                                 <option value="Other" className="text-slate-800">Other</option>
                             </select>
+                            <div className="print-only text-sm font-bold text-white bg-black/20 px-2 py-1 rounded">
+                                {area || 'Other'}
+                            </div>
                         </div>
 
                         {/* Metadata Badges */}
@@ -248,6 +251,9 @@ export function ObservationCard({ observation, obsNumber }: ObservationCardProps
                                     <option value="Medium">Medium Risk</option>
                                     <option value="Low">Low Risk</option>
                                 </select>
+                                <div className="print-only text-xs font-bold px-2 py-1 border border-white/30 rounded bg-white/10 uppercase">
+                                    {risk} Risk
+                                </div>
                             </div>
 
                             {/* Type Badge */}
@@ -262,6 +268,9 @@ export function ObservationCard({ observation, obsNumber }: ObservationCardProps
                                     <option value="Financial" className="text-slate-800">Financial</option>
                                     <option value="Non Financial" className="text-slate-800">Non-Financial</option>
                                 </select>
+                                <div className="print-only text-xs px-2 py-1 border border-white/20 rounded bg-white/5">
+                                    {type}
+                                </div>
                             </div>
 
                             {/* Financial Impact */}
@@ -276,6 +285,9 @@ export function ObservationCard({ observation, obsNumber }: ObservationCardProps
                                         onChange={(e) => handleUpdate('financialImpact', e.target.value)}
                                         disabled={isManagement}
                                     />
+                                    <div className="print-only text-sm font-bold bg-white text-slate-900 px-2 py-1 rounded">
+                                        ₹ {financialImpact || '0'}
+                                    </div>
                                 </div>
                             )}
                         </div>
@@ -306,6 +318,9 @@ export function ObservationCard({ observation, obsNumber }: ObservationCardProps
                                 disabled={isManagement}
                             />
                         )}
+                        <div className="print-only text-lg font-bold border-b border-white/30 pb-1 mt-1">
+                            {title || 'Untitled Observation'}
+                        </div>
                     </div>
 
                     {/* Controls Row */}
@@ -353,6 +368,9 @@ export function ObservationCard({ observation, obsNumber }: ObservationCardProps
                                 className="min-h-[80px]"
                                 disabled={isManagement}
                             />
+                            <div className="print-textarea-mirror">
+                                {background || '-'}
+                            </div>
                         </div>
 
                         <div className="space-y-1">
@@ -365,6 +383,9 @@ export function ObservationCard({ observation, obsNumber }: ObservationCardProps
                                 className="min-h-[80px]"
                                 disabled={isManagement}
                             />
+                            <div className="print-textarea-mirror">
+                                {obsText || '-'}
+                            </div>
                         </div>
 
                         <div className="space-y-1">
@@ -377,6 +398,9 @@ export function ObservationCard({ observation, obsNumber }: ObservationCardProps
                                 className="min-h-[80px]"
                                 disabled={isManagement}
                             />
+                            <div className="print-textarea-mirror">
+                                {recommendation || '-'}
+                            </div>
                         </div>
 
                         <div className="space-y-1">
@@ -389,6 +413,9 @@ export function ObservationCard({ observation, obsNumber }: ObservationCardProps
                                 className="min-h-[80px]"
                                 disabled={isManagement}
                             />
+                            <div className="print-textarea-mirror">
+                                {implication || '-'}
+                            </div>
                         </div>
 
                         <div className="space-y-4 pt-4 border-t border-slate-100">
@@ -402,6 +429,9 @@ export function ObservationCard({ observation, obsNumber }: ObservationCardProps
                                     placeholder="Detail the exact steps management will take..."
                                     className="min-h-[80px]"
                                 />
+                                <div className="print-textarea-mirror">
+                                    {actionPlan || '-'}
+                                </div>
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -412,6 +442,9 @@ export function ObservationCard({ observation, obsNumber }: ObservationCardProps
                                         value={targetDate ? new Date(targetDate).toISOString().split('T')[0] : ''}
                                         onChange={(e) => updateObservation(id, { targetDate: e.target.value ? new Date(e.target.value) : undefined })}
                                     />
+                                    <div className="print-only font-bold text-slate-900 border-b border-slate-200 pb-1">
+                                        {targetDate ? new Date(targetDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '-'}
+                                    </div>
                                 </div>
                                 <div className="space-y-1">
                                     <label className="text-sm font-medium text-slate-700">Responsibility</label>
@@ -428,6 +461,9 @@ export function ObservationCard({ observation, obsNumber }: ObservationCardProps
                                         <option value="Management Committee">Management Committee</option>
                                         <option value="Other">Other</option>
                                     </select>
+                                    <div className="print-only font-bold text-slate-900 border-b border-slate-200 pb-1">
+                                        {responsibility || '-'}
+                                    </div>
                                 </div>
                                 {/* Conditional Person Name Field */}
                                 {(responsibility === 'Management Committee' || responsibility === 'Other') && (
@@ -442,6 +478,9 @@ export function ObservationCard({ observation, obsNumber }: ObservationCardProps
                                             value={responsibilityPersonName || ''}
                                             onChange={(e) => updateObservation(id, { responsibilityPersonName: e.target.value })}
                                         />
+                                        <div className="print-only font-bold text-slate-900 border-b border-slate-200 pb-1">
+                                            {responsibilityPersonName || '-'}
+                                        </div>
                                     </div>
                                 )}
                             </div>
@@ -457,6 +496,9 @@ export function ObservationCard({ observation, obsNumber }: ObservationCardProps
                                     <option value="In-Progress">In-Progress</option>
                                     <option value="Closed">Closed</option>
                                 </select>
+                                <div className="print-only font-bold text-slate-900 border-b border-slate-200 pb-1">
+                                    {status}
+                                </div>
                             </div>
                         </div>
                     </div>
