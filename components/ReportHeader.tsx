@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { useReport } from '@/components/ReportContext';
+import { formatDDMMYYYY } from '@/utils/dates';
 
 export function ReportHeader() {
     const {
@@ -21,7 +22,7 @@ export function ReportHeader() {
                     {schoolName} | Internal Review Report
                 </div>
                 <div>
-                    {location} | Audit Date: {new Date(auditDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })} | Prepared By: {preparedBy}
+                    {location} | Audit Date: {formatDDMMYYYY(auditDate)} | Prepared By: {preparedBy}
                 </div>
             </div>
 
@@ -97,7 +98,7 @@ export function ReportHeader() {
                             className="w-full rounded-lg border-slate-300 bg-white/90 px-3 py-2 text-sm shadow-sm focus:ring-2 focus:ring-sky-500 outline-none"
                         />
                         <div className="print-only font-bold text-slate-900 border-b border-slate-200 pb-1">
-                            {auditDate ? new Date(auditDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '-'}
+                            {formatDDMMYYYY(auditDate)}
                         </div>
                     </div>
                     <div className="flex-1 min-w-[200px]">

@@ -5,6 +5,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { AppHeader } from '@/components/AppHeader';
 import { Button } from '@/components/ui/button';
+import { formatDDMMYYYY } from '@/utils/dates';
 import { Card, CardContent } from '@/components/ui/card';
 import { Eye, Loader2, CheckCircle, XCircle, Clock } from 'lucide-react';
 
@@ -202,11 +203,7 @@ export default function AdminReportsPage() {
                                             </span>
                                         </td>
                                         <td className="px-6 py-4 text-sm text-slate-600">
-                                            {new Date(report.submittedAt).toLocaleDateString('en-US', {
-                                                month: 'short',
-                                                day: 'numeric',
-                                                year: 'numeric'
-                                            })}
+                                            {formatDDMMYYYY(report.submittedAt)}
                                         </td>
                                         <td className="px-6 py-4">
                                             {report.workflowStatus === 'Draft' && (

@@ -7,6 +7,7 @@ import { AppHeader } from '@/components/AppHeader';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Eye, Loader2, CheckCircle, XCircle, Clock, FileCheck } from 'lucide-react';
+import { formatDDMMYYYY } from '@/utils/dates';
 
 interface ReportListItem {
     _id: string;
@@ -261,11 +262,7 @@ export default function ManagementReportsPage() {
                                             </span>
                                         </td>
                                         <td className="px-6 py-4 text-sm text-slate-600">
-                                            {new Date(report.auditDate).toLocaleDateString('en-US', {
-                                                month: 'short',
-                                                day: 'numeric',
-                                                year: 'numeric'
-                                            })}
+                                            {formatDDMMYYYY(report.auditDate)}
                                         </td>
                                         <td className="px-6 py-4">
                                             {getStatusBadge(report.workflowStatus)}

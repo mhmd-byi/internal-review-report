@@ -9,6 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
 import { Loader2, CheckCircle, XCircle, ArrowLeft, FileText } from 'lucide-react';
 import { IReport } from '@/models/Report';
+import { formatDDMMYYYY } from '@/utils/dates';
 
 export default function AdminReportDetailPage() {
     const { data: session } = useSession();
@@ -141,7 +142,7 @@ export default function AdminReportDetailPage() {
                     <div className="flex-1">
                         <h1 className="text-2xl font-bold text-slate-900">{report.schoolName}</h1>
                         <p className="text-sm text-slate-500">
-                            {report.location} • Submitted {new Date(report.submittedAt!).toLocaleDateString()}
+                            {report.location} • Submitted {formatDDMMYYYY(report.submittedAt)}
                         </p>
                     </div>
 
@@ -176,7 +177,7 @@ export default function AdminReportDetailPage() {
                             <div>
                                 <div className="text-xs text-slate-500 uppercase font-semibold">Audit Date</div>
                                 <div className="text-lg font-semibold text-slate-900">
-                                    {new Date(report.auditDate).toLocaleDateString()}
+                                    {formatDDMMYYYY(report.auditDate)}
                                 </div>
                             </div>
                         </div>
@@ -195,8 +196,8 @@ export default function AdminReportDetailPage() {
                                 <div key={obs.id} className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
                                     {/* Observation Header */}
                                     <div className={`p-4 flex items-center justify-between ${obs.risk === 'High' ? 'bg-red-50 border-b border-red-100' :
-                                            obs.risk === 'Medium' ? 'bg-yellow-50 border-b border-yellow-100' :
-                                                'bg-green-50 border-b border-green-100'
+                                        obs.risk === 'Medium' ? 'bg-yellow-50 border-b border-yellow-100' :
+                                            'bg-green-50 border-b border-green-100'
                                         }`}>
                                         <div className="flex items-center gap-3">
                                             <span className="flex items-center justify-center w-8 h-8 rounded-full bg-white border border-slate-200 text-sm font-bold text-slate-700 shadow-sm">
@@ -210,8 +211,8 @@ export default function AdminReportDetailPage() {
                                                     </span>
                                                     <span className="text-slate-300">•</span>
                                                     <span className={`px-2 py-0.5 text-[10px] uppercase rounded-full font-bold ${obs.risk === 'High' ? 'bg-red-100 text-red-700' :
-                                                            obs.risk === 'Medium' ? 'bg-yellow-100 text-yellow-700' :
-                                                                'bg-green-100 text-green-700'
+                                                        obs.risk === 'Medium' ? 'bg-yellow-100 text-yellow-700' :
+                                                            'bg-green-100 text-green-700'
                                                         }`}>
                                                         {obs.risk} Risk
                                                     </span>
@@ -228,8 +229,8 @@ export default function AdminReportDetailPage() {
                                         </div>
                                         <div className="text-right">
                                             <span className={`px-3 py-1 rounded-full text-xs font-bold border ${obs.status === 'Closed' ? 'bg-green-100 text-green-800 border-green-200' :
-                                                    obs.status === 'In-Progress' ? 'bg-blue-100 text-blue-800 border-blue-200' :
-                                                        'bg-slate-100 text-slate-800 border-slate-200'
+                                                obs.status === 'In-Progress' ? 'bg-blue-100 text-blue-800 border-blue-200' :
+                                                    'bg-slate-100 text-slate-800 border-slate-200'
                                                 }`}>
                                                 {obs.status}
                                             </span>
@@ -284,15 +285,18 @@ export default function AdminReportDetailPage() {
                                                     <div>
                                                         <label className="text-[10px] font-bold text-slate-500 uppercase block mb-1">Target Date</label>
                                                         <p className="text-sm text-slate-800">
-                                                            {obs.targetDate ? new Date(obs.targetDate).toLocaleDateString() : 'N/A'}
+                                                            {formatDDMMYYYY(obs.targetDate)}
                                                         </p>
                                                     </div>
                                                     <div>
                                                         <label className="text-[10px] font-bold text-slate-500 uppercase block mb-1">Responsibility</label>
-                                                        <p className="text-sm text-slate-800">
-                                                            {obs.responsibility}
-                                                            {obs.responsibilityPersonName && ` (${obs.responsibilityPersonName})`}
-                                                        </p>
+                                                        <p className="text-sm text-slate-800 font-bold">{obs.responsibility || 'N/A'}</p>
+                                                        {obs.responsibilityPersonName && (
+                                                            <div className="mt-1">
+                                                                <label className="text-[9px] font-bold text-slate-400 uppercase block">Name</label>
+                                                                <p className="text-xs text-slate-700">{obs.responsibilityPersonName}</p>
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 </div>
 
@@ -409,7 +413,7 @@ export default function AdminReportDetailPage() {
                             <p className="text-sm text-orange-800">{report.declineReason}</p>
                             {report.reviewedByName && (
                                 <p className="text-xs text-orange-600 mt-2">
-                                    Declined by {report.reviewedByName} on {new Date(report.reviewedAt!).toLocaleDateString()}
+                                    Declined by {report.reviewedByName} on {formatDDMMYYYY(report.reviewedAt)}
                                 </p>
                             )}
                         </CardContent>
