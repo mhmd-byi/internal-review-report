@@ -183,35 +183,126 @@ export default function AdminReportDetailPage() {
                     </CardContent>
                 </Card>
 
-                {/* Observations Preview */}
+                {/* Full Report Details */}
                 <Card className="mb-6">
                     <CardContent className="p-6">
-                        <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
-                            <FileText className="w-5 h-5" />
-                            Observations Summary
+                        <h3 className="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2 border-b pb-4">
+                            <FileText className="w-5 h-5 text-indigo-600" />
+                            Full Report Details
                         </h3>
-                        <div className="space-y-3 max-h-[400px] overflow-y-auto">
+                        <div className="space-y-8">
                             {activeObservations.map((obs, idx) => (
-                                <div key={obs.id} className="p-4 bg-slate-50 rounded-lg border border-slate-200">
-                                    <div className="flex items-start gap-3">
-                                        <span className="text-xs font-bold text-slate-500">#{idx + 1}</span>
-                                        <div className="flex-1">
-                                            <div className="flex items-center gap-2 mb-2">
-                                                <h4 className="font-semibold text-slate-900">{obs.title}</h4>
-                                                <span className={`px-2 py-0.5 text-[10px] uppercase rounded-full font-bold ${obs.risk === 'High' ? 'bg-red-100 text-red-700' :
-                                                        obs.risk === 'Medium' ? 'bg-yellow-100 text-yellow-700' :
-                                                            'bg-green-100 text-green-700'
-                                                    }`}>
-                                                    {obs.risk}
-                                                </span>
+                                <div key={obs.id} className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
+                                    {/* Observation Header */}
+                                    <div className={`p-4 flex items-center justify-between ${obs.risk === 'High' ? 'bg-red-50 border-b border-red-100' :
+                                            obs.risk === 'Medium' ? 'bg-yellow-50 border-b border-yellow-100' :
+                                                'bg-green-50 border-b border-green-100'
+                                        }`}>
+                                        <div className="flex items-center gap-3">
+                                            <span className="flex items-center justify-center w-8 h-8 rounded-full bg-white border border-slate-200 text-sm font-bold text-slate-700 shadow-sm">
+                                                {idx + 1}
+                                            </span>
+                                            <div>
+                                                <h4 className="font-bold text-slate-900">{obs.title}</h4>
+                                                <div className="flex items-center gap-2 mt-1">
+                                                    <span className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">
+                                                        {obs.area}
+                                                    </span>
+                                                    <span className="text-slate-300">•</span>
+                                                    <span className={`px-2 py-0.5 text-[10px] uppercase rounded-full font-bold ${obs.risk === 'High' ? 'bg-red-100 text-red-700' :
+                                                            obs.risk === 'Medium' ? 'bg-yellow-100 text-yellow-700' :
+                                                                'bg-green-100 text-green-700'
+                                                        }`}>
+                                                        {obs.risk} Risk
+                                                    </span>
+                                                    {obs.type === 'Financial' && (
+                                                        <>
+                                                            <span className="text-slate-300">•</span>
+                                                            <span className="px-2 py-0.5 text-[10px] uppercase rounded-full font-bold bg-blue-100 text-blue-700">
+                                                                Financial (₹{obs.financialImpact || 0})
+                                                            </span>
+                                                        </>
+                                                    )}
+                                                </div>
                                             </div>
-                                            <div className="text-xs text-slate-600 space-y-1">
-                                                <div><span className="font-semibold">Area:</span> {obs.area}</div>
-                                                {obs.actionPlan && (
-                                                    <div><span className="font-semibold">Action Plan:</span> {obs.actionPlan}</div>
-                                                )}
-                                                {obs.responsibility && (
-                                                    <div><span className="font-semibold">Responsibility:</span> {obs.responsibility}</div>
+                                        </div>
+                                        <div className="text-right">
+                                            <span className={`px-3 py-1 rounded-full text-xs font-bold border ${obs.status === 'Closed' ? 'bg-green-100 text-green-800 border-green-200' :
+                                                    obs.status === 'In-Progress' ? 'bg-blue-100 text-blue-800 border-blue-200' :
+                                                        'bg-slate-100 text-slate-800 border-slate-200'
+                                                }`}>
+                                                {obs.status}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    {/* Observation Content */}
+                                    <div className="p-5 grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div className="space-y-4">
+                                            <div>
+                                                <h5 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Background</h5>
+                                                <p className="text-sm text-slate-700 leading-relaxed bg-slate-50 p-3 rounded-lg border border-slate-100 italic">
+                                                    {obs.background || 'No background information provided.'}
+                                                </p>
+                                            </div>
+                                            <div>
+                                                <h5 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Observation</h5>
+                                                <p className="text-sm text-slate-900 leading-relaxed font-medium">
+                                                    {obs.observation || 'No observation details provided.'}
+                                                </p>
+                                            </div>
+                                            <div>
+                                                <h5 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Recommendation</h5>
+                                                <p className="text-sm text-indigo-900 leading-relaxed bg-indigo-50/50 p-3 rounded-lg border border-indigo-100">
+                                                    {obs.recommendation || 'No recommendation provided.'}
+                                                </p>
+                                            </div>
+                                            <div>
+                                                <h5 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Implication</h5>
+                                                <p className="text-sm text-red-900 leading-relaxed bg-red-50/30 p-3 rounded-lg border border-red-100/50">
+                                                    {obs.implication || 'No implication provided.'}
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        {/* Management Response Section */}
+                                        <div className="bg-slate-50 rounded-xl p-5 border border-slate-200">
+                                            <h5 className="text-sm font-bold text-indigo-900 mb-4 flex items-center gap-2">
+                                                <CheckCircle className="w-4 h-4 text-indigo-600" />
+                                                Management Response
+                                            </h5>
+
+                                            <div className="space-y-4">
+                                                <div>
+                                                    <label className="text-[10px] font-bold text-slate-500 uppercase block mb-1">Action Plan</label>
+                                                    <p className="text-sm text-slate-800 font-medium whitespace-pre-wrap">
+                                                        {obs.actionPlan || 'No action plan provided.'}
+                                                    </p>
+                                                </div>
+
+                                                <div className="grid grid-cols-2 gap-4">
+                                                    <div>
+                                                        <label className="text-[10px] font-bold text-slate-500 uppercase block mb-1">Target Date</label>
+                                                        <p className="text-sm text-slate-800">
+                                                            {obs.targetDate ? new Date(obs.targetDate).toLocaleDateString() : 'N/A'}
+                                                        </p>
+                                                    </div>
+                                                    <div>
+                                                        <label className="text-[10px] font-bold text-slate-500 uppercase block mb-1">Responsibility</label>
+                                                        <p className="text-sm text-slate-800">
+                                                            {obs.responsibility}
+                                                            {obs.responsibilityPersonName && ` (${obs.responsibilityPersonName})`}
+                                                        </p>
+                                                    </div>
+                                                </div>
+
+                                                {obs.reviewerNotes && (
+                                                    <div className="mt-4 pt-4 border-t border-slate-200">
+                                                        <label className="text-[10px] font-bold text-orange-600 uppercase block mb-1">Management Notes for Auditor</label>
+                                                        <p className="text-sm text-slate-700 bg-orange-50 p-3 rounded-lg border border-orange-100 italic font-medium whitespace-pre-wrap">
+                                                            {obs.reviewerNotes}
+                                                        </p>
+                                                    </div>
                                                 )}
                                             </div>
                                         </div>
