@@ -32,6 +32,8 @@ export default function AdminReportDetailPage() {
     const [adminReviewNotes, setAdminReviewNotes] = useState('');
     const [declineReason, setDeclineReason] = useState('');
     const [showDeclineForm, setShowDeclineForm] = useState(false);
+    const [activeRejectionId, setActiveRejectionId] = useState<string | null>(null);
+    const [currentRejectionComment, setCurrentRejectionComment] = useState('');
 
     useEffect(() => {
         fetchReport();
@@ -79,6 +81,71 @@ export default function AdminReportDetailPage() {
             alert('Failed to approve report');
         } finally {
             setActionLoading(false);
+        }
+    };
+
+    const toggleObservationStatus = async (obsId: string) => {
+        if (!report) return;
+
+        const updatedObservations = report.observations.map(o => {
+            if (o.id === obsId) {
+                const newStatus = o.status === 'Closed' ? 'Open' : 'Closed';
+                return { ...o, status: newStatus };
+            }
+            return o;
+        });
+
+        const updatedReport = { ...report, observations: updatedObservations };
+        setReport(updatedReport as any);
+
+        try {
+            const res = await fetch(`/api/reports/${reportId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ observations: updatedObservations }),
+            });
+
+            if (!res.ok) throw new Error('Failed to update status');
+        } catch (error) {
+            console.error('Error updating status:', error);
+            fetchReport(); // Rollback
+        }
+    };
+
+    const updateObservationApproval = async (obsId: string, approvalStatus: 'Approved' | 'Rejected', comment?: string) => {
+        if (!report) return;
+
+        const updatedObservations = report.observations.map(o => {
+            if (o.id === obsId) {
+                return {
+                    ...o,
+                    managementResponseApproval: approvalStatus,
+                    rejectionComment: approvalStatus === 'Rejected' ? (comment || o.rejectionComment) : ''
+                };
+            }
+            return o;
+        });
+
+        const updatedReport = { ...report, observations: updatedObservations };
+        setReport(updatedReport as any);
+
+        try {
+            const res = await fetch(`/api/reports/${reportId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ observations: updatedObservations }),
+            });
+
+            if (!res.ok) throw new Error('Failed to update approval status');
+
+            // Clear comment state if successful
+            if (approvalStatus === 'Rejected') {
+                setActiveRejectionId(null);
+                setCurrentRejectionComment('');
+            }
+        } catch (error) {
+            console.error('Error updating approval status:', error);
+            fetchReport(); // Rollback
         }
     };
 
@@ -302,13 +369,85 @@ export default function AdminReportDetailPage() {
                                                     </div>
 
                                                     {/* Management Response Section */}
-                                                    <div className="bg-slate-50 rounded-xl p-5 border border-slate-200">
-                                                        <h5 className="text-sm font-bold text-indigo-900 mb-4 flex items-center gap-2">
-                                                            <CheckCircle className="w-4 h-4 text-indigo-600" />
-                                                            Management Response
-                                                        </h5>
+                                                    <div className="bg-slate-50 rounded-xl p-5 border border-slate-200 flex flex-col">
+                                                        <div className="flex items-center justify-between mb-4">
+                                                            <h5 className="text-sm font-bold text-indigo-900 flex items-center gap-2">
+                                                                <CheckCircle className="w-4 h-4 text-indigo-600" />
+                                                                Management Response
+                                                            </h5>
 
-                                                        <div className="space-y-4">
+                                                            {/* Approval Buttons */}
+                                                            <div className="flex items-center gap-2">
+                                                                <button
+                                                                    onClick={() => updateObservationApproval(obs.id, 'Approved')}
+                                                                    className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase transition-all ${obs.managementResponseApproval === 'Approved'
+                                                                            ? 'bg-green-600 text-white shadow-lg shadow-green-200'
+                                                                            : 'bg-white text-slate-400 border border-slate-200 hover:border-green-500 hover:text-green-600'
+                                                                        }`}
+                                                                >
+                                                                    <CheckCircle className="w-3 h-3" />
+                                                                    {obs.managementResponseApproval === 'Approved' ? 'Approved' : 'Approve'}
+                                                                </button>
+                                                                <button
+                                                                    onClick={() => {
+                                                                        if (activeRejectionId === obs.id) {
+                                                                            setActiveRejectionId(null);
+                                                                        } else {
+                                                                            setActiveRejectionId(obs.id);
+                                                                            setCurrentRejectionComment(obs.rejectionComment || '');
+                                                                        }
+                                                                    }}
+                                                                    className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase transition-all ${obs.managementResponseApproval === 'Rejected'
+                                                                            ? 'bg-red-600 text-white shadow-lg shadow-red-200'
+                                                                            : 'bg-white text-slate-400 border border-slate-200 hover:border-red-500 hover:text-red-600'
+                                                                        }`}
+                                                                >
+                                                                    <XCircle className="w-3 h-3" />
+                                                                    {obs.managementResponseApproval === 'Rejected' ? 'Rejected' : 'Decline'}
+                                                                </button>
+                                                            </div>
+                                                        </div>
+
+                                                        <div className="space-y-4 flex-1">
+                                                            {/* Rejection Comment Box */}
+                                                            {activeRejectionId === obs.id && (
+                                                                <div className="mb-4 p-3 bg-red-50 border border-red-100 rounded-lg animate-in slide-in-from-top-2 duration-200">
+                                                                    <label className="text-[10px] font-bold text-red-600 uppercase block mb-2">Reason for Decline</label>
+                                                                    <Textarea
+                                                                        value={currentRejectionComment}
+                                                                        onChange={(e) => setCurrentRejectionComment(e.target.value)}
+                                                                        placeholder="Explain why this response is being declined..."
+                                                                        className="text-xs min-h-[80px] mb-2 border-red-200 focus:border-red-400"
+                                                                    />
+                                                                    <div className="flex justify-end gap-2">
+                                                                        <Button
+                                                                            size="sm"
+                                                                            variant="ghost"
+                                                                            className="h-7 text-[10px] hover:bg-red-100 text-red-700"
+                                                                            onClick={() => setActiveRejectionId(null)}
+                                                                        >
+                                                                            Cancel
+                                                                        </Button>
+                                                                        <Button
+                                                                            size="sm"
+                                                                            className="h-7 text-[10px] bg-red-600 hover:bg-red-700"
+                                                                            onClick={() => updateObservationApproval(obs.id, 'Rejected', currentRejectionComment)}
+                                                                            disabled={!currentRejectionComment.trim()}
+                                                                        >
+                                                                            Save Decline
+                                                                        </Button>
+                                                                    </div>
+                                                                </div>
+                                                            )}
+
+                                                            {/* Existing Rejection Comment (if not currently editing) */}
+                                                            {obs.managementResponseApproval === 'Rejected' && activeRejectionId !== obs.id && (
+                                                                <div className="mb-4 p-3 bg-red-50/50 border border-red-100 rounded-lg">
+                                                                    <label className="text-[10px] font-bold text-red-600 uppercase block mb-1">Decline Reason</label>
+                                                                    <p className="text-xs text-red-800 italic">{obs.rejectionComment || 'No reason provided.'}</p>
+                                                                </div>
+                                                            )}
+
                                                             <div>
                                                                 <label className="text-[10px] font-bold text-slate-500 uppercase block mb-1">Action Plan</label>
                                                                 <p className="text-sm text-slate-800 font-medium whitespace-pre-wrap">

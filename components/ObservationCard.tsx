@@ -11,6 +11,7 @@ import { IObservation } from '@/models/Report';
 import { cn } from '@/lib/utils';
 import { getTargetDateFromAudit, formatDDMMYYYY } from '@/utils/dates';
 import { useSession } from 'next-auth/react';
+import { CheckCircle, XCircle } from 'lucide-react';
 
 interface ObservationCardProps {
     observation: IObservation;
@@ -52,10 +53,11 @@ export function ObservationCard({ observation, obsNumber }: ObservationCardProps
         implication,
         actionPlan,
         targetDate,
-        status,
         responsibility,
         responsibilityPersonName,
         reviewerNotes,
+        managementResponseApproval,
+        rejectionComment,
     } = observation;
 
     useEffect(() => {
@@ -419,7 +421,39 @@ export function ObservationCard({ observation, obsNumber }: ObservationCardProps
                         </div>
 
                         <div className="space-y-4 pt-4 border-t border-slate-100">
-                            <h4 className="font-semibold text-slate-900">Management Response</h4>
+                            <div className="flex items-center justify-between">
+                                <h4 className="font-semibold text-slate-900">Management Response</h4>
+                                {managementResponseApproval && managementResponseApproval !== 'Pending' && (
+                                    <div className={cn(
+                                        "flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold uppercase border",
+                                        managementResponseApproval === 'Approved'
+                                            ? "bg-green-50 text-green-700 border-green-100"
+                                            : "bg-red-50 text-red-700 border-red-100"
+                                    )}>
+                                        {managementResponseApproval === 'Approved' ? (
+                                            <><CheckCircle className="w-3.5 h-3.5" /> Approved by Admin</>
+                                        ) : (
+                                            <><XCircle className="w-3.5 h-3.5" /> Declined by Admin</>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Admin Rejection Feedback for Management */}
+                            {managementResponseApproval === 'Rejected' && rejectionComment && (
+                                <div className="p-4 bg-red-50 border border-red-100 rounded-xl animate-in slide-in-from-left-2 duration-300">
+                                    <div className="flex items-center gap-2 mb-2 text-red-800">
+                                        <XCircle className="w-4 h-4" />
+                                        <span className="text-xs font-bold uppercase tracking-wider">Required Correction</span>
+                                    </div>
+                                    <p className="text-sm text-red-900 font-medium italic">
+                                        "{rejectionComment}"
+                                    </p>
+                                    <p className="text-[10px] text-red-600 mt-2 font-semibold">
+                                        Please update your response based on the above feedback.
+                                    </p>
+                                </div>
+                            )}
 
                             <div className="space-y-1">
                                 <label className="text-sm font-medium text-slate-700">Action Plan</label>

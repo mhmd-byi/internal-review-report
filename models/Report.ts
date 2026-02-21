@@ -18,6 +18,8 @@ export interface IObservation {
     responsibility: string;
     responsibilityPersonName?: string;
     reviewerNotes?: string;
+    managementResponseApproval?: 'Pending' | 'Approved' | 'Rejected';
+    rejectionComment?: string;
 }
 
 export interface IReport extends Document {
@@ -63,6 +65,12 @@ const ObservationSchema = new Schema<IObservation>({
     responsibility: { type: String, default: '' },
     responsibilityPersonName: { type: String, default: '' },
     reviewerNotes: { type: String, default: '' },
+    managementResponseApproval: {
+        type: String,
+        enum: ['Pending', 'Approved', 'Rejected'],
+        default: 'Pending'
+    },
+    rejectionComment: { type: String, default: '' },
 }, { _id: false }); // Subdocument, no need for separate _id usually, but can have if needed.
 
 const ReportSchema = new Schema<IReport>({
