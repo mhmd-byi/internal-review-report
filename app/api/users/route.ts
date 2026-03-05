@@ -9,9 +9,9 @@ export async function GET(request: Request) {
     try {
         const session = await getServerSession(authOptions);
 
-        if (!session || (session.user?.role !== 'admin' && session.user?.role !== 'user')) { // Allow basic users to potentially see management list if needed, or strictly admin. Plan said Admin sends.
+        if (!session || (session.user?.role !== 'admin' && session.user?.role !== 'super admin' && session.user?.role !== 'user')) { // Allow basic users to potentially see management list if needed, or strictly admin. Plan said Admin sends.
             // Actually, currently only Admin can access this route.
-            if (session?.user?.role !== 'admin') {
+            if (session?.user?.role !== 'admin' && session?.user?.role !== 'super admin') {
                 return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
             }
         }

@@ -38,7 +38,7 @@ export default function AdminUsersPage() {
     const [editingId, setEditingId] = useState<string | null>(null);
 
     useEffect(() => {
-        if (session?.user?.role !== 'admin') {
+        if (session?.user?.role !== 'admin' && session?.user?.role !== 'super admin') {
             // router.push('/'); // Middleware handles this
         } else {
             fetchUsers();
@@ -145,7 +145,7 @@ export default function AdminUsersPage() {
         }
     };
 
-    if (session?.user?.role !== 'admin') {
+    if (session?.user?.role !== 'admin' && session?.user?.role !== 'super admin') {
         return <div className="p-8 text-center text-red-500">Access Denied. Admins only.</div>;
     }
 
@@ -198,6 +198,7 @@ export default function AdminUsersPage() {
                                             <option value="user">User</option>
                                             <option value="management">Management</option>
                                             <option value="admin">Admin</option>
+                                            <option value="super admin">Super Admin</option>
                                         </Select>
                                     </div>
                                     {/* Responsibility Removed */}
@@ -252,9 +253,10 @@ export default function AdminUsersPage() {
                                                         <td className="p-3">{user.name}</td>
                                                         <td className="p-3">{user.email}</td>
                                                         <td className="p-3 capitalize">
-                                                            <span className={`px-2 py-1 rounded-full text-xs font-semibold ${user.role === 'admin' ? 'bg-purple-100 text-purple-700' :
-                                                                user.role === 'management' ? 'bg-emerald-100 text-emerald-700' :
-                                                                    'bg-blue-100 text-blue-700'
+                                                            <span className={`px-2 py-1 rounded-full text-xs font-semibold ${user.role === 'super admin' ? 'bg-red-100 text-red-700' :
+                                                                user.role === 'admin' ? 'bg-purple-100 text-purple-700' :
+                                                                    user.role === 'management' ? 'bg-emerald-100 text-emerald-700' :
+                                                                        'bg-blue-100 text-blue-700'
                                                                 }`}>
                                                                 {user.role}
                                                             </span>

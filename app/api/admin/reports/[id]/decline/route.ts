@@ -13,7 +13,7 @@ export async function POST(
         await dbConnect();
         const session = await getServerSession(authOptions);
 
-        if (!session || !session.user || session.user.role !== 'admin') {
+        if (!session || !session.user || (session.user.role !== 'admin' && session.user.role !== 'super admin')) {
             return NextResponse.json({ error: 'Unauthorized. Admin access required.' }, { status: 401 });
         }
 

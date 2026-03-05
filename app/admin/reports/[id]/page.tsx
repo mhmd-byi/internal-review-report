@@ -7,7 +7,7 @@ import { AppHeader } from '@/components/AppHeader';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
-import { Loader2, CheckCircle, XCircle, ArrowLeft, FileText } from 'lucide-react';
+import { Loader2, CheckCircle, XCircle, ArrowLeft, FileText, Trash2 } from 'lucide-react';
 import { IReport } from '@/models/Report';
 import { formatDDMMYYYY } from '@/utils/dates';
 
@@ -149,6 +149,30 @@ export default function AdminReportDetailPage() {
         }
     };
 
+    const handleDelete = async () => {
+        if (!confirm('Are you sure you want to delete this report? This action cannot be undone.')) return;
+
+        try {
+            setActionLoading(true);
+            const res = await fetch(`/api/reports/${reportId}`, {
+                method: 'DELETE',
+            });
+            const data = await res.json();
+
+            if (data.success) {
+                alert('Report deleted successfully');
+                router.push('/admin/reports');
+            } else {
+                alert(data.error || 'Failed to delete report');
+            }
+        } catch (error) {
+            console.error('Error deleting report:', error);
+            alert('Failed to delete report');
+        } finally {
+            setActionLoading(false);
+        }
+    };
+
     const handleDecline = async () => {
         if (!declineReason.trim()) {
             alert('Please provide a reason for declining');
@@ -181,7 +205,7 @@ export default function AdminReportDetailPage() {
         }
     };
 
-    if (session?.user?.role !== 'admin') {
+    if (session?.user?.role !== 'admin' && session?.user?.role !== 'super admin') {
         return <div className="p-8 text-center text-red-500">Access Denied</div>;
     }
 
@@ -249,6 +273,19 @@ export default function AdminReportDetailPage() {
                         <span className="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-sm font-semibold">
                             Declined
                         </span>
+                    )}
+
+                    {session?.user?.role === 'super admin' && (
+                        <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={handleDelete}
+                            disabled={actionLoading}
+                            className="ml-2"
+                        >
+                            <Trash2 className="w-4 h-4 mr-1" />
+                            Delete Report
+                        </Button>
                     )}
                 </div>
 

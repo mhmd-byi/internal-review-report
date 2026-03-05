@@ -19,7 +19,7 @@ export async function middleware(req: NextRequest) {
     }
 
     // Admin protection
-    if (pathname.startsWith('/admin') && token.role !== 'admin') {
+    if (pathname.startsWith('/admin') && token.role !== 'admin' && token.role !== 'super admin') {
         const url = req.nextUrl.clone();
         url.pathname = '/';
         return NextResponse.redirect(url);

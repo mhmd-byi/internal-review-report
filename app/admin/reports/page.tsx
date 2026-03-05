@@ -7,7 +7,7 @@ import { AppHeader } from '@/components/AppHeader';
 import { Button } from '@/components/ui/button';
 import { formatDDMMYYYY } from '@/utils/dates';
 import { Card, CardContent } from '@/components/ui/card';
-import { Eye, Loader2, CheckCircle, XCircle, Clock } from 'lucide-react';
+import { Eye, Loader2, CheckCircle, XCircle, Clock, Trash2 } from 'lucide-react';
 
 interface ReportListItem {
     _id: string;
@@ -51,6 +51,30 @@ export default function AdminReportsPage() {
         router.push(`/admin/reports/${reportId}`);
     };
 
+    const handleDeleteReport = async (reportId: string) => {
+        if (!confirm('Are you sure you want to delete this report? This action cannot be undone.')) return;
+
+        try {
+            setLoading(true);
+            const res = await fetch(`/api/reports/${reportId}`, {
+                method: 'DELETE',
+            });
+            const data = await res.json();
+
+            if (data.success) {
+                alert('Report deleted successfully');
+                fetchReports();
+            } else {
+                alert(data.error || 'Failed to delete report');
+            }
+        } catch (error) {
+            console.error('Failed to delete report:', error);
+            alert('Failed to delete report');
+        } finally {
+            setLoading(false);
+        }
+    };
+
     if (status === 'loading') {
         return (
             <div className="min-h-screen bg-slate-50 flex items-center justify-center">
@@ -59,7 +83,7 @@ export default function AdminReportsPage() {
         );
     }
 
-    if (session?.user?.role !== 'admin') {
+    if (session?.user?.role !== 'admin' && session?.user?.role !== 'super admin') {
         return (
             <div className="min-h-screen bg-slate-50">
                 <AppHeader title="Reports Review" />
@@ -237,7 +261,7 @@ export default function AdminReportsPage() {
                                                 </span>
                                             )}
                                         </td>
-                                        <td className="px-6 py-4 text-right">
+                                        <td className="px-6 py-4 text-right flex justify-end gap-2">
                                             <Button
                                                 size="sm"
                                                 variant="outline"
@@ -247,6 +271,17 @@ export default function AdminReportsPage() {
                                                 <Eye className="w-4 h-4 mr-1" />
                                                 Review
                                             </Button>
+
+                                            {session?.user?.role === 'super admin' && (
+                                                <Button
+                                                    size="sm"
+                                                    variant="outline"
+                                                    onClick={() => handleDeleteReport(report._id)}
+                                                    className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                </Button>
+                                            )}
                                         </td>
                                     </tr>
                                 ))}

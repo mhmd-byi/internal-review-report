@@ -6,7 +6,7 @@ export interface IUser extends Document {
     phone: string;
     itsId: string;  // 8-digit numeric ID
     password?: string;
-    role: 'admin' | 'user' | 'management';
+    role: 'admin' | 'user' | 'management' | 'super admin';
     responsibility?: string;
     createdAt: Date;
     updatedAt: Date;
@@ -28,7 +28,7 @@ const UserSchema = new Schema<IUser>({
         }
     },
     password: { type: String, required: true },
-    role: { type: String, enum: ['admin', 'user', 'management'], default: 'user' },
+    role: { type: String, enum: ['admin', 'user', 'management', 'super admin'], default: 'user' },
     responsibility: { type: String },
 }, { timestamps: true });
 

@@ -88,8 +88,8 @@ export async function PUT(
             const report = await Report.findByIdAndUpdate(id, safeUpdates, { new: true });
             return NextResponse.json({ success: true, data: report });
 
-        } else if (session.user.role === 'admin') {
-            // Admin can update everything
+        } else if (session.user.role === 'admin' || session.user.role === 'super admin') {
+            // Admin and Super Admin can update everything
             const report = await Report.findByIdAndUpdate(id, body, { new: true });
             return NextResponse.json({ success: true, data: report });
         } else {
@@ -107,7 +107,11 @@ export async function DELETE(
     { params }: { params: Promise<{ id: string }> }
 ) {
     try {
-        await dbConnect();
+        const session = await getServerSession(authOptions);
+        if (!session || session.user.role !== 'super admin') {
+            return NextResponse.json({ error: 'Unauthorized: Only Super Admin can delete reports' }, { status: 403 });
+        }
+
         const { id } = await params;
         const report = await Report.findByIdAndDelete(id);
 
