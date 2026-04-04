@@ -87,19 +87,34 @@ export function Toolbar() {
                 observations,
                 assignedTo: selectedUserId,
                 assignedToName: selectedUser?.name,
-                workflowStatus: 'Sent to Management'
+                workflowStatus: 'Sent to Management',
+                isDraft: false,
             };
 
-            const response = await fetch('/api/reports', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(reportData),
-            });
+            let response;
+            if (reportId) {
+                // Update the existing saved report instead of creating a duplicate
+                response = await fetch(`/api/reports/${reportId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(reportData),
+                });
+            } else {
+                // No saved report yet — create a new one
+                response = await fetch('/api/reports', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(reportData),
+                });
+            }
 
             if (!response.ok) throw new Error('Failed to send report');
 
             const result = await response.json();
-            setReportId(result.data._id);
+            if (!reportId && result.data?._id) {
+                setReportId(result.data._id);
+                window.history.pushState({}, '', `/report?id=${result.data._id}`);
+            }
             setWorkflowStatus('Sent to Management');
 
             alert(`Report sent to ${selectedUser?.name} successfully!`);
