@@ -43,7 +43,7 @@ export async function GET(request: Request) {
         const isDraftParam = searchParams.get('isDraft');
 
         let query: any = {};
-        if (session.user.role === 'admin') {
+        if (session.user.role === 'admin' || session.user.role === 'super admin') {
             // Admin sees all, but can filter by isDraft
             if (isDraftParam !== null) {
                 query.isDraft = isDraftParam === 'true';
@@ -54,9 +54,9 @@ export async function GET(request: Request) {
             if (isDraftParam !== null) {
                 query.isDraft = isDraftParam === 'true';
             }
-        } else if (session.user.responsibility) {
-            // Regular user responsible for specific area (legacy logic, keep if needed)
-            query = { "observations.responsibility": session.user.responsibility };
+        } else if (session.user.role === 'user') {
+            // Regular auditor sees only their own reports
+            query = { createdBy: session.user.id };
             if (isDraftParam !== null) {
                 query.isDraft = isDraftParam === 'true';
             }
