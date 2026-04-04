@@ -7,7 +7,7 @@ import { AppHeader } from '@/components/AppHeader';
 import { Button } from '@/components/ui/button';
 import { formatDDMMYYYY } from '@/utils/dates';
 import { Card, CardContent } from '@/components/ui/card';
-import { Eye, Loader2, CheckCircle, XCircle, Clock, Trash2 } from 'lucide-react';
+import { Eye, Loader2, CheckCircle, XCircle, Clock, Trash2, FileText } from 'lucide-react';
 
 interface ReportListItem {
     _id: string;
@@ -268,8 +268,17 @@ export default function AdminReportsPage() {
                                                 onClick={() => handleViewReport(report._id)}
                                                 className="text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50"
                                             >
-                                                <Eye className="w-4 h-4 mr-1" />
-                                                Review
+                                                {report.workflowStatus === 'Draft' ? (
+                                                    <>
+                                                        <FileText className="w-4 h-4 mr-1" />
+                                                        Open
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <Eye className="w-4 h-4 mr-1" />
+                                                        Review
+                                                    </>
+                                                )}
                                             </Button>
 
                                             {session?.user?.role === 'super admin' && (

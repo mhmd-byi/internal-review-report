@@ -7,7 +7,7 @@ import { AppHeader } from '@/components/AppHeader';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
-import { Loader2, CheckCircle, XCircle, ArrowLeft, FileText, Trash2 } from 'lucide-react';
+import { Loader2, CheckCircle, XCircle, ArrowLeft, FileText, Trash2, Edit, Printer } from 'lucide-react';
 import { IReport } from '@/models/Report';
 import { formatDDMMYYYY } from '@/utils/dates';
 
@@ -149,6 +149,11 @@ export default function AdminReportDetailPage() {
         }
     };
 
+    const handlePrint = () => {
+        alert("📄 Print Instructions:\n\n1. Select 'Save as PDF' as the destination.\n2. Ensure 'Background graphics' is ENABLED to see the risk colors.\n3. The layout is optimized for A4 paper size.");
+        window.print();
+    };
+
     const handleDelete = async () => {
         if (!confirm('Are you sure you want to delete this report? This action cannot be undone.')) return;
 
@@ -252,6 +257,7 @@ export default function AdminReportDetailPage() {
                         variant="outline"
                         size="sm"
                         onClick={() => router.push('/admin/reports')}
+                        className="print:hidden"
                     >
                         <ArrowLeft className="w-4 h-4 mr-1" />
                         Back to Reports
@@ -264,9 +270,25 @@ export default function AdminReportDetailPage() {
                         </p>
                     </div>
 
+                    {report.workflowStatus === 'Draft' && (
+                        <span className="px-3 py-1 bg-slate-100 text-slate-700 rounded-full text-sm font-semibold">
+                            Saved (Draft)
+                        </span>
+                    )}
+
+                    {report.workflowStatus === 'Sent to Management' && (
+                        <span className="px-3 py-1 bg-sky-100 text-sky-700 rounded-full text-sm font-semibold">
+                            Sent to Management
+                        </span>
+                    )}
                     {report.workflowStatus === 'Submitted by Management' && (
                         <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold">
                             Pending Review
+                        </span>
+                    )}
+                    {report.workflowStatus === 'Approved' && (
+                        <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-semibold">
+                            Approved
                         </span>
                     )}
                     {report.workflowStatus === 'Declined' && (
@@ -275,18 +297,41 @@ export default function AdminReportDetailPage() {
                         </span>
                     )}
 
-                    {session?.user?.role === 'super admin' && (
+                    <div className="flex gap-2 ml-2 print:hidden">
+                        {(report.workflowStatus === 'Draft' || report.workflowStatus === 'Declined') && (
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => router.push(`/report?id=${reportId}`)}
+                                className="text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 border-indigo-200"
+                            >
+                                <Edit className="w-4 h-4 mr-1" />
+                                Edit Report
+                            </Button>
+                        )}
+
                         <Button
-                            variant="destructive"
+                            variant="outline"
                             size="sm"
-                            onClick={handleDelete}
-                            disabled={actionLoading}
-                            className="ml-2"
+                            onClick={handlePrint}
+                            className="text-slate-600 hover:text-slate-700 hover:bg-slate-50 border-slate-200"
                         >
-                            <Trash2 className="w-4 h-4 mr-1" />
-                            Delete Report
+                            <Printer className="w-4 h-4 mr-1" />
+                            Print Report
                         </Button>
-                    )}
+
+                        {session?.user?.role === 'super admin' && (
+                            <Button
+                                variant="destructive"
+                                size="sm"
+                                onClick={handleDelete}
+                                disabled={actionLoading}
+                            >
+                                <Trash2 className="w-4 h-4 mr-1" />
+                                Delete Report
+                            </Button>
+                        )}
+                    </div>
                 </div>
 
                 {/* Report Summary */}
@@ -532,92 +577,94 @@ export default function AdminReportDetailPage() {
                 </Card>
 
                 {/* Admin Review Form */}
-                {(report.workflowStatus === 'Submitted by Management' || report.workflowStatus === 'Declined') && (
-                    <Card className="mb-6">
-                        <CardContent className="p-6">
-                            <h3 className="text-lg font-bold text-slate-900 mb-4">Admin Review</h3>
+                <div className="print:hidden">
+                    {(report.workflowStatus === 'Submitted by Management' || report.workflowStatus === 'Declined') && (
+                        <Card className="mb-6">
+                            <CardContent className="p-6">
+                                <h3 className="text-lg font-bold text-slate-900 mb-4">Admin Review</h3>
 
-                            <div className="space-y-4">
-                                <div>
-                                    <label className="block text-sm font-semibold text-slate-700 mb-2">
-                                        Review Notes (Optional)
-                                    </label>
-                                    <Textarea
-                                        value={adminReviewNotes}
-                                        onChange={(e) => setAdminReviewNotes(e.target.value)}
-                                        placeholder="Add any notes or feedback about this report..."
-                                        className="min-h-[100px]"
-                                    />
-                                </div>
-
-                                {showDeclineForm && (
+                                <div className="space-y-4">
                                     <div>
                                         <label className="block text-sm font-semibold text-slate-700 mb-2">
-                                            Decline Reason <span className="text-red-600">*</span>
+                                            Review Notes (Optional)
                                         </label>
                                         <Textarea
-                                            value={declineReason}
-                                            onChange={(e) => setDeclineReason(e.target.value)}
-                                            placeholder="Explain why this report is being declined..."
-                                            className="min-h-[100px] border-red-200 focus:border-red-400"
+                                            value={adminReviewNotes}
+                                            onChange={(e) => setAdminReviewNotes(e.target.value)}
+                                            placeholder="Add any notes or feedback about this report..."
+                                            className="min-h-[100px]"
                                         />
                                     </div>
-                                )}
 
-                                <div className="flex gap-3 pt-4">
-                                    {!showDeclineForm ? (
-                                        <>
-                                            <Button
-                                                onClick={handleApprove}
-                                                disabled={actionLoading}
-                                                className="bg-green-600 hover:bg-green-700 text-white"
-                                            >
-                                                {actionLoading ? (
-                                                    <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                                                ) : (
-                                                    <CheckCircle className="w-4 h-4 mr-2" />
-                                                )}
-                                                Approve Report
-                                            </Button>
-                                            <Button
-                                                onClick={() => setShowDeclineForm(true)}
-                                                variant="outline"
-                                                className="border-red-300 text-red-700 hover:bg-red-50"
-                                            >
-                                                <XCircle className="w-4 h-4 mr-2" />
-                                                Decline Report
-                                            </Button>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <Button
-                                                onClick={handleDecline}
-                                                disabled={actionLoading || !declineReason.trim()}
-                                                className="bg-red-600 hover:bg-red-700 text-white"
-                                            >
-                                                {actionLoading ? (
-                                                    <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                                                ) : (
-                                                    <XCircle className="w-4 h-4 mr-2" />
-                                                )}
-                                                Confirm Decline
-                                            </Button>
-                                            <Button
-                                                onClick={() => {
-                                                    setShowDeclineForm(false);
-                                                    setDeclineReason('');
-                                                }}
-                                                variant="outline"
-                                            >
-                                                Cancel
-                                            </Button>
-                                        </>
+                                    {showDeclineForm && (
+                                        <div>
+                                            <label className="block text-sm font-semibold text-slate-700 mb-2">
+                                                Decline Reason <span className="text-red-600">*</span>
+                                            </label>
+                                            <Textarea
+                                                value={declineReason}
+                                                onChange={(e) => setDeclineReason(e.target.value)}
+                                                placeholder="Explain why this report is being declined..."
+                                                className="min-h-[100px] border-red-200 focus:border-red-400"
+                                            />
+                                        </div>
                                     )}
+
+                                    <div className="flex gap-3 pt-4">
+                                        {!showDeclineForm ? (
+                                            <>
+                                                <Button
+                                                    onClick={handleApprove}
+                                                    disabled={actionLoading}
+                                                    className="bg-green-600 hover:bg-green-700 text-white"
+                                                >
+                                                    {actionLoading ? (
+                                                        <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                                                    ) : (
+                                                        <CheckCircle className="w-4 h-4 mr-2" />
+                                                    )}
+                                                    Approve Report
+                                                </Button>
+                                                <Button
+                                                    onClick={() => setShowDeclineForm(true)}
+                                                    variant="outline"
+                                                    className="border-red-300 text-red-700 hover:bg-red-50"
+                                                >
+                                                    <XCircle className="w-4 h-4 mr-2" />
+                                                    Decline Report
+                                                </Button>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Button
+                                                    onClick={handleDecline}
+                                                    disabled={actionLoading || !declineReason.trim()}
+                                                    className="bg-red-600 hover:bg-red-700 text-white"
+                                                >
+                                                    {actionLoading ? (
+                                                        <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                                                    ) : (
+                                                        <XCircle className="w-4 h-4 mr-2" />
+                                                    )}
+                                                    Confirm Decline
+                                                </Button>
+                                                <Button
+                                                    onClick={() => {
+                                                        setShowDeclineForm(false);
+                                                        setDeclineReason('');
+                                                    }}
+                                                    variant="outline"
+                                                >
+                                                    Cancel
+                                                </Button>
+                                            </>
+                                        )}
+                                    </div>
                                 </div>
-                            </div>
-                        </CardContent>
-                    </Card>
-                )}
+                            </CardContent>
+                        </Card>
+                    )}
+                </div>
 
                 {/* Previous Decline Info */}
                 {report.declineReason && report.workflowStatus === 'Declined' && (
