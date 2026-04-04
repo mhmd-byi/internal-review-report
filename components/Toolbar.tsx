@@ -61,17 +61,6 @@ export function Toolbar() {
             return;
         }
 
-        // Validate: every non-NA observation with a responsibility must have a person name
-        const missingPersonName = observations.filter(
-            obs => !obs.isNA && obs.responsibility && !obs.responsibilityPersonName?.trim()
-        );
-        if (missingPersonName.length > 0) {
-            const titles = missingPersonName
-                .map((obs, i) => `• ${obs.title?.trim() || `Observation ${i + 1}`}`)
-                .join('\n');
-            alert(`Please fill in the Responsible Person Name for the following observation(s) before sending:\n\n${titles}`);
-            return;
-        }
 
         setIsSending(true);
 
@@ -134,9 +123,9 @@ export function Toolbar() {
             return;
         }
 
-        // Validate: every non-NA observation with a responsibility must have a person name
+        // Validate: every non-NA observation with a responsibility must have a person name (only for Management/Other)
         const missingPersonName = observations.filter(
-            obs => !obs.isNA && obs.responsibility && !obs.responsibilityPersonName?.trim()
+            obs => !obs.isNA && (obs.responsibility === 'Management Committee' || obs.responsibility === 'Other') && !obs.responsibilityPersonName?.trim()
         );
         if (missingPersonName.length > 0) {
             const titles = missingPersonName
