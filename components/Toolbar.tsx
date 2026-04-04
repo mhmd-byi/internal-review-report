@@ -61,6 +61,18 @@ export function Toolbar() {
             return;
         }
 
+        // Validate: every non-NA observation with a responsibility must have a person name
+        const missingPersonName = observations.filter(
+            obs => !obs.isNA && obs.responsibility && !obs.responsibilityPersonName?.trim()
+        );
+        if (missingPersonName.length > 0) {
+            const titles = missingPersonName
+                .map((obs, i) => `• ${obs.title?.trim() || `Observation ${i + 1}`}`)
+                .join('\n');
+            alert(`Please fill in the Responsible Person Name for the following observation(s) before sending:\n\n${titles}`);
+            return;
+        }
+
         setIsSending(true);
 
         try {
@@ -104,6 +116,18 @@ export function Toolbar() {
     const handleSubmitForReview = async () => {
         if (!reportId) {
             alert('Report ID not found. Please save the report first.');
+            return;
+        }
+
+        // Validate: every non-NA observation with a responsibility must have a person name
+        const missingPersonName = observations.filter(
+            obs => !obs.isNA && obs.responsibility && !obs.responsibilityPersonName?.trim()
+        );
+        if (missingPersonName.length > 0) {
+            const titles = missingPersonName
+                .map((obs, i) => `• ${obs.title?.trim() || `Observation ${i + 1}`}`)
+                .join('\n');
+            alert(`Please fill in the Responsible Person Name for the following observation(s) before submitting:\n\n${titles}`);
             return;
         }
 

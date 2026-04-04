@@ -85,7 +85,7 @@ export default function DashboardPage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
                     {/* Create Report Card - Hidden for Management */}
-                    {(session?.user?.role === 'admin' || session?.user?.role === 'user') && (
+                    {(session?.user?.role === 'admin' || session?.user?.role === 'super admin' || session?.user?.role === 'user') && (
                         <Link href="/report" className="block group">
                             <Card className="h-full transition-all hover:shadow-lg hover:border-sky-500 cursor-pointer">
                                 <CardHeader>
@@ -129,7 +129,7 @@ export default function DashboardPage() {
                     )}
 
                     {/* Admin: Manage Users */}
-                    {session?.user?.role === 'admin' && (
+                    {(session?.user?.role === 'admin' || session?.user?.role === 'super admin') && (
                         <>
                             <Link href="/admin/users" className="block group">
                                 <Card className="h-full transition-all hover:shadow-lg hover:border-purple-500 cursor-pointer">
@@ -191,8 +191,8 @@ export default function DashboardPage() {
                     )}
                 </div>
 
-                {/* Saved Reports Section - Admin Only */}
-                {session?.user?.role === 'admin' && (
+                {/* Saved Reports Section - Admin and User */}
+                {(session?.user?.role === 'admin' || session?.user?.role === 'super admin' || session?.user?.role === 'user') && (
                     <div className="space-y-6 mb-8">
                         <h2 className="text-xl font-semibold text-slate-900 flex items-center gap-2">
                             <Save className="w-5 h-5 text-indigo-600" />
@@ -253,8 +253,8 @@ export default function DashboardPage() {
                     </div>
                 )}
 
-                {/* Draft Reports Section - Admin Only */}
-                {session?.user?.role === 'admin' && (
+                {/* Draft Reports Section - Admin and User */}
+                {(session?.user?.role === 'admin' || session?.user?.role === 'super admin' || session?.user?.role === 'user') && (
                     <div className="space-y-6">
                         <h2 className="text-xl font-semibold text-slate-900 flex items-center gap-2">
                             <FilePlus className="w-5 h-5 text-sky-600" />

@@ -481,7 +481,10 @@ export function ObservationCard({ observation, obsNumber }: ObservationCardProps
                                     </div>
                                 </div>
                                 <div className="space-y-1">
-                                    <label className="text-sm font-medium text-slate-700">Responsibility</label>
+                                    <label className="text-sm font-medium text-slate-700">
+                                        Responsibility
+                                        {responsibility && <span className="text-red-500 ml-1">*</span>}
+                                    </label>
                                     <select
                                         className="w-full h-9 rounded-md border border-input bg-white px-3 py-1 text-sm shadow-sm"
                                         value={responsibility}
@@ -499,19 +502,23 @@ export function ObservationCard({ observation, obsNumber }: ObservationCardProps
                                         {responsibility || '-'}
                                     </div>
                                 </div>
-                                {/* Person Name Field - Always show if responsibility is selected */}
+                                {/* Person Name Field - Required when responsibility is selected */}
                                 {responsibility && (
                                     <div className="space-y-1 md:col-span-2">
                                         <label className="text-sm font-medium text-slate-700">
                                             Responsible Person Name
-                                            <span className="text-xs text-slate-500 ml-1">(Please enter name)</span>
+                                            <span className="text-red-500 ml-1">*</span>
                                         </label>
                                         <Input
                                             type="text"
-                                            placeholder="Enter person's name"
+                                            placeholder="Enter person's name (required)"
                                             value={responsibilityPersonName || ''}
                                             onChange={(e) => updateObservation(id, { responsibilityPersonName: e.target.value })}
+                                            className={!responsibilityPersonName?.trim() ? 'border-red-400 focus:ring-red-400 bg-red-50' : ''}
                                         />
+                                        {!responsibilityPersonName?.trim() && (
+                                            <p className="text-xs text-red-500 font-medium mt-0.5">Person name is required</p>
+                                        )}
                                         <div className="print-only font-bold text-slate-900 border-b border-slate-200 pb-1">
                                             {responsibilityPersonName || '-'}
                                         </div>
