@@ -20,7 +20,7 @@ interface ObservationCardProps {
 
 export function ObservationCard({ observation, obsNumber }: ObservationCardProps) {
     const { data: session } = useSession();
-    const { updateObservation, deleteObservation, auditDate, observations } = useReport();
+    const { updateObservation, deleteObservation, auditDate, observations, workflowStatus } = useReport();
     const isManagement = session?.user?.role === 'management';
 
     // ... inside return ...
@@ -59,6 +59,10 @@ export function ObservationCard({ observation, obsNumber }: ObservationCardProps
         managementResponseApproval,
         rejectionComment,
     } = observation;
+
+    // Person name is required only when report is with management AND responsibility is management/others
+    const isNameRequired = (workflowStatus === 'Sent to Management' || workflowStatus === 'Submitted by Management') &&
+        (responsibility === 'Management Committee' || responsibility === 'Other');
 
     useEffect(() => {
         // Function to fetch templates
@@ -483,7 +487,7 @@ export function ObservationCard({ observation, obsNumber }: ObservationCardProps
                                 <div className="space-y-1">
                                     <label className="text-sm font-medium text-slate-700">
                                         Responsibility
-                                        {responsibility && <span className="text-red-500 ml-1">*</span>}
+                                        {isNameRequired && <span className="text-red-500 ml-1">*</span>}
                                     </label>
                                     <select
                                         className="w-full h-9 rounded-md border border-input bg-white px-3 py-1 text-sm shadow-sm"
@@ -511,12 +515,12 @@ export function ObservationCard({ observation, obsNumber }: ObservationCardProps
                                         </label>
                                         <Input
                                             type="text"
-                                            placeholder="Enter person's name (required)"
+                                            placeholder={isNameRequired ? "Enter person's name (required)" : "Enter person's name"}
                                             value={responsibilityPersonName || ''}
                                             onChange={(e) => updateObservation(id, { responsibilityPersonName: e.target.value })}
-                                            className={!responsibilityPersonName?.trim() ? 'border-red-400 focus:ring-red-400 bg-red-50' : ''}
+                                            className={isNameRequired && !responsibilityPersonName?.trim() ? 'border-red-400 focus:ring-red-400 bg-red-50' : ''}
                                         />
-                                        {!responsibilityPersonName?.trim() && (
+                                        {isNameRequired && !responsibilityPersonName?.trim() && (
                                             <p className="text-xs text-red-500 font-medium mt-0.5">Person name is required</p>
                                         )}
                                         <div className="print-only font-bold text-slate-900 border-b border-slate-200 pb-1">
