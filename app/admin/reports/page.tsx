@@ -7,7 +7,7 @@ import { AppHeader } from '@/components/AppHeader';
 import { Button } from '@/components/ui/button';
 import { formatDDMMYYYY } from '@/utils/dates';
 import { Card, CardContent } from '@/components/ui/card';
-import { Eye, Loader2, CheckCircle, XCircle, Clock, Trash2, FileText } from 'lucide-react';
+import { Eye, Loader2, CheckCircle, XCircle, Clock, Trash2, FileText, Edit } from 'lucide-react';
 
 interface ReportListItem {
     _id: string;
@@ -49,6 +49,10 @@ export default function AdminReportsPage() {
 
     const handleViewReport = (reportId: string) => {
         router.push(`/admin/reports/${reportId}`);
+    };
+
+    const handleEditReport = (reportId: string) => {
+        router.push(`/report?id=${reportId}`);
     };
 
     const handleDeleteReport = async (reportId: string) => {
@@ -280,6 +284,18 @@ export default function AdminReportsPage() {
                                                     </>
                                                 )}
                                             </Button>
+
+                                            {session?.user?.role === 'super admin' && (
+                                                <Button
+                                                    size="sm"
+                                                    variant="outline"
+                                                    onClick={() => handleEditReport(report._id)}
+                                                    className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 border-emerald-200"
+                                                >
+                                                    <Edit className="w-4 h-4 mr-1" />
+                                                    Edit
+                                                </Button>
+                                            )}
 
                                             {session?.user?.role === 'super admin' && (
                                                 <Button
