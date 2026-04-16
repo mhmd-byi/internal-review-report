@@ -80,6 +80,8 @@ export async function PUT(
                         targetDate: newObs.targetDate,
                         status: newObs.status,
                         responsibility: newObs.responsibility,
+                        responsibilityPersonName: newObs.responsibilityPersonName,
+                        reviewerNotes: newObs.reviewerNotes,
                     };
                 });
                 safeUpdates.observations = updatedObs;
