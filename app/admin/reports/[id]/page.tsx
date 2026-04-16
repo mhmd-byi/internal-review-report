@@ -298,7 +298,7 @@ export default function AdminReportDetailPage() {
                     )}
 
                     <div className="flex gap-2 ml-2 print:hidden">
-                        {(report.workflowStatus === 'Draft' || report.workflowStatus === 'Declined') && (
+                        {(report.workflowStatus === 'Draft' || report.workflowStatus === 'Declined' || session?.user?.role === 'super admin') && (
                             <Button
                                 variant="outline"
                                 size="sm"
